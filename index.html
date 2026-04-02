@@ -1,0 +1,1519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Whole Book — Every Banned Book Has a Story Worth Telling</title>
+  <meta name="description" content="A counter-database disputing politically motivated book bans. Search any flagged book and discover its real literary value." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Bebas+Neue&display=swap" rel="stylesheet" />
+
+  <style>
+    /* =============================================
+       CSS VARIABLES & RESET
+    ============================================= */
+    :root {
+      --ink: #0a0a0a;
+      --paper: #f5f0e8;
+      --paper-dark: #ede7d5;
+      --red: #c0392b;
+      --red-dark: #922b21;
+      --gold: #d4a017;
+      --white: #fefefe;
+      --gray: #6b6b6b;
+      --border: #0a0a0a;
+      --font-display: 'Bebas Neue', sans-serif;
+      --font-serif: 'Playfair Display', Georgia, serif;
+      --font-mono: 'Space Mono', monospace;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--font-serif);
+      overflow-x: hidden;
+      cursor: default;
+    }
+
+    /* =============================================
+       NOISE TEXTURE OVERLAY
+    ============================================= */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.4;
+    }
+
+    /* =============================================
+       HEADER / NAV
+    ============================================= */
+    .site-header {
+      border-bottom: 3px solid var(--border);
+      background: var(--ink);
+      color: var(--paper);
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .site-logo {
+      font-family: var(--font-display);
+      font-size: clamp(1.4rem, 3vw, 2rem);
+      letter-spacing: 0.05em;
+      color: var(--paper);
+      text-decoration: none;
+      padding: 0.8rem 0;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .site-logo .logo-accent {
+      color: var(--red);
+    }
+
+    .site-logo .logo-mark {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      background: var(--red);
+      border-radius: 50%;
+      margin-right: 4px;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.4); opacity: 0.7; }
+    }
+
+    .site-nav {
+      display: flex;
+      gap: 0;
+    }
+
+    .site-nav a {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--paper);
+      text-decoration: none;
+      padding: 1.1rem 1.2rem;
+      border-left: 1px solid rgba(255,255,255,0.1);
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .site-nav a:hover {
+      background: var(--red);
+      color: var(--white);
+    }
+
+    /* =============================================
+       HERO
+    ============================================= */
+    .hero {
+      min-height: 90vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border-bottom: 3px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-left {
+      background: var(--ink);
+      color: var(--paper);
+      padding: clamp(3rem, 6vw, 6rem) clamp(2rem, 5vw, 5rem);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Diagonal stripe pattern */
+    .hero-left::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        -45deg,
+        transparent,
+        transparent 40px,
+        rgba(192, 57, 43, 0.06) 40px,
+        rgba(192, 57, 43, 0.06) 41px
+      );
+      pointer-events: none;
+    }
+
+    .hero-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--red);
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+
+    .hero-eyebrow::before {
+      content: '';
+      display: block;
+      width: 40px;
+      height: 2px;
+      background: var(--red);
+    }
+
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(4rem, 8vw, 9rem);
+      line-height: 0.9;
+      letter-spacing: 0.02em;
+      margin-bottom: 1.5rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-title .line-accent {
+      color: var(--red);
+      display: block;
+    }
+
+    .hero-title .line-strike {
+      position: relative;
+      display: inline-block;
+    }
+
+    .hero-title .line-strike::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 50%;
+      width: 100%;
+      height: 6px;
+      background: var(--red);
+      transform: translateY(-50%) rotate(-1deg);
+      opacity: 0.7;
+    }
+
+    .hero-subtitle {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: clamp(1rem, 1.8vw, 1.3rem);
+      line-height: 1.6;
+      color: rgba(245, 240, 232, 0.75);
+      max-width: 480px;
+      margin-bottom: 2.5rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-stats {
+      display: flex;
+      gap: 2rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .stat {
+      border-left: 3px solid var(--red);
+      padding-left: 1rem;
+    }
+
+    .stat-number {
+      font-family: var(--font-display);
+      font-size: 2.2rem;
+      color: var(--paper);
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: rgba(245, 240, 232, 0.5);
+      margin-top: 0.2rem;
+    }
+
+    /* RIGHT SIDE — SEARCH */
+    .hero-right {
+      background: var(--paper);
+      padding: clamp(3rem, 6vw, 6rem) clamp(2rem, 5vw, 5rem);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      border-left: 3px solid var(--border);
+      position: relative;
+    }
+
+    .search-label {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gray);
+      margin-bottom: 1rem;
+    }
+
+    .search-wrapper {
+      position: relative;
+      margin-bottom: 1.5rem;
+    }
+
+    .search-input {
+      width: 100%;
+      border: 3px solid var(--ink);
+      background: var(--white);
+      font-family: var(--font-serif);
+      font-size: clamp(1rem, 2vw, 1.25rem);
+      padding: 1rem 5rem 1rem 1.25rem;
+      outline: none;
+      color: var(--ink);
+      transition: border-color 0.2s, box-shadow 0.2s;
+      -webkit-appearance: none;
+      border-radius: 0;
+    }
+
+    .search-input::placeholder {
+      color: #bbb;
+      font-style: italic;
+    }
+
+    .search-input:focus {
+      border-color: var(--red);
+      box-shadow: 4px 4px 0 var(--red);
+    }
+
+    .search-btn {
+      position: absolute;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      width: 4.5rem;
+      background: var(--ink);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+    }
+
+    .search-btn:hover { background: var(--red); }
+
+    .search-btn svg {
+      width: 20px;
+      height: 20px;
+      stroke: var(--paper);
+      fill: none;
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .search-results {
+      min-height: 200px;
+      border: 2px solid var(--paper-dark);
+      background: var(--white);
+      overflow-y: auto;
+      max-height: 420px;
+      transition: border-color 0.2s;
+    }
+
+    .search-results.has-results {
+      border-color: var(--ink);
+    }
+
+    .search-placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 200px;
+      color: var(--gray);
+      text-align: center;
+      padding: 2rem;
+    }
+
+    .search-placeholder-icon {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      opacity: 0.3;
+    }
+
+    .search-placeholder p {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      line-height: 1.8;
+    }
+
+    /* =============================================
+       BOOK CARD (search result)
+    ============================================= */
+    .book-card {
+      border-bottom: 1px solid var(--paper-dark);
+      padding: 1.25rem 1.5rem;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 1rem;
+      align-items: start;
+      cursor: pointer;
+      transition: background 0.15s;
+      animation: slideIn 0.2s ease-out;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .book-card:hover { background: var(--paper); }
+    .book-card:last-child { border-bottom: none; }
+
+    .book-card-title {
+      font-family: var(--font-serif);
+      font-weight: 700;
+      font-size: 1rem;
+      line-height: 1.3;
+      margin-bottom: 0.2rem;
+    }
+
+    .book-card-author {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--gray);
+      letter-spacing: 0.05em;
+    }
+
+    .book-card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+      margin-top: 0.5rem;
+    }
+
+    .tag {
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.2rem 0.5rem;
+      border: 1px solid;
+    }
+
+    .tag-award { border-color: var(--gold); color: var(--gold); }
+    .tag-banned { border-color: var(--red); color: var(--red); }
+    .tag-lgbtq { border-color: #8e44ad; color: #8e44ad; }
+    .tag-race { border-color: #16a085; color: #16a085; }
+
+    .book-card-scores {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0.4rem;
+    }
+
+    .score-pill {
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.3rem 0.6rem;
+      white-space: nowrap;
+    }
+
+    .score-ban {
+      background: var(--red);
+      color: var(--white);
+    }
+
+    .score-real {
+      background: var(--ink);
+      color: var(--paper);
+    }
+
+    /* =============================================
+       LOADING SPINNER
+    ============================================= */
+    .spinner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 200px;
+    }
+
+    .spinner-ring {
+      width: 36px;
+      height: 36px;
+      border: 3px solid var(--paper-dark);
+      border-top-color: var(--ink);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* =============================================
+       BOOK DETAIL MODAL
+    ============================================= */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(10, 10, 10, 0.85);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      backdrop-filter: blur(3px);
+    }
+
+    .modal-overlay.open {
+      display: flex;
+      animation: fadeIn 0.2s ease;
+    }
+
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    .modal {
+      background: var(--paper);
+      border: 3px solid var(--ink);
+      max-width: 780px;
+      width: 100%;
+      max-height: 88vh;
+      overflow-y: auto;
+      position: relative;
+      box-shadow: 8px 8px 0 var(--ink);
+      animation: modalSlide 0.25s ease;
+    }
+
+    @keyframes modalSlide {
+      from { transform: translateY(12px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .modal-header {
+      background: var(--ink);
+      color: var(--paper);
+      padding: 2rem 2.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 1rem;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .modal-title-block {}
+
+    .modal-book-title {
+      font-family: var(--font-display);
+      font-size: clamp(1.6rem, 4vw, 2.5rem);
+      letter-spacing: 0.02em;
+      line-height: 1;
+      margin-bottom: 0.4rem;
+    }
+
+    .modal-book-author {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.12em;
+      color: rgba(245, 240, 232, 0.6);
+      text-transform: uppercase;
+    }
+
+    .modal-close {
+      background: none;
+      border: 2px solid rgba(255,255,255,0.3);
+      color: var(--paper);
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.5rem 0.8rem;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .modal-close:hover {
+      background: var(--red);
+      border-color: var(--red);
+    }
+
+    .modal-body {
+      padding: 2.5rem;
+    }
+
+    /* Two-column verdict */
+    .verdict-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      border: 2px solid var(--ink);
+      margin-bottom: 2rem;
+    }
+
+    .verdict-col {
+      padding: 1.5rem;
+    }
+
+    .verdict-col:first-child {
+      border-right: 2px solid var(--ink);
+      background: #fff5f5;
+    }
+
+    .verdict-col:last-child {
+      background: #f5fff8;
+    }
+
+    .verdict-label {
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 0.6rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .verdict-label.ban { color: var(--red); }
+    .verdict-label.real { color: #1a7a3c; }
+
+    .verdict-label::before {
+      content: '';
+      display: block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    .verdict-rating {
+      font-family: var(--font-display);
+      font-size: 3.5rem;
+      line-height: 1;
+      margin-bottom: 0.3rem;
+    }
+
+    .verdict-col:first-child .verdict-rating { color: var(--red); }
+    .verdict-col:last-child .verdict-rating { color: #1a7a3c; }
+
+    .verdict-source {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--gray);
+      letter-spacing: 0.05em;
+    }
+
+    /* Analysis section */
+    .section-label {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gray);
+      margin-bottom: 0.8rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--paper-dark);
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--paper-dark);
+    }
+
+    .analysis-text {
+      font-family: var(--font-serif);
+      font-size: 1rem;
+      line-height: 1.75;
+      color: var(--ink);
+      margin-bottom: 2rem;
+    }
+
+    .analysis-text p + p {
+      margin-top: 1rem;
+    }
+
+    /* Awards */
+    .awards-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .award-badge {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.35rem 0.7rem;
+      border: 1.5px solid var(--gold);
+      color: var(--ink);
+      background: rgba(212, 160, 23, 0.08);
+    }
+
+    /* Context quote */
+    .context-quote {
+      border-left: 4px solid var(--red);
+      padding: 1rem 1.5rem;
+      background: rgba(192, 57, 43, 0.05);
+      margin-bottom: 2rem;
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 0.95rem;
+      line-height: 1.7;
+      color: var(--ink);
+    }
+
+    .context-quote cite {
+      display: block;
+      font-family: var(--font-mono);
+      font-style: normal;
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--gray);
+      margin-top: 0.6rem;
+    }
+
+    /* AI loader inside modal */
+    .ai-loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem;
+      gap: 1rem;
+    }
+
+    .ai-loading p {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--gray);
+      animation: blink 1.2s ease-in-out infinite;
+    }
+
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+    /* =============================================
+       MARQUEE BANNER
+    ============================================= */
+    .marquee-bar {
+      background: var(--red);
+      color: var(--white);
+      overflow: hidden;
+      border-bottom: 2px solid var(--red-dark);
+      padding: 0.6rem 0;
+    }
+
+    .marquee-track {
+      display: flex;
+      gap: 0;
+      white-space: nowrap;
+      animation: marquee 35s linear infinite;
+    }
+
+    @keyframes marquee {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+
+    .marquee-item {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 0 2.5rem;
+      flex-shrink: 0;
+    }
+
+    .marquee-sep {
+      opacity: 0.4;
+      margin: 0 0.5rem;
+    }
+
+    /* =============================================
+       ABOUT / MISSION SECTION
+    ============================================= */
+    .about-section {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      border-bottom: 3px solid var(--border);
+    }
+
+    .about-sidebar {
+      background: var(--red);
+      color: var(--white);
+      padding: 4rem 3rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      border-right: 3px solid var(--border);
+    }
+
+    .about-sidebar-title {
+      font-family: var(--font-display);
+      font-size: 4rem;
+      line-height: 0.95;
+      letter-spacing: 0.02em;
+      margin-bottom: 2rem;
+    }
+
+    .about-sidebar p {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      line-height: 1.8;
+      text-transform: uppercase;
+      opacity: 0.8;
+    }
+
+    .about-main {
+      padding: 4rem;
+    }
+
+    .about-main h2 {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 4vw, 3.5rem);
+      letter-spacing: 0.03em;
+      line-height: 1;
+      margin-bottom: 1.5rem;
+    }
+
+    .about-main p {
+      font-family: var(--font-serif);
+      font-size: 1.05rem;
+      line-height: 1.8;
+      color: #333;
+      max-width: 620px;
+      margin-bottom: 1.2rem;
+    }
+
+    .about-main strong {
+      color: var(--red);
+    }
+
+    /* =============================================
+       RECENTLY ADDED
+    ============================================= */
+    .recent-section {
+      padding: 5rem 4rem;
+      border-bottom: 3px solid var(--border);
+    }
+
+    .section-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 2.5rem;
+      border-bottom: 3px solid var(--ink);
+      padding-bottom: 1rem;
+    }
+
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 4vw, 3rem);
+      letter-spacing: 0.03em;
+    }
+
+    .section-meta {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--gray);
+    }
+
+    .books-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 0;
+      border: 2px solid var(--ink);
+    }
+
+    .book-tile {
+      padding: 1.8rem;
+      border-right: 2px solid var(--ink);
+      border-bottom: 2px solid var(--ink);
+      cursor: pointer;
+      transition: background 0.15s;
+      position: relative;
+    }
+
+    .book-tile:hover {
+      background: var(--ink);
+      color: var(--paper);
+    }
+
+    .book-tile:hover .book-tile-author { color: rgba(245,240,232,0.6); }
+    .book-tile:hover .book-tile-meta { color: rgba(245,240,232,0.5); }
+    .book-tile:hover .tile-tag { border-color: rgba(245,240,232,0.3); color: rgba(245,240,232,0.7); }
+
+    .book-tile-number {
+      font-family: var(--font-display);
+      font-size: 4rem;
+      color: var(--paper-dark);
+      line-height: 1;
+      margin-bottom: 0.5rem;
+      transition: color 0.15s;
+    }
+
+    .book-tile:hover .book-tile-number { color: rgba(245,240,232,0.1); }
+
+    .book-tile-title {
+      font-family: var(--font-serif);
+      font-weight: 700;
+      font-size: 1.05rem;
+      line-height: 1.3;
+      margin-bottom: 0.3rem;
+    }
+
+    .book-tile-author {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.08em;
+      color: var(--gray);
+      margin-bottom: 0.8rem;
+      transition: color 0.15s;
+    }
+
+    .book-tile-meta {
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--gray);
+      transition: color 0.15s;
+    }
+
+    .tile-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+      margin-top: 0.6rem;
+    }
+
+    .tile-tag {
+      font-family: var(--font-mono);
+      font-size: 0.55rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.2rem 0.4rem;
+      border: 1px solid var(--paper-dark);
+      color: var(--gray);
+      transition: border-color 0.15s, color 0.15s;
+    }
+
+    /* =============================================
+       FOOTER
+    ============================================= */
+    footer {
+      background: var(--ink);
+      color: var(--paper);
+      padding: 3rem 4rem;
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 3rem;
+      border-top: 3px solid var(--border);
+    }
+
+    .footer-brand {
+      font-family: var(--font-display);
+      font-size: 2.5rem;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.8rem;
+    }
+
+    .footer-tagline {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 0.95rem;
+      color: rgba(245,240,232,0.6);
+      line-height: 1.6;
+      max-width: 340px;
+    }
+
+    .footer-col h4 {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--red);
+      margin-bottom: 1rem;
+    }
+
+    .footer-col ul {
+      list-style: none;
+    }
+
+    .footer-col ul li + li { margin-top: 0.5rem; }
+
+    .footer-col ul li a {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.05em;
+      color: rgba(245,240,232,0.6);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .footer-col ul li a:hover { color: var(--paper); }
+
+    .footer-bottom {
+      grid-column: 1 / -1;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      padding-top: 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .footer-bottom p {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      color: rgba(245,240,232,0.35);
+      text-transform: uppercase;
+    }
+
+    /* =============================================
+       RESPONSIVE
+    ============================================= */
+    @media (max-width: 900px) {
+      .hero { grid-template-columns: 1fr; min-height: auto; }
+      .hero-right { border-left: none; border-top: 3px solid var(--border); }
+      .about-section { grid-template-columns: 1fr; }
+      .about-sidebar { border-right: none; border-bottom: 3px solid var(--border); }
+      .about-main { padding: 2.5rem; }
+      footer { grid-template-columns: 1fr; gap: 2rem; }
+      .recent-section { padding: 3rem 2rem; }
+      .site-nav { display: none; }
+      .verdict-grid { grid-template-columns: 1fr; }
+      .verdict-col:first-child { border-right: none; border-bottom: 2px solid var(--ink); }
+    }
+
+    @media (max-width: 600px) {
+      .hero-stats { flex-wrap: wrap; }
+      .modal-body { padding: 1.5rem; }
+      .modal-header { padding: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===== HEADER ===== -->
+  <header class="site-header">
+    <a href="/" class="site-logo">
+      <span class="logo-mark"></span>
+      The <span class="logo-accent">Whole</span> Book
+    </a>
+    <nav class="site-nav">
+      <a href="#search">Search</a>
+      <a href="#about">About</a>
+      <a href="#recently-added">Browse</a>
+      <a href="#contribute">Contribute</a>
+    </nav>
+  </header>
+
+  <!-- ===== HERO ===== -->
+  <section class="hero" id="search">
+    <div class="hero-left">
+      <div class="hero-eyebrow">Counter-Database</div>
+      <h1 class="hero-title">
+        <span>Every</span>
+        <span class="line-accent">Banned</span>
+        <span>Book</span>
+        <span>Tells</span>
+        <span class="line-accent">the</span>
+        <span>Truth</span>
+      </h1>
+      <p class="hero-subtitle">
+        They strip books of context to justify removal. We restore the whole picture — literary value, awards, reader impact, and what these books actually say.
+      </p>
+      <div class="hero-stats">
+        <div class="stat">
+          <div class="stat-number" id="stat-books">0</div>
+          <div class="stat-label">Books Documented</div>
+        </div>
+        <div class="stat">
+          <div class="stat-number" id="stat-states">0</div>
+          <div class="stat-label">States Affected</div>
+        </div>
+        <div class="stat">
+          <div class="stat-number" id="stat-challenged">0</div>
+          <div class="stat-label">Challenges Filed</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-right">
+      <div class="search-label">Search any flagged book</div>
+      <div class="search-wrapper">
+        <input
+          class="search-input"
+          id="searchInput"
+          type="text"
+          placeholder="Title, author, or keyword…"
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <button class="search-btn" id="searchBtn" aria-label="Search">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </button>
+      </div>
+      <div class="search-results" id="searchResults">
+        <div class="search-placeholder">
+          <div class="search-placeholder-icon">📚</div>
+          <p>Search a title above<br/>to see the real story</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== MARQUEE ===== -->
+  <div class="marquee-bar" aria-hidden="true">
+    <div class="marquee-track" id="marqueeTrack">
+      <!-- filled by JS -->
+    </div>
+  </div>
+
+  <!-- ===== ABOUT ===== -->
+  <section class="about-section" id="about">
+    <div class="about-sidebar">
+      <div class="about-sidebar-title">Context<br/>Matters</div>
+      <p>Every excerpt stripped of context. Every keyword flagged without meaning. Every child denied a story that might have saved their life.</p>
+    </div>
+    <div class="about-main">
+      <h2>They Rate. We Respond.</h2>
+      <p>
+        Across America, AI-powered tools are being used to generate book challenge reports — scanning for keywords, producing "ratings," and flooding school districts with paperwork designed to overwhelm librarians and remove books from shelves.
+      </p>
+      <p>
+        <strong>The Whole Book</strong> is a counter-database. For every book flagged by groups like Moms for Liberty and tools like BLOCKADE, we document the full picture: the literary merit, the awards, the professional reviews, the readers whose lives were changed.
+      </p>
+      <p>
+        Because a paragraph torn from its context is not a review. <strong>It's a weapon.</strong> And context is the antidote.
+      </p>
+    </div>
+  </section>
+
+  <!-- ===== RECENTLY ADDED ===== -->
+  <section class="recent-section" id="recently-added">
+    <div class="section-header">
+      <h2 class="section-title">Recently Documented</h2>
+      <span class="section-meta">Latest additions to the database</span>
+    </div>
+    <div class="books-grid" id="recentBooks">
+      <!-- filled by JS -->
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer id="contribute">
+    <div>
+      <div class="footer-brand">The Whole Book</div>
+      <p class="footer-tagline">A counter-database disputing politically motivated book bans across America.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Navigate</h4>
+      <ul>
+        <li><a href="#search">Search Books</a></li>
+        <li><a href="#about">Our Mission</a></li>
+        <li><a href="#recently-added">Browse All</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Resources</h4>
+      <ul>
+        <li><a href="https://www.ala.org/advocacy/bbooks" target="_blank">ALA Banned Books</a></li>
+        <li><a href="https://pen.org/issue/book-bans/" target="_blank">PEN America</a></li>
+        <li><a href="https://www.txftrp.org" target="_blank">TX Freedom to Read</a></li>
+      </ul>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2025 The Whole Book — All books deserve to be read in full</p>
+      <p>Not affiliated with RatedBooks.org</p>
+    </div>
+  </footer>
+
+  <!-- ===== MODAL ===== -->
+  <div class="modal-overlay" id="modalOverlay" role="dialog" aria-modal="true">
+    <div class="modal" id="modal">
+      <div class="modal-header">
+        <div class="modal-title-block">
+          <div class="modal-book-title" id="modalTitle">—</div>
+          <div class="modal-book-author" id="modalAuthor">—</div>
+        </div>
+        <button class="modal-close" id="modalClose">✕ Close</button>
+      </div>
+      <div class="modal-body" id="modalBody">
+        <div class="ai-loading">
+          <div class="spinner-ring"></div>
+          <p>Generating literary analysis…</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =============================================
+       JAVASCRIPT
+  ============================================= -->
+  <script>
+    // =============================================
+    // SAMPLE BOOK DATA
+    // Replace with Supabase queries in production
+    // =============================================
+    const BOOKS = [
+      {
+        id: 1,
+        title: "The Bluest Eye",
+        author: "Toni Morrison",
+        year: 1970,
+        ban_rating: "5/5 — Deviant Content",
+        ban_source: "RatedBooks.org",
+        goodreads_rating: "3.96",
+        awards: ["Nobel Prize in Literature (author)", "American Book Award (author)", "Pulitzer Prize (author)"],
+        tags: ["race", "award"],
+        summary: "Morrison's debut novel examines the devastating effects of white beauty standards on a young Black girl in 1940s Ohio. Widely taught in college literature courses as a foundational text in American literature.",
+        why_banned: "Contains passages depicting abuse and racial trauma. Challengers extract violent/sexual scenes without noting they are portrayed critically to expose — not celebrate — harm.",
+        professional_review: "\"Morrison's first novel is a work of staggering power\" — The New York Times",
+        states_banned: ["Missouri", "Texas", "Virginia", "Tennessee"],
+        age_range: "Ages 16+",
+      },
+      {
+        id: 2,
+        title: "Gender Queer: A Memoir",
+        author: "Maia Kobabe",
+        year: 2019,
+        ban_rating: "5/5 — Pornographic",
+        ban_source: "RatedBooks.org / BLOCKADE Scanner",
+        goodreads_rating: "4.21",
+        awards: ["Alex Award (ALA)", "Stonewall Book Award"],
+        tags: ["lgbtq", "award", "banned"],
+        summary: "A graphic memoir exploring gender identity and sexuality, written for young adults navigating similar questions. Used by school counselors and therapists as a resource for LGBTQ+ teens.",
+        why_banned: "Contains illustrations of the author's own experience with puberty and sexuality. Challengers present select images without noting their autobiographical, non-titillating context.",
+        professional_review: "\"An essential tool for anyone struggling with gender identity\" — School Library Journal",
+        states_banned: ["Virginia", "Texas", "Utah", "Florida", "Missouri"],
+        age_range: "Ages 14+",
+      },
+      {
+        id: 3,
+        title: "The Hate U Give",
+        author: "Angie Thomas",
+        year: 2017,
+        ban_rating: "4/5 — Inflammatory Content",
+        ban_source: "RatedBooks.org",
+        goodreads_rating: "4.46",
+        awards: ["William C. Morris Award", "Coretta Scott King Award (Honor)", "YALSA Best Fiction for Young Adults"],
+        tags: ["race", "award", "banned"],
+        summary: "A YA novel about a Black teenager who witnesses her childhood friend's death at the hands of a police officer and must find her voice. Named one of the most important YA novels of the decade.",
+        why_banned: "Described as 'anti-police' and promoting 'political agendas.' Challengers object to its depiction of systemic racism and its sympathetic portrayal of protest movements.",
+        professional_review: "\"Absolutely riveting\" — John Green. \"A must-read\" — Entertainment Weekly",
+        states_banned: ["Texas", "South Carolina", "Tennessee"],
+        age_range: "Ages 13+",
+      },
+      {
+        id: 4,
+        title: "And Tango Makes Three",
+        author: "Justin Richardson & Peter Parnell",
+        year: 2005,
+        ban_rating: "4/5 — Agenda-Based",
+        ban_source: "RatedBooks.org",
+        goodreads_rating: "4.31",
+        awards: ["Lambda Literary Award"],
+        tags: ["lgbtq", "award", "banned"],
+        summary: "A picture book based on the true story of two male penguins at Central Park Zoo who raised a chick together. Has been the #1 most challenged book in the ALA's list multiple years running.",
+        why_banned: "Depicts a same-sex penguin couple. Challengers argue it promotes homosexuality to children despite the story being a factual account of documented animal behavior.",
+        professional_review: "\"A gentle, honest portrayal of an alternative family\" — Kirkus Reviews",
+        states_banned: ["Texas", "Florida", "Georgia", "Alabama", "Missouri"],
+        age_range: "All ages",
+      },
+      {
+        id: 5,
+        title: "Speak",
+        author: "Laurie Halse Anderson",
+        year: 1999,
+        ban_rating: "4/5 — Sexual Content",
+        ban_source: "RatedBooks.org",
+        goodreads_rating: "3.95",
+        awards: ["National Book Award Finalist", "Printz Award Honor Book"],
+        tags: ["award", "banned"],
+        summary: "A YA novel about a high school freshman who stops speaking after being raped at a party. Widely used in schools to open conversations about sexual assault and trauma. Credited by thousands of teens with helping them find their voice.",
+        why_banned: "Contains depictions of sexual assault. The irony: challengers attempt to silence a book about silencing survivors. Mental health professionals cite the novel as a vital resource.",
+        professional_review: "\"Shattering, funny, and ultimately triumphant\" — The New York Times Book Review",
+        states_banned: ["Texas", "Idaho", "Missouri", "Virginia"],
+        age_range: "Ages 13+",
+      },
+      {
+        id: 6,
+        title: "All Boys Aren't Blue",
+        author: "George M. Johnson",
+        year: 2020,
+        ban_rating: "5/5 — Pornographic",
+        ban_source: "BLOCKADE Scanner / NarraTrue",
+        goodreads_rating: "4.38",
+        awards: ["ALA Rainbow List", "Kirkus Best Books"],
+        tags: ["lgbtq", "race", "banned"],
+        summary: "A memoir-manifesto about growing up as a Black queer person in New Jersey. Written specifically to give Black LGBTQ+ youth a mirror in literature — a representation largely absent in school libraries.",
+        why_banned: "Contains candid descriptions of the author's own sexual experiences. Challengers flag these passages without noting the memoir format or the author's intent to destigmatize and validate queer Black identity.",
+        professional_review: "\"Essential, joyful, and necessary\" — Entertainment Weekly",
+        states_banned: ["Texas", "Florida", "Virginia", "Tennessee", "Kansas"],
+        age_range: "Ages 14+",
+      },
+    ];
+
+    const MARQUEE_TITLES = BOOKS.map(b => b.title);
+
+    // =============================================
+    // COUNTERS ANIMATION
+    // =============================================
+    function animateCount(el, target, duration = 1800) {
+      let start = 0;
+      const step = target / (duration / 16);
+      const timer = setInterval(() => {
+        start += step;
+        if (start >= target) { el.textContent = target.toLocaleString(); clearInterval(timer); }
+        else { el.textContent = Math.floor(start).toLocaleString(); }
+      }, 16);
+    }
+
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        animateCount(document.getElementById('stat-books'), 847);
+        animateCount(document.getElementById('stat-states'), 42);
+        animateCount(document.getElementById('stat-challenged'), 4300);
+      }, 400);
+    });
+
+    // =============================================
+    // MARQUEE
+    // =============================================
+    const marqueeTrack = document.getElementById('marqueeTrack');
+    const allTitles = [...MARQUEE_TITLES, ...MARQUEE_TITLES, ...MARQUEE_TITLES, ...MARQUEE_TITLES];
+    marqueeTrack.innerHTML = allTitles.map(t =>
+      `<span class="marquee-item">${t} <span class="marquee-sep">◆</span></span>`
+    ).join('');
+
+    // =============================================
+    // SEARCH
+    // =============================================
+    const searchInput = document.getElementById('searchInput');
+    const searchBtn = document.getElementById('searchBtn');
+    const searchResults = document.getElementById('searchResults');
+
+    function doSearch(query) {
+      const q = query.toLowerCase().trim();
+      if (!q) {
+        searchResults.classList.remove('has-results');
+        searchResults.innerHTML = `<div class="search-placeholder"><div class="search-placeholder-icon">📚</div><p>Search a title above<br/>to see the real story</p></div>`;
+        return;
+      }
+
+      const results = BOOKS.filter(b =>
+        b.title.toLowerCase().includes(q) ||
+        b.author.toLowerCase().includes(q) ||
+        b.summary.toLowerCase().includes(q) ||
+        (b.awards && b.awards.some(a => a.toLowerCase().includes(q)))
+      );
+
+      if (results.length === 0) {
+        searchResults.classList.remove('has-results');
+        searchResults.innerHTML = `<div class="search-placeholder"><div class="search-placeholder-icon">🔍</div><p>No results found<br/>for "${query}"<br/><br/>This book may not be<br/>in our database yet</p></div>`;
+        return;
+      }
+
+      searchResults.classList.add('has-results');
+      searchResults.innerHTML = results.map(book => `
+        <div class="book-card" onclick="openModal(${book.id})">
+          <div>
+            <div class="book-card-title">${book.title}</div>
+            <div class="book-card-author">by ${book.author} (${book.year})</div>
+            <div class="book-card-tags">
+              ${book.tags.map(t => `<span class="tag tag-${t}">${t}</span>`).join('')}
+              ${book.states_banned.length > 0 ? `<span class="tag tag-banned">Banned in ${book.states_banned.length} states</span>` : ''}
+            </div>
+          </div>
+          <div class="book-card-scores">
+            <span class="score-pill score-ban">${book.ban_rating.split('—')[0].trim()} ban score</span>
+            <span class="score-pill score-real">★ ${book.goodreads_rating} readers</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    searchInput.addEventListener('input', e => doSearch(e.target.value));
+    searchBtn.addEventListener('click', () => doSearch(searchInput.value));
+    searchInput.addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(searchInput.value); });
+
+    // =============================================
+    // RECENT BOOKS GRID
+    // =============================================
+    const recentBooks = document.getElementById('recentBooks');
+    recentBooks.innerHTML = BOOKS.map((book, i) => `
+      <div class="book-tile" onclick="openModal(${book.id})">
+        <div class="book-tile-number">0${i + 1}</div>
+        <div class="book-tile-title">${book.title}</div>
+        <div class="book-tile-author">— ${book.author}</div>
+        <div class="book-tile-meta">Banned in ${book.states_banned.length} states · ${book.age_range}</div>
+        <div class="tile-tags">
+          ${book.tags.map(t => `<span class="tile-tag">${t}</span>`).join('')}
+        </div>
+      </div>
+    `).join('');
+
+    // =============================================
+    // MODAL
+    // =============================================
+    const modalOverlay = document.getElementById('modalOverlay');
+    const modalClose = document.getElementById('modalClose');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalAuthor = document.getElementById('modalAuthor');
+    const modalBody = document.getElementById('modalBody');
+
+    function openModal(id) {
+      const book = BOOKS.find(b => b.id === id);
+      if (!book) return;
+
+      modalTitle.textContent = book.title;
+      modalAuthor.textContent = `by ${book.author} · ${book.year}`;
+      modalOverlay.classList.add('open');
+      document.body.style.overflow = 'hidden';
+
+      // Show loading state
+      modalBody.innerHTML = `
+        <div class="ai-loading">
+          <div class="spinner-ring"></div>
+          <p>Generating literary analysis…</p>
+        </div>
+      `;
+
+      // Call Claude API for literary analysis
+      generateAnalysis(book);
+    }
+
+    async function generateAnalysis(book) {
+      const prompt = `You are a literary critic and intellectual freedom advocate. Write a compelling defense of the book "${book.title}" by ${book.author} (${book.year}).
+
+This book has been flagged by conservative groups with the rating: "${book.ban_rating}"
+
+Write 2 short paragraphs (3-4 sentences each) that:
+1. Explain what the book is ACTUALLY about and its literary/social importance
+2. Explain why the book ban rating misrepresents the book and what the book actually teaches young readers
+
+Be specific, passionate, and cite the book's real value. Do not be preachy. Write in a direct, literary voice.`;
+
+      try {
+        const response = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model: 'claude-sonnet-4-20250514',
+            max_tokens: 1000,
+            messages: [{ role: 'user', content: prompt }]
+          })
+        });
+
+        const data = await response.json();
+        const analysisText = data.content?.[0]?.text || '';
+
+        renderModal(book, analysisText);
+      } catch (err) {
+        renderModal(book, book.summary);
+      }
+    }
+
+    function renderModal(book, aiAnalysis) {
+      // Parse AI text into paragraphs
+      const paragraphs = aiAnalysis.split('\n').filter(p => p.trim().length > 0);
+
+      modalBody.innerHTML = `
+        <!-- Verdict comparison -->
+        <div class="verdict-grid">
+          <div class="verdict-col">
+            <div class="verdict-label ban">Their Rating</div>
+            <div class="verdict-rating">${book.ban_rating.split('/')[0]}/5</div>
+            <div class="verdict-source">${book.ban_source}</div>
+          </div>
+          <div class="verdict-col">
+            <div class="verdict-label real">Reader Rating</div>
+            <div class="verdict-rating">★${book.goodreads_rating}</div>
+            <div class="verdict-source">Goodreads — community of readers</div>
+          </div>
+        </div>
+
+        <!-- Awards -->
+        ${book.awards.length > 0 ? `
+          <div class="section-label">Awards & Recognition</div>
+          <div class="awards-list">
+            ${book.awards.map(a => `<span class="award-badge">🏆 ${a}</span>`).join('')}
+          </div>
+        ` : ''}
+
+        <!-- AI Literary Analysis -->
+        <div class="section-label">Literary Analysis</div>
+        <div class="analysis-text">
+          ${paragraphs.map(p => `<p>${p}</p>`).join('')}
+        </div>
+
+        <!-- Why it's banned -->
+        <div class="section-label">Why They Want It Banned</div>
+        <div class="context-quote">
+          ${book.why_banned}
+          <cite>The Whole Book — Context Analysis</cite>
+        </div>
+
+        <!-- Professional review -->
+        <div class="section-label">Professional Reviews</div>
+        <div class="analysis-text">
+          <p>${book.professional_review}</p>
+        </div>
+
+        <!-- Where banned -->
+        <div class="section-label">States With Active Challenges or Bans</div>
+        <div class="awards-list">
+          ${book.states_banned.map(s => `<span class="award-badge" style="border-color:var(--red);color:var(--red);background:rgba(192,57,43,0.05)">⚠ ${s}</span>`).join('')}
+        </div>
+      `;
+    }
+
+    modalClose.addEventListener('click', closeModal);
+    modalOverlay.addEventListener('click', e => { if (e.target === modalOverlay) closeModal(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+    function closeModal() {
+      modalOverlay.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+  </script>
+</body>
+</html>
