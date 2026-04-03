@@ -3,22 +3,24 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Reviewer Dashboard</title>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <title>Add Book — The Whole Book</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg: #f5f2ee;
-      --surface: #ffffff;
-      --surface2: #faf8f5;
-      --border: #e2ddd7;
-      --accent: #c8622a;
-      --accent-light: rgba(200,98,42,0.1);
-      --text: #1a1714;
-      --muted: #8a8178;
-      --success: #2a7c5a;
-      --error: #c8322a;
+      --bg: #111318;
+      --surface: #1a1d24;
+      --surface2: #20242d;
+      --border: #2e3240;
+      --accent: #e8b86d;
+      --accent-glow: rgba(232,184,109,0.15);
+      --text: #edeef2;
+      --muted: #6b7080;
+      --success: #6fcf97;
+      --error: #eb5757;
+      --pro: #7eb8f7;
+      --rated: #b89df7;
     }
 
     body {
@@ -31,25 +33,26 @@
     }
     body.ready { opacity: 1; }
 
-    /* Nav */
     nav {
-      background: var(--surface);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(17,19,24,0.92);
+      backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border);
       padding: 0 40px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      height: 60px;
+      height: 58px;
     }
 
     .nav-brand {
-      font-family: 'Playfair Display', serif;
-      font-size: 20px;
-      font-weight: 900;
-      letter-spacing: -0.02em;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 22px;
+      font-weight: 700;
       color: var(--text);
     }
-
     .nav-brand span { color: var(--accent); }
 
     .nav-right {
@@ -73,180 +76,90 @@
     }
     .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
 
-    /* Main */
     main {
-      max-width: 960px;
+      max-width: 1100px;
       margin: 0 auto;
-      padding: 48px 24px;
+      padding: 52px 32px 80px;
     }
 
     .page-header {
-      margin-bottom: 40px;
-      display: flex;
-      align-items: flex-end;
-      justify-content: space-between;
+      margin-bottom: 48px;
     }
 
     .page-header h1 {
-      font-family: 'Playfair Display', serif;
-      font-size: 38px;
-      font-weight: 900;
-      letter-spacing: -0.03em;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 48px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
       line-height: 1;
-    }
-
-    .page-header h1 span { color: var(--accent); }
-
-    /* Tabs */
-    .tabs {
-      display: flex;
-      border-bottom: 2px solid var(--border);
-      margin-bottom: 32px;
-      gap: 0;
-    }
-
-    .tab {
-      padding: 12px 28px;
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--muted);
-      cursor: pointer;
-      border-bottom: 2px solid transparent;
-      margin-bottom: -2px;
-      transition: color 0.2s, border-color 0.2s;
-      letter-spacing: 0.02em;
-    }
-
-    .tab.active {
-      color: var(--accent);
-      border-bottom-color: var(--accent);
-    }
-
-    /* Add button */
-    .btn-add {
-      background: var(--accent);
-      color: #fff;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 13px;
-      font-weight: 500;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 2px;
-      cursor: pointer;
-      transition: opacity 0.2s;
-    }
-    .btn-add:hover { opacity: 0.88; }
-
-    /* Review cards */
-    .review-list { display: flex; flex-direction: column; gap: 12px; }
-
-    .review-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 3px;
-      padding: 20px 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      transition: box-shadow 0.2s, border-color 0.2s;
-      animation: slideIn 0.3s ease both;
-    }
-
-    @keyframes slideIn {
-      from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .review-card:hover { border-color: var(--accent); box-shadow: 0 2px 16px rgba(200,98,42,0.08); }
-
-    .card-book { font-weight: 500; font-size: 15px; margin-bottom: 4px; }
-    .card-meta { font-size: 12px; color: var(--muted); }
-
-    .card-actions { display: flex; gap: 8px; flex-shrink: 0; }
-
-    .btn-edit, .btn-delete {
-      font-family: 'DM Sans', sans-serif;
-      font-size: 11px;
-      font-weight: 500;
-      padding: 6px 14px;
-      border-radius: 2px;
-      cursor: pointer;
-      transition: all 0.15s;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-    }
-
-    .btn-edit {
-      background: none;
-      border: 1px solid var(--border);
-      color: var(--text);
-    }
-    .btn-edit:hover { border-color: var(--accent); color: var(--accent); }
-
-    .btn-delete {
-      background: none;
-      border: 1px solid var(--border);
-      color: var(--muted);
-    }
-    .btn-delete:hover { border-color: var(--error); color: var(--error); }
-
-    .empty-state {
-      text-align: center;
-      padding: 60px 24px;
-      color: var(--muted);
-      font-size: 14px;
-      border: 1px dashed var(--border);
-      border-radius: 3px;
-    }
-
-    .empty-state strong {
-      display: block;
-      font-family: 'Playfair Display', serif;
-      font-size: 22px;
-      color: var(--text);
       margin-bottom: 8px;
     }
 
-    /* Modal */
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(26,23,20,0.5);
-      z-index: 100;
-      align-items: center;
-      justify-content: center;
-      backdrop-filter: blur(2px);
-    }
-    .modal-overlay.open { display: flex; }
+    .page-header h1 span { color: var(--accent); }
+    .page-header p { color: var(--muted); font-size: 14px; font-weight: 300; }
 
-    .modal {
+    /* Two-column grid for top row */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .form-full { margin-bottom: 20px; }
+
+    /* Section cards */
+    .section {
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 4px;
-      padding: 36px 40px;
-      width: 100%;
-      max-width: 520px;
-      max-height: 90vh;
-      overflow-y: auto;
-      animation: modalIn 0.25s ease both;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+      padding: 28px 28px 24px;
+      position: relative;
     }
 
-    @keyframes modalIn {
-      from { opacity: 0; transform: scale(0.97) translateY(10px); }
-      to { opacity: 1; transform: scale(1) translateY(0); }
+    .section::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      border-radius: 4px 4px 0 0;
     }
 
-    .modal h2 {
-      font-family: 'Playfair Display', serif;
-      font-size: 24px;
-      font-weight: 700;
-      margin-bottom: 24px;
+    .section.book-section::before   { background: var(--accent); }
+    .section.rated-section::before  { background: var(--rated); }
+    .section.pro-section::before    { background: var(--pro); }
+
+    .section-label {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
-    .field { margin-bottom: 18px; }
+    .section.book-section  .section-label { color: var(--accent); }
+    .section.rated-section .section-label { color: var(--rated); }
+    .section.pro-section   .section-label { color: var(--pro); }
+
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .field { margin-bottom: 16px; }
+    .field:last-child { margin-bottom: 0; }
+
+    .field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
 
     label {
       display: block;
@@ -258,94 +171,112 @@
       margin-bottom: 7px;
     }
 
-    input, textarea, select {
+    .optional {
+      font-size: 10px;
+      font-weight: 400;
+      letter-spacing: 0;
+      text-transform: none;
+      opacity: 0.7;
+      margin-left: 3px;
+    }
+
+    input, textarea {
       width: 100%;
       background: var(--surface2);
       border: 1px solid var(--border);
       border-radius: 2px;
-      padding: 10px 12px;
+      padding: 10px 13px;
       color: var(--text);
       font-family: 'DM Sans', sans-serif;
       font-size: 14px;
       outline: none;
-      transition: border-color 0.2s;
+      transition: border-color 0.2s, box-shadow 0.2s;
     }
-    input:focus, textarea:focus, select:focus { border-color: var(--accent); }
+
+    input:focus, textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
     input::placeholder, textarea::placeholder { color: var(--muted); }
-    textarea { resize: vertical; min-height: 90px; }
+    textarea { resize: vertical; min-height: 100px; line-height: 1.6; }
 
-    .modal-actions {
+    /* Submit */
+    .submit-row {
       display: flex;
-      gap: 10px;
-      margin-top: 28px;
-      justify-content: flex-end;
-    }
-
-    .btn-save {
-      background: var(--accent);
-      color: #fff;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 13px;
-      font-weight: 500;
-      border: none;
-      padding: 10px 24px;
-      border-radius: 2px;
-      cursor: pointer;
-      transition: opacity 0.2s;
-    }
-    .btn-save:hover { opacity: 0.88; }
-    .btn-save:disabled { opacity: 0.5; cursor: not-allowed; }
-
-    .btn-cancel {
-      background: none;
-      border: 1px solid var(--border);
-      color: var(--muted);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 13px;
-      padding: 10px 20px;
-      border-radius: 2px;
-      cursor: pointer;
-    }
-    .btn-cancel:hover { border-color: var(--text); color: var(--text); }
-
-    .form-msg {
-      font-size: 12px;
+      align-items: center;
+      justify-content: space-between;
       margin-top: 12px;
-      text-align: right;
+      padding-top: 28px;
+      border-top: 1px solid var(--border);
     }
-    .form-msg.error { color: var(--error); }
-    .form-msg.success { color: var(--success); }
 
-    /* Book search dropdown */
-    .book-search-wrap { position: relative; }
-    .book-results {
-      position: absolute;
-      top: 100%;
-      left: 0; right: 0;
+    .submit-hint { font-size: 12px; color: var(--muted); font-weight: 300; }
+
+    .btn-submit {
+      background: var(--accent);
+      color: #111318;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      border: none;
+      padding: 13px 36px;
+      border-radius: 2px;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-submit:hover { opacity: 0.88; }
+    .btn-submit:active { transform: scale(0.98); }
+    .btn-submit:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .spinner {
+      display: none;
+      width: 13px; height: 13px;
+      border: 2px solid rgba(17,19,24,0.3);
+      border-top-color: #111318;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .btn-submit.loading .spinner { display: block; }
+    .btn-submit.loading .btn-label { display: none; }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 32px;
+      right: 32px;
       background: var(--surface);
       border: 1px solid var(--border);
-      border-top: none;
-      border-radius: 0 0 2px 2px;
-      max-height: 180px;
-      overflow-y: auto;
-      z-index: 10;
-      display: none;
-    }
-    .book-results.open { display: block; }
-    .book-option {
-      padding: 10px 12px;
-      cursor: pointer;
+      border-radius: 4px;
+      padding: 14px 20px;
       font-size: 13px;
-      transition: background 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      transform: translateY(80px);
+      opacity: 0;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+      z-index: 200;
     }
-    .book-option:hover { background: var(--accent-light); }
-    .book-option small { color: var(--muted); display: block; font-size: 11px; }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast.success { border-color: var(--success); }
+    .toast.error   { border-color: var(--error); }
+    .toast-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .toast.success .toast-dot { background: var(--success); }
+    .toast.error   .toast-dot { background: var(--error); }
 
-    .loading-row {
-      padding: 20px;
-      text-align: center;
-      color: var(--muted);
-      font-size: 13px;
+    @media (max-width: 768px) {
+      .form-grid, .field-row { grid-template-columns: 1fr; }
+      main { padding: 32px 16px 60px; }
+      nav { padding: 0 16px; }
     }
   </style>
 </head>
@@ -360,110 +291,111 @@
 
   <main>
     <div class="page-header">
-      <h1>My <span>Reviews</span></h1>
-      <button class="btn-add" onclick="openModal()">+ New Review</button>
+      <h1>Add a <span>Book</span></h1>
+      <p>Enter book details, rated report, and professional review in one submission.</p>
     </div>
 
-    <div class="tabs">
-      <div class="tab active" onclick="switchTab('pro')" id="tab-pro">Pro Reviews</div>
-      <div class="tab" onclick="switchTab('rated')" id="tab-rated">Rated Reports</div>
+    <!-- Top row: Book Details (left) + Rated Report (right) -->
+    <div class="form-grid">
+
+      <div class="section book-section">
+        <div class="section-label">Book Details</div>
+        <div class="field">
+          <label>Title</label>
+          <input type="text" id="b-title" placeholder="Book title" />
+        </div>
+        <div class="field">
+          <label>Author</label>
+          <input type="text" id="b-author" placeholder="Author name" />
+        </div>
+        <div class="field">
+          <label>ISBN</label>
+          <input type="text" id="b-isbn" placeholder="978-0-000-00000-0" />
+        </div>
+        <div class="field">
+          <label>Cover Art URL <span class="optional">optional</span></label>
+          <input type="url" id="b-cover" placeholder="https://…" />
+        </div>
+      </div>
+
+      <div class="section rated-section">
+        <div class="section-label">Rated Books Report</div>
+        <div class="field">
+          <label>Rating <span class="optional">1–5</span></label>
+          <input type="number" id="r-rating" min="1" max="5" placeholder="e.g. 3" />
+        </div>
+        <div class="field">
+          <label>Flagged Categories <span class="optional">optional</span></label>
+          <input type="text" id="r-flagged" placeholder="e.g. Violence, Language, Sexual Content" />
+        </div>
+        <div class="field">
+          <label>Excerpts <span class="optional">optional</span></label>
+          <textarea id="r-excerpts" placeholder="Notable excerpts from the book…"></textarea>
+        </div>
+        <div class="field">
+          <label>Report URL <span class="optional">optional</span></label>
+          <input type="url" id="r-report-url" placeholder="https://ratedbooks.org/…" />
+        </div>
+      </div>
+
     </div>
 
-    <div id="panel-pro" class="review-list">
-      <div class="loading-row">Loading…</div>
+    <!-- Bottom row: Pro Review (full width) -->
+    <div class="form-full">
+      <div class="section pro-section">
+        <div class="section-label">Professional Review</div>
+        <div class="field-row">
+          <div class="field">
+            <label>Source</label>
+            <input type="text" id="p-source" placeholder="e.g. Publishers Weekly, Booklist, Library Journal" />
+          </div>
+          <div class="field">
+            <label>Award <span class="optional">optional</span></label>
+            <input type="text" id="p-award" placeholder="e.g. Newbery Medal, Pulitzer Prize" />
+          </div>
+        </div>
+        <div class="field">
+          <label>Review Summary</label>
+          <textarea id="p-summary" style="min-height:130px" placeholder="Paste or summarize the professional review here…"></textarea>
+        </div>
+        <div class="field">
+          <label>Review URL <span class="optional">optional</span></label>
+          <input type="url" id="p-url" placeholder="https://…" />
+        </div>
+      </div>
     </div>
-    <div id="panel-rated" class="review-list" style="display:none">
-      <div class="loading-row">Loading…</div>
+
+    <div class="submit-row">
+      <span class="submit-hint">All three records will be saved together.</span>
+      <button class="btn-submit" id="submitBtn" onclick="handleSubmit()">
+        <span class="btn-label">Save Book</span>
+        <div class="spinner"></div>
+      </button>
     </div>
   </main>
 
-  <!-- Modal -->
-  <div class="modal-overlay" id="modalOverlay">
-    <div class="modal">
-      <h2 id="modal-title">New Review</h2>
-
-      <!-- Book search -->
-      <div class="field">
-        <label>Book</label>
-        <div class="book-search-wrap">
-          <input type="text" id="bookSearch" placeholder="Search by title or author…" autocomplete="off" oninput="searchBooks(this.value)"/>
-          <div class="book-results" id="bookResults"></div>
-        </div>
-        <input type="hidden" id="selectedBookId"/>
-      </div>
-
-      <!-- Pro Review fields -->
-      <div id="pro-fields">
-        <div class="field">
-          <label>Source</label>
-          <input type="text" id="f-source" placeholder="e.g. New York Times"/>
-        </div>
-        <div class="field">
-          <label>Summary</label>
-          <textarea id="f-summary" placeholder="Brief summary of the review…"></textarea>
-        </div>
-        <div class="field">
-          <label>URL</label>
-          <input type="url" id="f-url" placeholder="https://…"/>
-        </div>
-        <div class="field">
-          <label>Award</label>
-          <input type="text" id="f-award" placeholder="e.g. Pulitzer Prize (optional)"/>
-        </div>
-      </div>
-
-      <!-- Rated Report fields -->
-      <div id="rated-fields" style="display:none">
-        <div class="field">
-          <label>Rating (1–5)</label>
-          <input type="number" id="f-rating" min="1" max="5" placeholder="1–5"/>
-        </div>
-        <div class="field">
-          <label>Flagged Categories</label>
-          <input type="text" id="f-flagged" placeholder="e.g. Violence, Language"/>
-        </div>
-        <div class="field">
-          <label>Excerpts</label>
-          <textarea id="f-excerpts" placeholder="Notable excerpts…"></textarea>
-        </div>
-        <div class="field">
-          <label>Report URL</label>
-          <input type="url" id="f-report-url" placeholder="https://…"/>
-        </div>
-      </div>
-
-      <div class="modal-actions">
-        <button class="btn-cancel" onclick="closeModal()">Cancel</button>
-        <button class="btn-save" id="saveBtn" onclick="saveReview()">Save</button>
-      </div>
-      <div class="form-msg" id="formMsg"></div>
-    </div>
+  <div class="toast" id="toast">
+    <div class="toast-dot"></div>
+    <span id="toast-msg"></span>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-      // ── CONFIG ── Replace with your actual Supabase project values ──────────
+     // ── CONFIG ── Replace with your actual Supabase project values ──────────
     const SUPABASE_URL = 'https://cqslqfztgtuuidgdkyyz.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_TBJdijzfEaYzBDBeqAy2CA_edJMKfgz';
 
     const { createClient } = supabase;
     const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    let currentTab = 'pro';
-    let editingId   = null;
-    let allBooks    = [];
     let currentUser = null;
 
-    // ── Auth guard ────────────────────────────────────────────────────────
     async function init() {
       const { data: { session } } = await sb.auth.getSession();
       if (!session) { window.location.href = '/login.html'; return; }
       currentUser = session.user;
       document.getElementById('user-email-display').textContent = currentUser.email;
       document.body.classList.add('ready');
-      await loadBooks();
-      loadReviews('pro');
-      loadReviews('rated');
     }
 
     async function handleLogout() {
@@ -471,212 +403,91 @@
       window.location.href = '/login.html';
     }
 
-    // ── Load books for search ─────────────────────────────────────────────
-    async function loadBooks() {
-      const { data } = await sb.from('books').select('id, title, author').order('title');
-      allBooks = data || [];
-    }
+    async function handleSubmit() {
+      const title = document.getElementById('b-title').value.trim();
+      if (!title) { showToast('Please enter a book title.', 'error'); return; }
 
-    function searchBooks(query) {
-      const results = document.getElementById('bookResults');
-      if (!query) { results.classList.remove('open'); return; }
-      const matches = allBooks.filter(b =>
-        b.title.toLowerCase().includes(query.toLowerCase()) ||
-        (b.author || '').toLowerCase().includes(query.toLowerCase())
-      ).slice(0, 8);
+      const btn = document.getElementById('submitBtn');
+      btn.classList.add('loading');
+      btn.disabled = true;
 
-      if (!matches.length) { results.classList.remove('open'); return; }
+      try {
+        // 1. Insert book
+        const { data: book, error: bookErr } = await sb
+          .from('books')
+          .insert({
+            title,
+            author:    document.getElementById('b-author').value.trim() || null,
+            isbn:      document.getElementById('b-isbn').value.trim()   || null,
+            cover_url: document.getElementById('b-cover').value.trim()  || null,
+          })
+          .select('id')
+          .single();
 
-      results.innerHTML = matches.map(b => `
-        <div class="book-option" onclick="selectBook('${b.id}', '${b.title.replace(/'/g,"\\'")}', '${(b.author||'').replace(/'/g,"\\'")}')">
-          ${b.title}
-          <small>${b.author || ''}</small>
-        </div>`).join('');
-      results.classList.add('open');
-    }
+        if (bookErr) throw new Error('Book: ' + bookErr.message);
+        const bookId = book.id;
 
-    function selectBook(id, title, author) {
-      document.getElementById('bookSearch').value = `${title}${author ? ' — ' + author : ''}`;
-      document.getElementById('selectedBookId').value = id;
-      document.getElementById('bookResults').classList.remove('open');
-    }
+        // 2. Insert rated report if any data entered
+        const rating    = document.getElementById('r-rating').value;
+        const flagged   = document.getElementById('r-flagged').value.trim();
+        const excerpts  = document.getElementById('r-excerpts').value.trim();
+        const reportUrl = document.getElementById('r-report-url').value.trim();
 
-    // Close book dropdown on outside click
-    document.addEventListener('click', e => {
-      if (!e.target.closest('.book-search-wrap')) {
-        document.getElementById('bookResults').classList.remove('open');
+        if (rating || flagged || excerpts || reportUrl) {
+          const { error: rErr } = await sb.from('rated_reports').insert({
+            book_id:            bookId,
+            user_id:            currentUser.id,
+            rating:             rating ? parseInt(rating) : null,
+            flagged_categories: flagged   || null,
+            excerpts:           excerpts  || null,
+            report_url:         reportUrl || null,
+          });
+          if (rErr) throw new Error('Rated report: ' + rErr.message);
+        }
+
+        // 3. Insert pro review if any data entered
+        const source  = document.getElementById('p-source').value.trim();
+        const award   = document.getElementById('p-award').value.trim();
+        const summary = document.getElementById('p-summary').value.trim();
+        const proUrl  = document.getElementById('p-url').value.trim();
+
+        if (source || summary || proUrl) {
+          const { error: pErr } = await sb.from('pro_reviews').insert({
+            book_id: bookId,
+            user_id: currentUser.id,
+            source:  source  || null,
+            award:   award   || null,
+            summary: summary || null,
+            url:     proUrl  || null,
+          });
+          if (pErr) throw new Error('Pro review: ' + pErr.message);
+        }
+
+        showToast('Book saved successfully!', 'success');
+        clearForm();
+
+      } catch (err) {
+        showToast(err.message, 'error');
+      } finally {
+        btn.classList.remove('loading');
+        btn.disabled = false;
       }
-    });
-
-    // ── Tabs ──────────────────────────────────────────────────────────────
-    function switchTab(tab) {
-      currentTab = tab;
-      document.getElementById('tab-pro').classList.toggle('active', tab === 'pro');
-      document.getElementById('tab-rated').classList.toggle('active', tab === 'rated');
-      document.getElementById('panel-pro').style.display   = tab === 'pro'   ? 'flex' : 'none';
-      document.getElementById('panel-rated').style.display = tab === 'rated' ? 'flex' : 'none';
-      document.getElementById('panel-pro').style.flexDirection   = 'column';
-      document.getElementById('panel-rated').style.flexDirection = 'column';
-    }
-
-    // ── Load reviews ──────────────────────────────────────────────────────
-    async function loadReviews(type) {
-      const panel = document.getElementById(`panel-${type}`);
-      panel.innerHTML = '<div class="loading-row">Loading…</div>';
-
-      const table = type === 'pro' ? 'pro_reviews' : 'rated_reports';
-      const { data, error } = await sb
-        .from(table)
-        .select('*, books(title, author)')
-        .eq('user_id', currentUser.id)
-        .order('created_at', { ascending: false });
-
-      if (error) { panel.innerHTML = `<div class="loading-row">${error.message}</div>`; return; }
-
-      if (!data.length) {
-        panel.innerHTML = `<div class="empty-state">
-          <strong>No reviews yet</strong>
-          Click "+ New Review" to add your first ${type === 'pro' ? 'pro review' : 'rated report'}.
-        </div>`;
-        return;
-      }
-
-      panel.innerHTML = '';
-      data.forEach(row => {
-        const card = document.createElement('div');
-        card.className = 'review-card';
-        const bookTitle = row.books?.title || 'Unknown Book';
-        const bookAuthor = row.books?.author || '';
-        const meta = type === 'pro'
-          ? `${row.source || 'No source'} ${row.award ? '· ' + row.award : ''}`
-          : `Rating: ${row.rating || '—'} · ${row.flagged_categories || 'No flags'}`;
-
-        card.innerHTML = `
-          <div>
-            <div class="card-book">${bookTitle}</div>
-            <div class="card-meta">${bookAuthor ? bookAuthor + ' · ' : ''}${meta}</div>
-          </div>
-          <div class="card-actions">
-            <button class="btn-edit"   onclick="openEdit('${type}', '${row.id}')">Edit</button>
-            <button class="btn-delete" onclick="deleteReview('${type}', '${row.id}', this)">Delete</button>
-          </div>`;
-        panel.appendChild(card);
-      });
-    }
-
-    // ── Modal ─────────────────────────────────────────────────────────────
-    function openModal(type) {
-      editingId = null;
-      const t = type || currentTab;
-      document.getElementById('modal-title').textContent = t === 'pro' ? 'New Pro Review' : 'New Rated Report';
-      document.getElementById('pro-fields').style.display   = t === 'pro'   ? 'block' : 'none';
-      document.getElementById('rated-fields').style.display = t === 'rated' ? 'block' : 'none';
-      clearForm();
-      document.getElementById('modalOverlay').classList.add('open');
-    }
-
-    async function openEdit(type, id) {
-      editingId = id;
-      const table = type === 'pro' ? 'pro_reviews' : 'rated_reports';
-      const { data } = await sb.from(table).select('*, books(title, author)').eq('id', id).single();
-      if (!data) return;
-
-      // Switch to correct tab form
-      document.getElementById('modal-title').textContent = type === 'pro' ? 'Edit Pro Review' : 'Edit Rated Report';
-      document.getElementById('pro-fields').style.display   = type === 'pro'   ? 'block' : 'none';
-      document.getElementById('rated-fields').style.display = type === 'rated' ? 'block' : 'none';
-
-      // Set book
-      document.getElementById('selectedBookId').value = data.book_id || '';
-      document.getElementById('bookSearch').value = data.books
-        ? `${data.books.title}${data.books.author ? ' — ' + data.books.author : ''}` : '';
-
-      if (type === 'pro') {
-        document.getElementById('f-source').value  = data.source  || '';
-        document.getElementById('f-summary').value = data.summary || '';
-        document.getElementById('f-url').value     = data.url     || '';
-        document.getElementById('f-award').value   = data.award   || '';
-      } else {
-        document.getElementById('f-rating').value      = data.rating             || '';
-        document.getElementById('f-flagged').value     = data.flagged_categories || '';
-        document.getElementById('f-excerpts').value    = data.excerpts           || '';
-        document.getElementById('f-report-url').value  = data.report_url         || '';
-      }
-
-      document.getElementById('modalOverlay').classList.add('open');
-    }
-
-    function closeModal() {
-      document.getElementById('modalOverlay').classList.remove('open');
-      clearForm();
     }
 
     function clearForm() {
-      ['f-source','f-summary','f-url','f-award','f-rating','f-flagged','f-excerpts','f-report-url','bookSearch','selectedBookId'].forEach(id => {
-        document.getElementById(id).value = '';
-      });
-      document.getElementById('formMsg').textContent = '';
-      document.getElementById('bookResults').classList.remove('open');
+      ['b-title','b-author','b-isbn','b-cover',
+       'r-rating','r-flagged','r-excerpts','r-report-url',
+       'p-source','p-award','p-summary','p-url'
+      ].forEach(id => document.getElementById(id).value = '');
     }
 
-    // ── Save ──────────────────────────────────────────────────────────────
-    async function saveReview() {
-      const btn   = document.getElementById('saveBtn');
-      const msg   = document.getElementById('formMsg');
-      const type  = document.getElementById('pro-fields').style.display !== 'none' ? 'pro' : 'rated';
-      const table = type === 'pro' ? 'pro_reviews' : 'rated_reports';
-      const bookId = document.getElementById('selectedBookId').value;
-
-      if (!bookId) { msg.textContent = 'Please select a book.'; msg.className = 'form-msg error'; return; }
-
-      btn.disabled = true;
-      msg.textContent = '';
-
-      let payload = { book_id: bookId, user_id: currentUser.id };
-
-      if (type === 'pro') {
-        payload.source  = document.getElementById('f-source').value.trim();
-        payload.summary = document.getElementById('f-summary').value.trim();
-        payload.url     = document.getElementById('f-url').value.trim();
-        payload.award   = document.getElementById('f-award').value.trim();
-      } else {
-        payload.rating             = parseInt(document.getElementById('f-rating').value) || null;
-        payload.flagged_categories = document.getElementById('f-flagged').value.trim();
-        payload.excerpts           = document.getElementById('f-excerpts').value.trim();
-        payload.report_url         = document.getElementById('f-report-url').value.trim();
-      }
-
-      let error;
-      if (editingId) {
-        ({ error } = await sb.from(table).update(payload).eq('id', editingId));
-      } else {
-        ({ error } = await sb.from(table).insert(payload));
-      }
-
-      btn.disabled = false;
-
-      if (error) {
-        msg.textContent = error.message;
-        msg.className = 'form-msg error';
-      } else {
-        msg.textContent = editingId ? 'Saved!' : 'Review added!';
-        msg.className = 'form-msg success';
-        setTimeout(() => {
-          closeModal();
-          loadReviews(type);
-          switchTab(type);
-        }, 600);
-      }
-    }
-
-    // ── Delete ────────────────────────────────────────────────────────────
-    async function deleteReview(type, id, btn) {
-      if (!confirm('Delete this review? This cannot be undone.')) return;
-      const table = type === 'pro' ? 'pro_reviews' : 'rated_reports';
-      btn.textContent = '…';
-      const { error } = await sb.from(table).delete().eq('id', id);
-      if (error) { alert(error.message); btn.textContent = 'Delete'; return; }
-      loadReviews(type);
+    let toastTimer;
+    function showToast(msg, type) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toast-msg').textContent = msg;
+      toast.className = `toast ${type} show`;
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove('show'), 4000);
     }
 
     init();
