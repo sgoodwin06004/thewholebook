@@ -273,6 +273,61 @@
     .toast.success .toast-dot { background: var(--success); }
     .toast.error   .toast-dot { background: var(--error); }
 
+    /* Multi-review items */
+    .pro-review-item {
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: 20px;
+      margin-bottom: 16px;
+      position: relative;
+      background: var(--surface2);
+      animation: slideIn 0.25s ease both;
+    }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .review-item-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .review-item-num {
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--pro);
+      font-weight: 500;
+    }
+    .btn-remove-review {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 18px;
+      cursor: pointer;
+      line-height: 1;
+      padding: 0 4px;
+      transition: color 0.15s;
+    }
+    .btn-remove-review:hover { color: var(--error); }
+    .btn-add-review {
+      background: none;
+      border: 1px dashed var(--border);
+      color: var(--pro);
+      font-family: "DM Sans", sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      padding: 10px 20px;
+      border-radius: 2px;
+      cursor: pointer;
+      width: 100%;
+      transition: border-color 0.2s, background 0.2s;
+      margin-top: 4px;
+    }
+    .btn-add-review:hover { border-color: var(--pro); background: rgba(126,184,247,0.05); }
+
     @media (max-width: 768px) {
       .form-grid, .field-row { grid-template-columns: 1fr; }
       main { padding: 32px 16px 60px; }
@@ -340,28 +395,12 @@
 
     </div>
 
-    <!-- Bottom row: Pro Review (full width) -->
+    <!-- Bottom row: Pro Reviews (full width, multiple) -->
     <div class="form-full">
       <div class="section pro-section">
-        <div class="section-label">Professional Review</div>
-        <div class="field-row">
-          <div class="field">
-            <label>Source</label>
-            <input type="text" id="p-source" placeholder="e.g. Publishers Weekly, Booklist, Library Journal" />
-          </div>
-          <div class="field">
-            <label>Award <span class="optional">optional</span></label>
-            <input type="text" id="p-award" placeholder="e.g. Newbery Medal, Pulitzer Prize" />
-          </div>
-        </div>
-        <div class="field">
-          <label>Review Summary</label>
-          <textarea id="p-summary" style="min-height:130px" placeholder="Paste or summarize the professional review here…"></textarea>
-        </div>
-        <div class="field">
-          <label>Review URL <span class="optional">optional</span></label>
-          <input type="url" id="p-url" placeholder="https://…" />
-        </div>
+        <div class="section-label">Professional Reviews</div>
+        <div id="pro-reviews-list"></div>
+        <button type="button" class="btn-add-review" onclick="addProReview()">+ Add Another Review</button>
       </div>
     </div>
 
@@ -381,14 +420,53 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-     // ── CONFIG ── Replace with your actual Supabase project values ──────────
-    const SUPABASE_URL = 'https://cqslqfztgtuuidgdkyyz.supabase.co';
-    const SUPABASE_ANON_KEY = 'sb_publishable_TBJdijzfEaYzBDBeqAy2CA_edJMKfgz';
+    const SUPABASE_URL      = 'https://cqslqfztgtuuidgdkyyz.supabase.co';
+    const SUPABASE_ANON_KEY = 'YOUR_ANON_KEY'; // ← replace with your anon key
 
     const { createClient } = supabase;
     const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     let currentUser = null;
+
+    let proReviewCount = 0;
+
+    function addProReview() {
+      proReviewCount++;
+      const idx = proReviewCount;
+      const list = document.getElementById('pro-reviews-list');
+      const div = document.createElement('div');
+      div.className = 'pro-review-item';
+      div.id = 'pro-review-' + idx;
+      div.innerHTML = `
+        <div class="review-item-header">
+          <span class="review-item-num">Review ${idx}</span>
+          ${idx > 1 ? '<button type="button" class="btn-remove-review" onclick="removeProReview(' + idx + ')" title="Remove">×</button>' : ''}
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Source</label>
+            <input type="text" id="p-source-${idx}" placeholder="e.g. Publishers Weekly, Booklist" />
+          </div>
+          <div class="field">
+            <label>Award <span class="optional">optional</span></label>
+            <input type="text" id="p-award-${idx}" placeholder="e.g. Newbery Medal" />
+          </div>
+        </div>
+        <div class="field">
+          <label>Review Summary</label>
+          <textarea id="p-summary-${idx}" style="min-height:110px" placeholder="Paste or summarize the professional review here…"></textarea>
+        </div>
+        <div class="field">
+          <label>Review URL <span class="optional">optional</span></label>
+          <input type="url" id="p-url-${idx}" placeholder="https://…" />
+        </div>`;
+      list.appendChild(div);
+    }
+
+    function removeProReview(idx) {
+      const el = document.getElementById('pro-review-' + idx);
+      if (el) el.remove();
+    }
 
     async function init() {
       const { data: { session } } = await sb.auth.getSession();
@@ -396,6 +474,7 @@
       currentUser = session.user;
       document.getElementById('user-email-display').textContent = currentUser.email;
       document.body.classList.add('ready');
+      addProReview(); // start with one review block
     }
 
     async function handleLogout() {
@@ -445,22 +524,25 @@
           if (rErr) throw new Error('Rated report: ' + rErr.message);
         }
 
-        // 3. Insert pro review if any data entered
-        const source  = document.getElementById('p-source').value.trim();
-        const award   = document.getElementById('p-award').value.trim();
-        const summary = document.getElementById('p-summary').value.trim();
-        const proUrl  = document.getElementById('p-url').value.trim();
-
-        if (source || summary || proUrl) {
-          const { error: pErr } = await sb.from('pro_reviews').insert({
-            book_id: bookId,
-            user_id: currentUser.id,
-            source:  source  || null,
-            award:   award   || null,
-            summary: summary || null,
-            url:     proUrl  || null,
-          });
-          if (pErr) throw new Error('Pro review: ' + pErr.message);
+        // 3. Insert all pro reviews
+        const reviewItems = document.querySelectorAll('.pro-review-item');
+        for (const item of reviewItems) {
+          const idx     = item.id.replace('pro-review-', '');
+          const source  = (document.getElementById('p-source-'  + idx) || {}).value?.trim();
+          const award   = (document.getElementById('p-award-'   + idx) || {}).value?.trim();
+          const summary = (document.getElementById('p-summary-' + idx) || {}).value?.trim();
+          const proUrl  = (document.getElementById('p-url-'     + idx) || {}).value?.trim();
+          if (source || summary || proUrl) {
+            const { error: pErr } = await sb.from('pro_reviews').insert({
+              book_id: bookId,
+              user_id: currentUser.id,
+              source:  source  || null,
+              award:   award   || null,
+              summary: summary || null,
+              url:     proUrl  || null,
+            });
+            if (pErr) throw new Error('Pro review: ' + pErr.message);
+          }
         }
 
         showToast('Book saved successfully!', 'success');
@@ -476,9 +558,12 @@
 
     function clearForm() {
       ['b-title','b-author','b-isbn','b-cover',
-       'r-rating','r-flagged','r-excerpts','r-report-url',
-       'p-source','p-award','p-summary','p-url'
+       'r-rating','r-flagged','r-excerpts','r-report-url'
       ].forEach(id => document.getElementById(id).value = '');
+      // Reset pro reviews back to one empty block
+      document.getElementById('pro-reviews-list').innerHTML = '';
+      proReviewCount = 0;
+      addProReview();
     }
 
     let toastTimer;
