@@ -1,0 +1,24 @@
+{
+  "name": "thewholebook",
+  "version": "1.0.0",
+  "description": "This is an anti-rightwing book banning website.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sgoodwin06004/thewholebook.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/sgoodwin06004/thewholebook/issues"
+  },
+  "homepage": "https://github.com/sgoodwin06004/thewholebook#readme",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.101.1"
+  }
+}
