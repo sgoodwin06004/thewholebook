@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0f;
+      --surface: #13131a;
+      --border: #2a2a3a;
+      --accent: #7c6aff;
+      --accent-glow: rgba(124,106,255,0.2);
+      --text: #e8e8f0;
+      --muted: #666680;
+    }
+
+    body {
+      min-height: 100vh;
+      background: var(--bg);
+      font-family: 'DM Mono', monospace;
+      color: var(--text);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    body.ready { opacity: 1; }
+
+    /* Top nav */
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 32px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    .nav-brand {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 18px;
+      letter-spacing: -0.02em;
+    }
+
+    .nav-brand span {
+      color: var(--accent);
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .logout-btn {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .logout-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* Main content */
+    main {
+      max-width: 900px;
+      margin: 48px auto;
+      padding: 0 32px;
+    }
+
+    .welcome {
+      margin-bottom: 40px;
+    }
+
+    .welcome h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+
+    .welcome p {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    /* User management panel */
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .panel-title {
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .invite-btn {
+      background: var(--accent);
+      color: #fff;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      border: none;
+      padding: 7px 16px;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .invite-btn:hover { opacity: 0.85; }
+
+    /* Invite form */
+    .invite-form {
+      display: none;
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(124,106,255,0.05);
+      gap: 10px;
+      align-items: flex-end;
+    }
+    .invite-form.open { display: flex; }
+
+    .invite-form input {
+      flex: 1;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: 9px 12px;
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      outline: none;
+    }
+    .invite-form input:focus { border-color: var(--accent); }
+    .invite-form input::placeholder { color: var(--muted); }
+
+    .send-btn {
+      background: none;
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 9px 18px;
+      border-radius: 3px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.2s, color 0.2s;
+    }
+    .send-btn:hover { background: var(--accent); color: #fff; }
+
+    .invite-msg {
+      font-size: 11px;
+      padding: 0 24px 12px;
+      display: none;
+    }
+    .invite-msg.error { color: #ff6b6b; display: block; }
+    .invite-msg.success { color: #6bffb8; display: block; }
+
+    /* User list */
+    .user-list {
+      padding: 0;
+    }
+
+    .user-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 24px;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+      transition: background 0.15s;
+    }
+    .user-row:last-child { border-bottom: none; }
+    .user-row:hover { background: rgba(255,255,255,0.02); }
+
+    .user-email { color: var(--text); }
+    .user-meta { color: var(--muted); font-size: 11px; margin-top: 2px; }
+
+    .user-badge {
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 2px;
+    }
+    .badge-confirmed { background: rgba(107,255,184,0.1); color: #6bffb8; border: 1px solid rgba(107,255,184,0.3); }
+    .badge-pending { background: rgba(255,200,100,0.1); color: #ffc864; border: 1px solid rgba(255,200,100,0.3); }
+
+    .empty-state {
+      padding: 32px 24px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    #loading-indicator {
+      padding: 20px 24px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <div class="nav-brand">Admin<span>.</span></div>
+    <div class="nav-right">
+      <span id="user-email-display"></span>
+      <button class="logout-btn" onclick="handleLogout()">Sign Out</button>
+    </div>
+  </nav>
+
+  <main>
+    <div class="welcome">
+      <h1>Dashboard</h1>
+      <p>Manage admin users and site settings.</p>
+    </div>
+
+    <!-- User Management Panel -->
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">Admin Users</span>
+        <button class="invite-btn" onclick="toggleInvite()">+ Invite User</button>
+      </div>
+
+      <div class="invite-form" id="inviteForm">
+        <input type="email" id="inviteEmail" placeholder="colleague@example.com"/>
+        <button class="send-btn" onclick="sendInvite()">Send Invite</button>
+      </div>
+      <div class="invite-msg" id="inviteMsg"></div>
+
+      <div class="user-list" id="userList">
+        <div id="loading-indicator">Loading users…</div>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    // ── CONFIG ── Replace with your actual Supabase project values ──────────
+    const SUPABASE_URL = 'https://cqslqfztgtuuidgdkyyz.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_TBJdijzfEaYzBDBeqAy2CA_edJMKfgz';
+    // ────────────────────────────────────────────────────────────────────────
+
+    const { createClient } = supabase;
+    const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // Auth guard — redirect to login if no session
+    async function init() {
+      const { data: { session } } = await sb.auth.getSession();
+      if (!session) {
+        window.location.href = '/login.html';
+        return;
+      }
+      document.getElementById('user-email-display').textContent = session.user.email;
+      document.body.classList.add('ready');
+      loadUsers();
+    }
+
+    async function handleLogout() {
+      await sb.auth.signOut();
+      window.location.href = '/login.html';
+    }
+
+    // ── User listing via Admin API (requires service role key on server) ──
+    // This calls a Vercel serverless function to list users safely.
+    async function loadUsers() {
+      const list = document.getElementById('userList');
+      try {
+        const res = await fetch('/api/admin/users');
+        if (!res.ok) throw new Error('Could not load users');
+        const { users } = await res.json();
+
+        list.innerHTML = '';
+        if (!users || users.length === 0) {
+          list.innerHTML = '<div class="empty-state">No users found.</div>';
+          return;
+        }
+
+        users.forEach(u => {
+          const row = document.createElement('div');
+          row.className = 'user-row';
+          const confirmed = !!u.email_confirmed_at;
+          row.innerHTML = `
+            <div>
+              <div class="user-email">${u.email}</div>
+              <div class="user-meta">Added ${new Date(u.created_at).toLocaleDateString()}</div>
+            </div>
+            <span class="user-badge ${confirmed ? 'badge-confirmed' : 'badge-pending'}">
+              ${confirmed ? 'Active' : 'Pending'}
+            </span>`;
+          list.appendChild(row);
+        });
+      } catch (e) {
+        list.innerHTML = `<div class="empty-state">${e.message}</div>`;
+      }
+    }
+
+    // ── Invite new user ──────────────────────────────────────────────────
+    function toggleInvite() {
+      const f = document.getElementById('inviteForm');
+      f.classList.toggle('open');
+      if (f.classList.contains('open')) document.getElementById('inviteEmail').focus();
+    }
+
+    async function sendInvite() {
+      const email = document.getElementById('inviteEmail').value.trim();
+      const msgEl = document.getElementById('inviteMsg');
+
+      if (!email) {
+        showInviteMsg('Please enter an email address.', 'error');
+        return;
+      }
+
+      showInviteMsg('Sending invite…', '');
+
+      const res = await fetch('/api/admin/invite', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        showInviteMsg(data.error || 'Failed to invite user.', 'error');
+      } else {
+        showInviteMsg(`Invite sent to ${email}`, 'success');
+        document.getElementById('inviteEmail').value = '';
+        document.getElementById('inviteForm').classList.remove('open');
+        setTimeout(loadUsers, 1500);
+      }
+    }
+
+    function showInviteMsg(text, type) {
+      const el = document.getElementById('inviteMsg');
+      el.textContent = text;
+      el.className = 'invite-msg ' + type;
+    }
+
+    init();
+  </script>
+</body>
+</html>

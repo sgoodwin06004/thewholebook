@@ -217,49 +217,104 @@
     <h1>Sign In</h1>
     <p class="subtitle">Enter your credentials to continue</p>
 
-    <div class="field">
-      <label for="email">Email</label>
-      <input type="email" id="email" placeholder="you@example.com" autocomplete="email"/>
+    <!-- Sign in view -->
+    <div id="view-signin">
+      <div class="field">
+        <label for="email">Email</label>
+        <input type="email" id="email" placeholder="you@example.com" autocomplete="email"/>
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="••••••••" autocomplete="current-password"/>
+      </div>
+      <button class="btn" id="loginBtn" onclick="handleLogin()">
+        <span class="btn-text">Sign In</span>
+        <div class="spinner"></div>
+      </button>
+      <div class="message" id="msg"></div>
+      <hr class="divider"/>
+      <p class="footer-link">
+        Forgot password? <a href="#" onclick="handleReset(event)">Reset via email</a>
+      </p>
     </div>
 
-    <div class="field">
-      <label for="password">Password</label>
-      <input type="password" id="password" placeholder="••••••••" autocomplete="current-password"/>
+    <!-- Set password view (invite / password reset) -->
+    <div id="view-setpassword" style="display:none">
+      <div class="field">
+        <label for="new-password">Choose a Password</label>
+        <input type="password" id="new-password" placeholder="Min. 8 characters" autocomplete="new-password"/>
+      </div>
+      <div class="field">
+        <label for="confirm-password">Confirm Password</label>
+        <input type="password" id="confirm-password" placeholder="Repeat password" autocomplete="new-password"/>
+      </div>
+      <button class="btn" id="setBtn" onclick="handleSetPassword()">
+        <span class="btn-text">Set Password & Sign In</span>
+        <div class="spinner"></div>
+      </button>
+      <div class="message" id="msg2"></div>
     </div>
-
-    <button class="btn" id="loginBtn" onclick="handleLogin()">
-      <span class="btn-text">Sign In</span>
-      <div class="spinner"></div>
-    </button>
-
-    <div class="message" id="msg"></div>
-
-    <hr class="divider"/>
-    <p class="footer-link">
-      Forgot password? <a href="#" onclick="handleReset(event)">Reset via email</a>
-    </p>
   </div>
 
   <!-- Supabase JS -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     // ── CONFIG ── Replace with your actual Supabase project values ──────────
-    const SUPABASE_URL = 'https://cqslqfztgtuuidgdkyyz.supabase.co';
-    const SUPABASE_ANON_KEY = 'sb_publishable_TBJdijzfEaYzBDBeqAy2CA_edJMKfgz';
+    const SUPABASE_URL = 'https://YOUR_PROJECT.supabase.co';
+    const SUPABASE_ANON_KEY = 'YOUR_ANON_KEY';
     // ────────────────────────────────────────────────────────────────────────
 
     const { createClient } = supabase;
     const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // If already logged in, redirect straight to admin
-    sb.auth.getSession().then(({ data }) => {
+    // ── Detect invite / password-reset token in URL hash ──────────────────
+    // Supabase puts #access_token=...&type=invite (or type=recovery) in the URL
+    function getHashParams() {
+      return Object.fromEntries(
+        window.location.hash.slice(1).split('&').map(p => p.split('='))
+      );
+    }
+
+    async function init() {
+      const hash = getHashParams();
+      const type = hash.type; // 'invite' or 'recovery'
+
+      if ((type === 'invite' || type === 'recovery') && hash.access_token) {
+        // Exchange the token so we have a live session
+        const { error } = await sb.auth.setSession({
+          access_token: hash.access_token,
+          refresh_token: hash.refresh_token || ''
+        });
+        if (error) {
+          setMsg(error.message, 'error');
+          return;
+        }
+        // Show set-password view
+        document.getElementById('view-signin').style.display = 'none';
+        document.getElementById('view-setpassword').style.display = 'block';
+        document.querySelector('h1').textContent = type === 'invite' ? 'Set Password' : 'New Password';
+        document.querySelector('.subtitle').textContent = 'Choose a password to activate your account.';
+        // Clear the hash from the URL bar
+        history.replaceState(null, '', window.location.pathname);
+        return;
+      }
+
+      // Normal flow — if already logged in go straight to admin
+      const { data } = await sb.auth.getSession();
       if (data.session) window.location.href = '/admin.html';
-    });
+    }
 
-    const btn = document.getElementById('loginBtn');
-    const msg = document.getElementById('msg');
+    init();
 
+    // ── Sign in ───────────────────────────────────────────────────────────
     function setMsg(text, type) {
+      const msg = document.getElementById('msg');
+      msg.textContent = text;
+      msg.className = 'message ' + type;
+    }
+
+    function setMsg2(text, type) {
+      const msg = document.getElementById('msg2');
       msg.textContent = text;
       msg.className = 'message ' + type;
     }
@@ -267,17 +322,14 @@
     async function handleLogin() {
       const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value;
-
       if (!email || !password) return setMsg('Please fill in all fields.', 'error');
 
-      btn.classList.add('loading');
-      btn.disabled = true;
+      const btn = document.getElementById('loginBtn');
+      btn.classList.add('loading'); btn.disabled = true;
       setMsg('', '');
 
       const { error } = await sb.auth.signInWithPassword({ email, password });
-
-      btn.classList.remove('loading');
-      btn.disabled = false;
+      btn.classList.remove('loading'); btn.disabled = false;
 
       if (error) {
         setMsg(error.message, 'error');
@@ -287,6 +339,28 @@
       }
     }
 
+    // ── Set password (invite / recovery) ─────────────────────────────────
+    async function handleSetPassword() {
+      const pw  = document.getElementById('new-password').value;
+      const pw2 = document.getElementById('confirm-password').value;
+      if (!pw || pw.length < 8) return setMsg2('Password must be at least 8 characters.', 'error');
+      if (pw !== pw2) return setMsg2('Passwords do not match.', 'error');
+
+      const btn = document.getElementById('setBtn');
+      btn.classList.add('loading'); btn.disabled = true;
+
+      const { error } = await sb.auth.updateUser({ password: pw });
+      btn.classList.remove('loading'); btn.disabled = false;
+
+      if (error) {
+        setMsg2(error.message, 'error');
+      } else {
+        setMsg2('Password set! Redirecting…', 'success');
+        setTimeout(() => window.location.href = '/admin.html', 800);
+      }
+    }
+
+    // ── Password reset email ──────────────────────────────────────────────
     async function handleReset(e) {
       e.preventDefault();
       const email = document.getElementById('email').value.trim();
@@ -295,14 +369,16 @@
       const { error } = await sb.auth.resetPasswordForEmail(email, {
         redirectTo: window.location.origin + '/login.html'
       });
-
       if (error) setMsg(error.message, 'error');
       else setMsg('Password reset email sent!', 'success');
     }
 
-    // Allow Enter key to submit
     document.addEventListener('keydown', e => {
-      if (e.key === 'Enter') handleLogin();
+      if (e.key === 'Enter') {
+        const spView = document.getElementById('view-setpassword');
+        if (spView.style.display !== 'none') handleSetPassword();
+        else handleLogin();
+      }
     });
   </script>
 </body>
