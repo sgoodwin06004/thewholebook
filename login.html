@@ -259,7 +259,7 @@
   <!-- Supabase JS -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-      // ── CONFIG ── Replace with your actual Supabase project values ──────────
+   // ── CONFIG ── Replace with your actual Supabase project values ──────────
     const SUPABASE_URL = 'https://cqslqfztgtuuidgdkyyz.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_TBJdijzfEaYzBDBeqAy2CA_edJMKfgz';
     // ────────────────────────────────────────────────────────────────────────
@@ -267,8 +267,21 @@
     const { createClient } = supabase;
     const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+    // ── Role-based redirect ───────────────────────────────────────────────
+    async function redirectByRole() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) return;
+  const { data: profile, error } = await sb
+    .from('profiles')
+    .select('role')
+    .eq('id', session.user.id)
+    .single();
+  console.log('profile:', profile, 'error:', error);
+  const role = profile?.role || 'reviewer';
+  window.location.href = role === 'admin' ? '/admin.html' : '/reviewer.html';
+}
+
     // ── Detect invite / password-reset token in URL hash ──────────────────
-    // Supabase puts #access_token=...&type=invite (or type=recovery) in the URL
     function getHashParams() {
       return Object.fromEntries(
         window.location.hash.slice(1).split('&').map(p => p.split('='))
@@ -277,31 +290,25 @@
 
     async function init() {
       const hash = getHashParams();
-      const type = hash.type; // 'invite' or 'recovery'
+      const type = hash.type;
 
       if ((type === 'invite' || type === 'recovery') && hash.access_token) {
-        // Exchange the token so we have a live session
         const { error } = await sb.auth.setSession({
           access_token: hash.access_token,
           refresh_token: hash.refresh_token || ''
         });
-        if (error) {
-          setMsg(error.message, 'error');
-          return;
-        }
-        // Show set-password view
+        if (error) { setMsg(error.message, 'error'); return; }
         document.getElementById('view-signin').style.display = 'none';
         document.getElementById('view-setpassword').style.display = 'block';
         document.querySelector('h1').textContent = type === 'invite' ? 'Set Password' : 'New Password';
         document.querySelector('.subtitle').textContent = 'Choose a password to activate your account.';
-        // Clear the hash from the URL bar
         history.replaceState(null, '', window.location.pathname);
         return;
       }
 
-      // Normal flow — if already logged in go straight to admin
+      // Already logged in — redirect by role
       const { data } = await sb.auth.getSession();
-      if (data.session) window.location.href = '/admin.html';
+      if (data.session) redirectByRole();
     }
 
     init();
@@ -335,7 +342,7 @@
         setMsg(error.message, 'error');
       } else {
         setMsg('Access granted — redirecting…', 'success');
-        setTimeout(() => window.location.href = '/admin.html', 800);
+        setTimeout(() => redirectByRole(), 800);
       }
     }
 
@@ -356,7 +363,7 @@
         setMsg2(error.message, 'error');
       } else {
         setMsg2('Password set! Redirecting…', 'success');
-        setTimeout(() => window.location.href = '/admin.html', 800);
+        setTimeout(() => redirectByRole(), 800);
       }
     }
 
