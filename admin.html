@@ -226,6 +226,20 @@
       color: var(--muted);
       font-size: 12px;
     }
+
+    .role-select {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      padding: 5px 10px;
+      cursor: pointer;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .role-select:focus { border-color: var(--accent); }
   </style>
 </head>
 <body>
@@ -264,7 +278,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    // ── CONFIG ── Replace with your actual Supabase project values ──────────
+      // ── CONFIG ── Replace with your actual Supabase project values ──────────
     const SUPABASE_URL = 'https://cqslqfztgtuuidgdkyyz.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_TBJdijzfEaYzBDBeqAy2CA_edJMKfgz';
     // ────────────────────────────────────────────────────────────────────────
@@ -289,12 +303,19 @@
       window.location.href = '/login.html';
     }
 
-    // ── User listing via Admin API (requires service role key on server) ──
-    // This calls a Vercel serverless function to list users safely.
+    // ── User listing ─────────────────────────────────────────────────────
+    async function getToken() {
+      const { data } = await sb.auth.getSession();
+      return data.session?.access_token;
+    }
+
     async function loadUsers() {
       const list = document.getElementById('userList');
       try {
-        const res = await fetch('/api/admin/users');
+        const token = await getToken();
+        const res = await fetch('/api/admin/users', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
         if (!res.ok) throw new Error('Could not load users');
         const { users } = await res.json();
 
@@ -308,19 +329,41 @@
           const row = document.createElement('div');
           row.className = 'user-row';
           const confirmed = !!u.email_confirmed_at;
+          const role = u.role || 'reviewer';
           row.innerHTML = `
             <div>
               <div class="user-email">${u.email}</div>
               <div class="user-meta">Added ${new Date(u.created_at).toLocaleDateString()}</div>
             </div>
-            <span class="user-badge ${confirmed ? 'badge-confirmed' : 'badge-pending'}">
-              ${confirmed ? 'Active' : 'Pending'}
-            </span>`;
+            <div style="display:flex;align-items:center;gap:10px">
+              <select class="role-select" data-id="${u.id}" onchange="updateRole(this)">
+                <option value="reviewer" ${role === 'reviewer' ? 'selected' : ''}>Reviewer</option>
+                <option value="admin"    ${role === 'admin'    ? 'selected' : ''}>Admin</option>
+              </select>
+              <span class="user-badge ${confirmed ? 'badge-confirmed' : 'badge-pending'}">
+                ${confirmed ? 'Active' : 'Pending'}
+              </span>
+            </div>`;
           list.appendChild(row);
         });
       } catch (e) {
         list.innerHTML = `<div class="empty-state">${e.message}</div>`;
       }
+    }
+
+    async function updateRole(select) {
+      const userId = select.dataset.id;
+      const role   = select.value;
+      const token  = await getToken();
+
+      const res = await fetch('/api/admin/set-role', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ userId, role })
+      });
+
+      const data = await res.json();
+      if (!res.ok) alert('Error: ' + data.error);
     }
 
     // ── Invite new user ──────────────────────────────────────────────────
@@ -334,21 +377,18 @@
       const email = document.getElementById('inviteEmail').value.trim();
       const msgEl = document.getElementById('inviteMsg');
 
-      if (!email) {
-        showInviteMsg('Please enter an email address.', 'error');
-        return;
-      }
+      if (!email) { showInviteMsg('Please enter an email address.', 'error'); return; }
 
       showInviteMsg('Sending invite…', '');
+      const token = await getToken();
 
       const res = await fetch('/api/admin/invite', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ email })
       });
 
       const data = await res.json();
-
       if (!res.ok) {
         showInviteMsg(data.error || 'Failed to invite user.', 'error');
       } else {
