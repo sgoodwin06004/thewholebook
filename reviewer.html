@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Reviewer Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f5f2ee;
+      --surface: #ffffff;
+      --surface2: #faf8f5;
+      --border: #e2ddd7;
+      --accent: #c8622a;
+      --accent-light: rgba(200,98,42,0.1);
+      --text: #1a1714;
+      --muted: #8a8178;
+      --success: #2a7c5a;
+      --error: #c8322a;
+    }
+
+    body {
+      min-height: 100vh;
+      background: var(--bg);
+      font-family: 'DM Sans', sans-serif;
+      color: var(--text);
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+    body.ready { opacity: 1; }
+
+    /* Nav */
+    nav {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 60px;
+    }
+
+    .nav-brand {
+      font-family: 'Playfair Display', serif;
+      font-size: 20px;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      color: var(--text);
+    }
+
+    .nav-brand span { color: var(--accent); }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .btn-ghost {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 12px;
+      padding: 6px 14px;
+      border-radius: 2px;
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* Main */
+    main {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 48px 24px;
+    }
+
+    .page-header {
+      margin-bottom: 40px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+    }
+
+    .page-header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 38px;
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      line-height: 1;
+    }
+
+    .page-header h1 span { color: var(--accent); }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      border-bottom: 2px solid var(--border);
+      margin-bottom: 32px;
+      gap: 0;
+    }
+
+    .tab {
+      padding: 12px 28px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      transition: color 0.2s, border-color 0.2s;
+      letter-spacing: 0.02em;
+    }
+
+    .tab.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+
+    /* Add button */
+    .btn-add {
+      background: var(--accent);
+      color: #fff;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 2px;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .btn-add:hover { opacity: 0.88; }
+
+    /* Review cards */
+    .review-list { display: flex; flex-direction: column; gap: 12px; }
+
+    .review-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      transition: box-shadow 0.2s, border-color 0.2s;
+      animation: slideIn 0.3s ease both;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .review-card:hover { border-color: var(--accent); box-shadow: 0 2px 16px rgba(200,98,42,0.08); }
+
+    .card-book { font-weight: 500; font-size: 15px; margin-bottom: 4px; }
+    .card-meta { font-size: 12px; color: var(--muted); }
+
+    .card-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+    .btn-edit, .btn-delete {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 11px;
+      font-weight: 500;
+      padding: 6px 14px;
+      border-radius: 2px;
+      cursor: pointer;
+      transition: all 0.15s;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .btn-edit {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+    .btn-edit:hover { border-color: var(--accent); color: var(--accent); }
+
+    .btn-delete {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+    .btn-delete:hover { border-color: var(--error); color: var(--error); }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 24px;
+      color: var(--muted);
+      font-size: 14px;
+      border: 1px dashed var(--border);
+      border-radius: 3px;
+    }
+
+    .empty-state strong {
+      display: block;
+      font-family: 'Playfair Display', serif;
+      font-size: 22px;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    /* Modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(26,23,20,0.5);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(2px);
+    }
+    .modal-overlay.open { display: flex; }
+
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 36px 40px;
+      width: 100%;
+      max-width: 520px;
+      max-height: 90vh;
+      overflow-y: auto;
+      animation: modalIn 0.25s ease both;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+    }
+
+    @keyframes modalIn {
+      from { opacity: 0; transform: scale(0.97) translateY(10px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .modal h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 24px;
+    }
+
+    .field { margin-bottom: 18px; }
+
+    label {
+      display: block;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 7px;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      padding: 10px 12px;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    input:focus, textarea:focus, select:focus { border-color: var(--accent); }
+    input::placeholder, textarea::placeholder { color: var(--muted); }
+    textarea { resize: vertical; min-height: 90px; }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 28px;
+      justify-content: flex-end;
+    }
+
+    .btn-save {
+      background: var(--accent);
+      color: #fff;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      border: none;
+      padding: 10px 24px;
+      border-radius: 2px;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .btn-save:hover { opacity: 0.88; }
+    .btn-save:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .btn-cancel {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      padding: 10px 20px;
+      border-radius: 2px;
+      cursor: pointer;
+    }
+    .btn-cancel:hover { border-color: var(--text); color: var(--text); }
+
+    .form-msg {
+      font-size: 12px;
+      margin-top: 12px;
+      text-align: right;
+    }
+    .form-msg.error { color: var(--error); }
+    .form-msg.success { color: var(--success); }
+
+    /* Book search dropdown */
+    .book-search-wrap { position: relative; }
+    .book-results {
+      position: absolute;
+      top: 100%;
+      left: 0; right: 0;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-top: none;
+      border-radius: 0 0 2px 2px;
+      max-height: 180px;
+      overflow-y: auto;
+      z-index: 10;
+      display: none;
+    }
+    .book-results.open { display: block; }
+    .book-option {
+      padding: 10px 12px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: background 0.15s;
+    }
+    .book-option:hover { background: var(--accent-light); }
+    .book-option small { color: var(--muted); display: block; font-size: 11px; }
+
+    .loading-row {
+      padding: 20px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <div class="nav-brand">The Whole<span>Book</span></div>
+    <div class="nav-right">
+      <span id="user-email-display"></span>
+      <button class="btn-ghost" onclick="handleLogout()">Sign Out</button>
+    </div>
+  </nav>
+
+  <main>
+    <div class="page-header">
+      <h1>My <span>Reviews</span></h1>
+      <button class="btn-add" onclick="openModal()">+ New Review</button>
+    </div>
+
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('pro')" id="tab-pro">Pro Reviews</div>
+      <div class="tab" onclick="switchTab('rated')" id="tab-rated">Rated Reports</div>
+    </div>
+
+    <div id="panel-pro" class="review-list">
+      <div class="loading-row">Loading…</div>
+    </div>
+    <div id="panel-rated" class="review-list" style="display:none">
+      <div class="loading-row">Loading…</div>
+    </div>
+  </main>
+
+  <!-- Modal -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+      <h2 id="modal-title">New Review</h2>
+
+      <!-- Book search -->
+      <div class="field">
+        <label>Book</label>
+        <div class="book-search-wrap">
+          <input type="text" id="bookSearch" placeholder="Search by title or author…" autocomplete="off" oninput="searchBooks(this.value)"/>
+          <div class="book-results" id="bookResults"></div>
+        </div>
+        <input type="hidden" id="selectedBookId"/>
+      </div>
+
+      <!-- Pro Review fields -->
+      <div id="pro-fields">
+        <div class="field">
+          <label>Source</label>
+          <input type="text" id="f-source" placeholder="e.g. New York Times"/>
+        </div>
+        <div class="field">
+          <label>Summary</label>
+          <textarea id="f-summary" placeholder="Brief summary of the review…"></textarea>
+        </div>
+        <div class="field">
+          <label>URL</label>
+          <input type="url" id="f-url" placeholder="https://…"/>
+        </div>
+        <div class="field">
+          <label>Award</label>
+          <input type="text" id="f-award" placeholder="e.g. Pulitzer Prize (optional)"/>
+        </div>
+      </div>
+
+      <!-- Rated Report fields -->
+      <div id="rated-fields" style="display:none">
+        <div class="field">
+          <label>Rating (1–5)</label>
+          <input type="number" id="f-rating" min="1" max="5" placeholder="1–5"/>
+        </div>
+        <div class="field">
+          <label>Flagged Categories</label>
+          <input type="text" id="f-flagged" placeholder="e.g. Violence, Language"/>
+        </div>
+        <div class="field">
+          <label>Excerpts</label>
+          <textarea id="f-excerpts" placeholder="Notable excerpts…"></textarea>
+        </div>
+        <div class="field">
+          <label>Report URL</label>
+          <input type="url" id="f-report-url" placeholder="https://…"/>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+        <button class="btn-save" id="saveBtn" onclick="saveReview()">Save</button>
+      </div>
+      <div class="form-msg" id="formMsg"></div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+      // ── CONFIG ── Replace with your actual Supabase project values ──────────
+    const SUPABASE_URL = 'https://cqslqfztgtuuidgdkyyz.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_TBJdijzfEaYzBDBeqAy2CA_edJMKfgz';
+
+    const { createClient } = supabase;
+    const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    let currentTab = 'pro';
+    let editingId   = null;
+    let allBooks    = [];
+    let currentUser = null;
+
+    // ── Auth guard ────────────────────────────────────────────────────────
+    async function init() {
+      const { data: { session } } = await sb.auth.getSession();
+      if (!session) { window.location.href = '/login.html'; return; }
+      currentUser = session.user;
+      document.getElementById('user-email-display').textContent = currentUser.email;
+      document.body.classList.add('ready');
+      await loadBooks();
+      loadReviews('pro');
+      loadReviews('rated');
+    }
+
+    async function handleLogout() {
+      await sb.auth.signOut();
+      window.location.href = '/login.html';
+    }
+
+    // ── Load books for search ─────────────────────────────────────────────
+    async function loadBooks() {
+      const { data } = await sb.from('books').select('id, title, author').order('title');
+      allBooks = data || [];
+    }
+
+    function searchBooks(query) {
+      const results = document.getElementById('bookResults');
+      if (!query) { results.classList.remove('open'); return; }
+      const matches = allBooks.filter(b =>
+        b.title.toLowerCase().includes(query.toLowerCase()) ||
+        (b.author || '').toLowerCase().includes(query.toLowerCase())
+      ).slice(0, 8);
+
+      if (!matches.length) { results.classList.remove('open'); return; }
+
+      results.innerHTML = matches.map(b => `
+        <div class="book-option" onclick="selectBook('${b.id}', '${b.title.replace(/'/g,"\\'")}', '${(b.author||'').replace(/'/g,"\\'")}')">
+          ${b.title}
+          <small>${b.author || ''}</small>
+        </div>`).join('');
+      results.classList.add('open');
+    }
+
+    function selectBook(id, title, author) {
+      document.getElementById('bookSearch').value = `${title}${author ? ' — ' + author : ''}`;
+      document.getElementById('selectedBookId').value = id;
+      document.getElementById('bookResults').classList.remove('open');
+    }
+
+    // Close book dropdown on outside click
+    document.addEventListener('click', e => {
+      if (!e.target.closest('.book-search-wrap')) {
+        document.getElementById('bookResults').classList.remove('open');
+      }
+    });
+
+    // ── Tabs ──────────────────────────────────────────────────────────────
+    function switchTab(tab) {
+      currentTab = tab;
+      document.getElementById('tab-pro').classList.toggle('active', tab === 'pro');
+      document.getElementById('tab-rated').classList.toggle('active', tab === 'rated');
+      document.getElementById('panel-pro').style.display   = tab === 'pro'   ? 'flex' : 'none';
+      document.getElementById('panel-rated').style.display = tab === 'rated' ? 'flex' : 'none';
+      document.getElementById('panel-pro').style.flexDirection   = 'column';
+      document.getElementById('panel-rated').style.flexDirection = 'column';
+    }
+
+    // ── Load reviews ──────────────────────────────────────────────────────
+    async function loadReviews(type) {
+      const panel = document.getElementById(`panel-${type}`);
+      panel.innerHTML = '<div class="loading-row">Loading…</div>';
+
+      const table = type === 'pro' ? 'pro_reviews' : 'rated_reports';
+      const { data, error } = await sb
+        .from(table)
+        .select('*, books(title, author)')
+        .eq('user_id', currentUser.id)
+        .order('created_at', { ascending: false });
+
+      if (error) { panel.innerHTML = `<div class="loading-row">${error.message}</div>`; return; }
+
+      if (!data.length) {
+        panel.innerHTML = `<div class="empty-state">
+          <strong>No reviews yet</strong>
+          Click "+ New Review" to add your first ${type === 'pro' ? 'pro review' : 'rated report'}.
+        </div>`;
+        return;
+      }
+
+      panel.innerHTML = '';
+      data.forEach(row => {
+        const card = document.createElement('div');
+        card.className = 'review-card';
+        const bookTitle = row.books?.title || 'Unknown Book';
+        const bookAuthor = row.books?.author || '';
+        const meta = type === 'pro'
+          ? `${row.source || 'No source'} ${row.award ? '· ' + row.award : ''}`
+          : `Rating: ${row.rating || '—'} · ${row.flagged_categories || 'No flags'}`;
+
+        card.innerHTML = `
+          <div>
+            <div class="card-book">${bookTitle}</div>
+            <div class="card-meta">${bookAuthor ? bookAuthor + ' · ' : ''}${meta}</div>
+          </div>
+          <div class="card-actions">
+            <button class="btn-edit"   onclick="openEdit('${type}', '${row.id}')">Edit</button>
+            <button class="btn-delete" onclick="deleteReview('${type}', '${row.id}', this)">Delete</button>
+          </div>`;
+        panel.appendChild(card);
+      });
+    }
+
+    // ── Modal ─────────────────────────────────────────────────────────────
+    function openModal(type) {
+      editingId = null;
+      const t = type || currentTab;
+      document.getElementById('modal-title').textContent = t === 'pro' ? 'New Pro Review' : 'New Rated Report';
+      document.getElementById('pro-fields').style.display   = t === 'pro'   ? 'block' : 'none';
+      document.getElementById('rated-fields').style.display = t === 'rated' ? 'block' : 'none';
+      clearForm();
+      document.getElementById('modalOverlay').classList.add('open');
+    }
+
+    async function openEdit(type, id) {
+      editingId = id;
+      const table = type === 'pro' ? 'pro_reviews' : 'rated_reports';
+      const { data } = await sb.from(table).select('*, books(title, author)').eq('id', id).single();
+      if (!data) return;
+
+      // Switch to correct tab form
+      document.getElementById('modal-title').textContent = type === 'pro' ? 'Edit Pro Review' : 'Edit Rated Report';
+      document.getElementById('pro-fields').style.display   = type === 'pro'   ? 'block' : 'none';
+      document.getElementById('rated-fields').style.display = type === 'rated' ? 'block' : 'none';
+
+      // Set book
+      document.getElementById('selectedBookId').value = data.book_id || '';
+      document.getElementById('bookSearch').value = data.books
+        ? `${data.books.title}${data.books.author ? ' — ' + data.books.author : ''}` : '';
+
+      if (type === 'pro') {
+        document.getElementById('f-source').value  = data.source  || '';
+        document.getElementById('f-summary').value = data.summary || '';
+        document.getElementById('f-url').value     = data.url     || '';
+        document.getElementById('f-award').value   = data.award   || '';
+      } else {
+        document.getElementById('f-rating').value      = data.rating             || '';
+        document.getElementById('f-flagged').value     = data.flagged_categories || '';
+        document.getElementById('f-excerpts').value    = data.excerpts           || '';
+        document.getElementById('f-report-url').value  = data.report_url         || '';
+      }
+
+      document.getElementById('modalOverlay').classList.add('open');
+    }
+
+    function closeModal() {
+      document.getElementById('modalOverlay').classList.remove('open');
+      clearForm();
+    }
+
+    function clearForm() {
+      ['f-source','f-summary','f-url','f-award','f-rating','f-flagged','f-excerpts','f-report-url','bookSearch','selectedBookId'].forEach(id => {
+        document.getElementById(id).value = '';
+      });
+      document.getElementById('formMsg').textContent = '';
+      document.getElementById('bookResults').classList.remove('open');
+    }
+
+    // ── Save ──────────────────────────────────────────────────────────────
+    async function saveReview() {
+      const btn   = document.getElementById('saveBtn');
+      const msg   = document.getElementById('formMsg');
+      const type  = document.getElementById('pro-fields').style.display !== 'none' ? 'pro' : 'rated';
+      const table = type === 'pro' ? 'pro_reviews' : 'rated_reports';
+      const bookId = document.getElementById('selectedBookId').value;
+
+      if (!bookId) { msg.textContent = 'Please select a book.'; msg.className = 'form-msg error'; return; }
+
+      btn.disabled = true;
+      msg.textContent = '';
+
+      let payload = { book_id: bookId, user_id: currentUser.id };
+
+      if (type === 'pro') {
+        payload.source  = document.getElementById('f-source').value.trim();
+        payload.summary = document.getElementById('f-summary').value.trim();
+        payload.url     = document.getElementById('f-url').value.trim();
+        payload.award   = document.getElementById('f-award').value.trim();
+      } else {
+        payload.rating             = parseInt(document.getElementById('f-rating').value) || null;
+        payload.flagged_categories = document.getElementById('f-flagged').value.trim();
+        payload.excerpts           = document.getElementById('f-excerpts').value.trim();
+        payload.report_url         = document.getElementById('f-report-url').value.trim();
+      }
+
+      let error;
+      if (editingId) {
+        ({ error } = await sb.from(table).update(payload).eq('id', editingId));
+      } else {
+        ({ error } = await sb.from(table).insert(payload));
+      }
+
+      btn.disabled = false;
+
+      if (error) {
+        msg.textContent = error.message;
+        msg.className = 'form-msg error';
+      } else {
+        msg.textContent = editingId ? 'Saved!' : 'Review added!';
+        msg.className = 'form-msg success';
+        setTimeout(() => {
+          closeModal();
+          loadReviews(type);
+          switchTab(type);
+        }, 600);
+      }
+    }
+
+    // ── Delete ────────────────────────────────────────────────────────────
+    async function deleteReview(type, id, btn) {
+      if (!confirm('Delete this review? This cannot be undone.')) return;
+      const table = type === 'pro' ? 'pro_reviews' : 'rated_reports';
+      btn.textContent = '…';
+      const { error } = await sb.from(table).delete().eq('id', id);
+      if (error) { alert(error.message); btn.textContent = 'Delete'; return; }
+      loadReviews(type);
+    }
+
+    init();
+  </script>
+</body>
+</html>
