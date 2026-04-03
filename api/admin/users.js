@@ -28,12 +28,17 @@ export default async function handler(req, res) {
   const { data, error } = await sb.auth.admin.listUsers();
   if (error) return res.status(500).json({ error: error.message });
 
-  // Return only safe fields
+  // Fetch roles from profiles table
+  const { data: profiles } = await sb.from('profiles').select('id, role');
+  const roleMap = Object.fromEntries((profiles || []).map(p => [p.id, p.role]));
+
+  // Return only safe fields + role
   const users = data.users.map(u => ({
     id: u.id,
     email: u.email,
     created_at: u.created_at,
     email_confirmed_at: u.email_confirmed_at,
+    role: roleMap[u.id] || 'reviewer',
   }));
 
   return res.status(200).json({ users });
