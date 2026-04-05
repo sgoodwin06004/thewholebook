@@ -203,6 +203,7 @@
         <div class="field"><label>Author</label><input type="text" id="b-author" placeholder="Author name"/></div>
         <div class="field"><label>ISBN</label><input type="text" id="b-isbn" placeholder="978-0-000-00000-0"/></div>
         <div class="field"><label>Cover Art URL <span class="optional">optional</span></label><input type="url" id="b-cover" placeholder="https://…"/></div>
+        <div class="field"><label>Goodreads Rating <span class="optional">optional</span></label><input type="text" id="b-goodreads" placeholder="e.g. 4.23"/></div>
       </div>
 
       <div class="section rated-section">
@@ -328,6 +329,7 @@
       document.getElementById('b-author').value = book.author   || '';
       document.getElementById('b-isbn').value   = book.isbn     || '';
       document.getElementById('b-cover').value  = book.cover_url || '';
+      document.getElementById('b-goodreads').value = book.goodreads_rating || '';
 
       // Fill rated report
       document.getElementById('r-rating').value     = rated?.rating             || '';
@@ -400,7 +402,7 @@
       currentBookId   = null;
       existingRatedId = null;
       document.getElementById('bookSearch').value = '';
-      ['b-title','b-author','b-isbn','b-cover',
+      ['b-title','b-author','b-isbn','b-cover','b-goodreads',
        'r-rating','r-flagged','r-excerpts','r-report-url'
       ].forEach(id => document.getElementById(id).value = '');
       document.getElementById('pro-reviews-list').innerHTML = '';
@@ -428,6 +430,7 @@
             author:    document.getElementById('b-author').value.trim() || null,
             isbn:      document.getElementById('b-isbn').value.trim()   || null,
             cover_url: document.getElementById('b-cover').value.trim()  || null,
+            goodreads_rating: document.getElementById('b-goodreads').value.trim() || null,
           }).eq('id', currentBookId);
           if (error) throw new Error('Book: ' + error.message);
           bookId = currentBookId;
@@ -437,6 +440,7 @@
             author:    document.getElementById('b-author').value.trim() || null,
             isbn:      document.getElementById('b-isbn').value.trim()   || null,
             cover_url: document.getElementById('b-cover').value.trim()  || null,
+            goodreads_rating: document.getElementById('b-goodreads').value.trim() || null,
           }).select('id').single();
           if (error) throw new Error('Book: ' + error.message);
           bookId = data.id;
