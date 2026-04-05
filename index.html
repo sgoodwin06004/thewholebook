@@ -1285,7 +1285,7 @@
     }
 
     function getReviewsForBook(bookId) {
-      return PRO_REVIEWS.filter(r => r.book_id === bookId);
+      return PRO_REVIEWS.filter(r => String(r.book_id) === String(bookId));
     }
 
     function renderRecentBooks() {
@@ -1451,7 +1451,7 @@
           </div>
         `}
 
-        ${reviews.length > 0 ? `
+        ${(reviews && reviews.length > 0) ? `
           <div class="section-label">Professional Reviews</div>
           ${reviews.map(r => `
             <div class="analysis-text" style="margin-bottom:1.5rem">
