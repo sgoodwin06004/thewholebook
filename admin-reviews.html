@@ -260,7 +260,14 @@
       document.getElementById('user-email-display').textContent = currentUser.email;
       document.body.classList.add('ready');
       await loadAllBooks();
-      addProReview(); // start with one empty block
+      // Check if a book ID was passed in the URL
+      const params = new URLSearchParams(window.location.search);
+      const bookId = params.get('book');
+      if (bookId) {
+        await loadBook(bookId);
+      } else {
+        addProReview(); // start with one empty block
+      }
     }
 
     async function handleLogout() {
