@@ -1,18 +1,15 @@
 <!DOCTYPE html>
-<!-- saved from url=(0045)file:///C:/Users/marti/Downloads/index_2.html -->
-<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-  
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>The Whole Book — Every Banned Book Has a Story Worth Telling</title>
   <meta name="description" content="A counter-database disputing politically motivated book bans. Search any flagged book and discover its real literary value.">
-  <link rel="preconnect" href="https://fonts.googleapis.com/">
-  <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
-  <link href="./index_files/css2" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:ital,wght@0,700;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 
   <style>
-    /* =============================================
-       CSS VARIABLES & RESET
-    ============================================= */
     :root {
       --ink: #0a0a0a;
       --paper: #f5f0e8;
@@ -38,7 +35,6 @@
       cursor: default;
     }
 
-    /* NOISE TEXTURE */
     body::before {
       content: '';
       position: fixed;
@@ -49,9 +45,7 @@
       opacity: 0.4;
     }
 
-    /* =============================================
-       HEADER / NAV
-    ============================================= */
+    /* NAV */
     .site-header {
       border-bottom: 3px solid var(--border);
       background: var(--ink);
@@ -81,8 +75,7 @@
 
     .site-logo .logo-mark {
       display: inline-block;
-      width: 8px;
-      height: 8px;
+      width: 8px; height: 8px;
       background: var(--red);
       border-radius: 50%;
       margin-right: 4px;
@@ -110,9 +103,7 @@
 
     .site-nav a:hover { background: var(--red); color: var(--white); }
 
-    /* =============================================
-       HERO
-    ============================================= */
+    /* HERO */
     .hero {
       min-height: 90vh;
       display: grid;
@@ -139,10 +130,8 @@
       inset: 0;
       background: repeating-linear-gradient(
         -45deg,
-        transparent,
-        transparent 40px,
-        rgba(192, 57, 43, 0.06) 40px,
-        rgba(192, 57, 43, 0.06) 41px
+        transparent, transparent 40px,
+        rgba(192,57,43,0.06) 40px, rgba(192,57,43,0.06) 41px
       );
       pointer-events: none;
     }
@@ -162,8 +151,7 @@
     .hero-eyebrow::before {
       content: '';
       display: block;
-      width: 40px;
-      height: 2px;
+      width: 40px; height: 2px;
       background: var(--red);
     }
 
@@ -184,7 +172,7 @@
       font-style: italic;
       font-size: clamp(1rem, 1.8vw, 1.3rem);
       line-height: 1.6;
-      color: rgba(245, 240, 232, 0.75);
+      color: rgba(245,240,232,0.75);
       max-width: 480px;
       margin-bottom: 2.5rem;
       position: relative;
@@ -212,11 +200,10 @@
       font-size: 0.6rem;
       letter-spacing: 0.15em;
       text-transform: uppercase;
-      color: rgba(245, 240, 232, 0.5);
+      color: rgba(245,240,232,0.5);
       margin-top: 0.2rem;
     }
 
-    /* RIGHT SIDE — SEARCH */
     .hero-right {
       background: var(--paper);
       padding: clamp(3rem, 6vw, 6rem) clamp(2rem, 5vw, 5rem);
@@ -236,10 +223,7 @@
       margin-bottom: 1rem;
     }
 
-    .search-wrapper {
-      position: relative;
-      margin-bottom: 1.5rem;
-    }
+    .search-wrapper { position: relative; margin-bottom: 1.5rem; }
 
     .search-input {
       width: 100%;
@@ -256,17 +240,11 @@
     }
 
     .search-input::placeholder { color: #bbb; font-style: italic; }
-
-    .search-input:focus {
-      border-color: var(--red);
-      box-shadow: 4px 4px 0 var(--red);
-    }
+    .search-input:focus { border-color: var(--red); box-shadow: 4px 4px 0 var(--red); }
 
     .search-btn {
       position: absolute;
-      right: 0;
-      top: 0;
-      bottom: 0;
+      right: 0; top: 0; bottom: 0;
       width: 4.5rem;
       background: var(--ink);
       border: none;
@@ -280,8 +258,7 @@
     .search-btn:hover { background: var(--red); }
 
     .search-btn svg {
-      width: 20px;
-      height: 20px;
+      width: 20px; height: 20px;
       stroke: var(--paper);
       fill: none;
       stroke-width: 2.5;
@@ -321,9 +298,7 @@
       line-height: 1.8;
     }
 
-    /* =============================================
-       BOOK CARD (search result)
-    ============================================= */
+    /* BOOK CARD */
     .book-card {
       border-bottom: 1px solid var(--paper-dark);
       padding: 1.25rem 1.5rem;
@@ -343,28 +318,9 @@
 
     .book-card:hover { background: var(--paper); }
     .book-card:last-child { border-bottom: none; }
-
-    .book-card-title {
-      font-family: var(--font-serif);
-      font-weight: 700;
-      font-size: 1rem;
-      line-height: 1.3;
-      margin-bottom: 0.2rem;
-    }
-
-    .book-card-author {
-      font-family: var(--font-mono);
-      font-size: 0.7rem;
-      color: var(--gray);
-      letter-spacing: 0.05em;
-    }
-
-    .book-card-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.3rem;
-      margin-top: 0.5rem;
-    }
+    .book-card-title { font-family: var(--font-serif); font-weight: 700; font-size: 1rem; line-height: 1.3; margin-bottom: 0.2rem; }
+    .book-card-author { font-family: var(--font-mono); font-size: 0.7rem; color: var(--gray); letter-spacing: 0.05em; }
+    .book-card-tags { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.5rem; }
 
     .tag {
       font-family: var(--font-mono);
@@ -378,12 +334,7 @@
     .tag-award { border-color: var(--gold); color: var(--gold); }
     .tag-banned { border-color: var(--red); color: var(--red); }
 
-    .book-card-scores {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 0.4rem;
-    }
+    .book-card-scores { display: flex; flex-direction: column; align-items: flex-end; gap: 0.4rem; }
 
     .score-pill {
       font-family: var(--font-mono);
@@ -397,34 +348,16 @@
     .score-ban { background: var(--red); color: var(--white); }
     .score-real { background: var(--ink); color: var(--paper); }
 
-    /* =============================================
-       LOADING SPINNER
-    ============================================= */
-    .spinner {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 200px;
-    }
-
-    .spinner-ring {
-      width: 36px;
-      height: 36px;
-      border: 3px solid var(--paper-dark);
-      border-top-color: var(--ink);
-      border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-    }
-
+    /* SPINNER */
+    .spinner { display: flex; align-items: center; justify-content: center; height: 200px; }
+    .spinner-ring { width: 36px; height: 36px; border: 3px solid var(--paper-dark); border-top-color: var(--ink); border-radius: 50%; animation: spin 0.7s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* =============================================
-       BOOK DETAIL MODAL
-    ============================================= */
+    /* MODAL */
     .modal-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(10, 10, 10, 0.85);
+      background: rgba(10,10,10,0.85);
       z-index: 1000;
       display: none;
       align-items: center;
@@ -433,11 +366,7 @@
       backdrop-filter: blur(3px);
     }
 
-    .modal-overlay.open {
-      display: flex;
-      animation: fadeIn 0.2s ease;
-    }
-
+    .modal-overlay.open { display: flex; animation: fadeIn 0.2s ease; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
     .modal {
@@ -470,21 +399,8 @@
       z-index: 10;
     }
 
-    .modal-book-title {
-      font-family: var(--font-display);
-      font-size: clamp(1.6rem, 4vw, 2.5rem);
-      letter-spacing: 0.02em;
-      line-height: 1;
-      margin-bottom: 0.4rem;
-    }
-
-    .modal-book-author {
-      font-family: var(--font-mono);
-      font-size: 0.75rem;
-      letter-spacing: 0.12em;
-      color: rgba(245, 240, 232, 0.6);
-      text-transform: uppercase;
-    }
+    .modal-book-title { font-family: var(--font-display); font-size: clamp(1.6rem, 4vw, 2.5rem); letter-spacing: 0.02em; line-height: 1; margin-bottom: 0.4rem; }
+    .modal-book-author { font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.12em; color: rgba(245,240,232,0.6); text-transform: uppercase; }
 
     .modal-close {
       background: none;
@@ -533,28 +449,15 @@
     .verdict-label::before {
       content: '';
       display: block;
-      width: 8px;
-      height: 8px;
+      width: 8px; height: 8px;
       border-radius: 50%;
       background: currentColor;
     }
 
-    .verdict-rating {
-      font-family: var(--font-display);
-      font-size: 3.5rem;
-      line-height: 1;
-      margin-bottom: 0.3rem;
-    }
-
+    .verdict-rating { font-family: var(--font-display); font-size: 3.5rem; line-height: 1; margin-bottom: 0.3rem; }
     .verdict-col:first-child .verdict-rating { color: var(--red); }
     .verdict-col:last-child .verdict-rating { color: #1a7a3c; }
-
-    .verdict-source {
-      font-family: var(--font-mono);
-      font-size: 0.65rem;
-      color: var(--gray);
-      letter-spacing: 0.05em;
-    }
+    .verdict-source { font-family: var(--font-mono); font-size: 0.65rem; color: var(--gray); letter-spacing: 0.05em; }
 
     .section-label {
       font-family: var(--font-mono);
@@ -570,29 +473,12 @@
       gap: 0.6rem;
     }
 
-    .section-label::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: var(--paper-dark);
-    }
+    .section-label::after { content: ''; flex: 1; height: 1px; background: var(--paper-dark); }
 
-    .analysis-text {
-      font-family: var(--font-serif);
-      font-size: 1rem;
-      line-height: 1.75;
-      color: var(--ink);
-      margin-bottom: 2rem;
-    }
-
+    .analysis-text { font-family: var(--font-serif); font-size: 1rem; line-height: 1.75; color: var(--ink); margin-bottom: 2rem; }
     .analysis-text p + p { margin-top: 1rem; }
 
-    .awards-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      margin-bottom: 2rem;
-    }
+    .awards-list { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 2rem; }
 
     .award-badge {
       font-family: var(--font-mono);
@@ -602,13 +488,13 @@
       padding: 0.35rem 0.7rem;
       border: 1.5px solid var(--gold);
       color: var(--ink);
-      background: rgba(212, 160, 23, 0.08);
+      background: rgba(212,160,23,0.08);
     }
 
     .context-quote {
       border-left: 4px solid var(--red);
       padding: 1rem 1.5rem;
-      background: rgba(192, 57, 43, 0.05);
+      background: rgba(192,57,43,0.05);
       margin-bottom: 2rem;
       font-family: var(--font-serif);
       font-style: italic;
@@ -628,29 +514,7 @@
       margin-top: 0.6rem;
     }
 
-    .ai-loading {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 3rem;
-      gap: 1rem;
-    }
-
-    .ai-loading p {
-      font-family: var(--font-mono);
-      font-size: 0.7rem;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: var(--gray);
-      animation: blink 1.2s ease-in-out infinite;
-    }
-
-    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
-
-    /* =============================================
-       MARQUEE BANNER
-    ============================================= */
+    /* MARQUEE */
     .marquee-bar {
       background: var(--red);
       color: var(--white);
@@ -682,9 +546,7 @@
 
     .marquee-sep { opacity: 0.4; margin: 0 0.5rem; }
 
-    /* =============================================
-       ABOUT / MISSION SECTION
-    ============================================= */
+    /* ABOUT */
     .about-section {
       display: grid;
       grid-template-columns: 1fr 2fr;
@@ -701,47 +563,160 @@
       border-right: 3px solid var(--border);
     }
 
-    .about-sidebar-title {
-      font-family: var(--font-display);
-      font-size: 4rem;
-      line-height: 0.95;
-      letter-spacing: 0.02em;
-      margin-bottom: 2rem;
+    .about-sidebar-title { font-family: var(--font-display); font-size: 4rem; line-height: 0.95; letter-spacing: 0.02em; margin-bottom: 2rem; }
+
+    .about-sidebar p { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.1em; line-height: 1.8; text-transform: uppercase; opacity: 0.8; }
+
+    .about-main { padding: 4rem; }
+    .about-main h2 { font-family: var(--font-display); font-size: clamp(2rem, 4vw, 3.5rem); letter-spacing: 0.03em; line-height: 1; margin-bottom: 1.5rem; }
+    .about-main p { font-family: var(--font-serif); font-size: 1.05rem; line-height: 1.8; color: #333; max-width: 620px; margin-bottom: 1.2rem; }
+    .about-main strong { color: var(--red); }
+
+    /* MOST BANNED SECTION */
+    .banned-section {
+      background: var(--ink);
+      color: var(--paper);
+      padding: 5rem 4rem;
+      border-bottom: 3px solid var(--border);
     }
 
-    .about-sidebar p {
+    .banned-section .section-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 2.5rem;
+      border-bottom: 3px solid rgba(255,255,255,0.15);
+      padding-bottom: 1rem;
+    }
+
+    .banned-section .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 4vw, 3rem);
+      letter-spacing: 0.03em;
+      color: var(--paper);
+    }
+
+    .banned-section .section-title span { color: var(--red); }
+
+    .banned-section .section-meta {
       font-family: var(--font-mono);
       font-size: 0.7rem;
       letter-spacing: 0.1em;
-      line-height: 1.8;
       text-transform: uppercase;
-      opacity: 0.8;
+      color: rgba(245,240,232,0.4);
     }
 
-    .about-main { padding: 4rem; }
+    .banned-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      border: 2px solid rgba(255,255,255,0.12);
+    }
 
-    .about-main h2 {
+    .banned-row {
+      display: grid;
+      grid-template-columns: 64px 1fr auto;
+      align-items: center;
+      gap: 1.5rem;
+      padding: 1.4rem 1.8rem;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      cursor: pointer;
+      transition: background 0.15s;
+      animation: slideIn 0.25s ease both;
+    }
+
+    .banned-row:last-child { border-bottom: none; }
+    .banned-row:hover { background: rgba(192,57,43,0.12); }
+
+    .banned-rank {
       font-family: var(--font-display);
-      font-size: clamp(2rem, 4vw, 3.5rem);
-      letter-spacing: 0.03em;
+      font-size: 2.8rem;
+      color: rgba(245,240,232,0.1);
       line-height: 1;
-      margin-bottom: 1.5rem;
+      text-align: center;
+      transition: color 0.15s;
     }
 
-    .about-main p {
+    .banned-row:hover .banned-rank { color: var(--red); }
+
+    .banned-info {}
+
+    .banned-title {
       font-family: var(--font-serif);
+      font-weight: 700;
       font-size: 1.05rem;
-      line-height: 1.8;
-      color: #333;
-      max-width: 620px;
-      margin-bottom: 1.2rem;
+      line-height: 1.3;
+      margin-bottom: 0.25rem;
+      color: var(--paper);
     }
 
-    .about-main strong { color: var(--red); }
+    .banned-author {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.08em;
+      color: rgba(245,240,232,0.45);
+      margin-bottom: 0.5rem;
+    }
 
-    /* =============================================
-       RECENTLY ADDED
-    ============================================= */
+    .banned-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+    }
+
+    .banned-tag {
+      font-family: var(--font-mono);
+      font-size: 0.55rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.2rem 0.45rem;
+      border: 1px solid;
+    }
+
+    .banned-tag-flag { border-color: rgba(192,57,43,0.6); color: var(--red); }
+    .banned-tag-review { border-color: rgba(245,240,232,0.2); color: rgba(245,240,232,0.5); }
+
+    .banned-rating-block {
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    .banned-rating-num {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      color: var(--red);
+      line-height: 1;
+    }
+
+    .banned-rating-label {
+      font-family: var(--font-mono);
+      font-size: 0.55rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(245,240,232,0.3);
+      margin-top: 0.2rem;
+    }
+
+    .banned-no-rating {
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(245,240,232,0.2);
+      text-align: right;
+    }
+
+    .banned-loading {
+      padding: 4rem;
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: rgba(245,240,232,0.3);
+    }
+
+    /* RECENTLY ADDED */
     .recent-section {
       padding: 5rem 4rem;
       border-bottom: 3px solid var(--border);
@@ -756,19 +731,8 @@
       padding-bottom: 1rem;
     }
 
-    .section-title {
-      font-family: var(--font-display);
-      font-size: clamp(2rem, 4vw, 3rem);
-      letter-spacing: 0.03em;
-    }
-
-    .section-meta {
-      font-family: var(--font-mono);
-      font-size: 0.7rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--gray);
-    }
+    .section-title { font-family: var(--font-display); font-size: clamp(2rem, 4vw, 3rem); letter-spacing: 0.03em; }
+    .section-meta { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gray); }
 
     .books-grid {
       display: grid;
@@ -786,67 +750,19 @@
       position: relative;
     }
 
-    .book-tile:hover {
-      background: var(--ink);
-      color: var(--paper);
-    }
-
+    .book-tile:hover { background: var(--ink); color: var(--paper); }
     .book-tile:hover .book-tile-author { color: rgba(245,240,232,0.6); }
     .book-tile:hover .book-tile-meta { color: rgba(245,240,232,0.5); }
     .book-tile:hover .tile-tag { border-color: rgba(245,240,232,0.3); color: rgba(245,240,232,0.7); }
 
-    .book-tile-cover {
-      width: 60px;
-      height: 85px;
-      object-fit: cover;
-      border: 2px solid var(--paper-dark);
-      margin-bottom: 1rem;
-      display: block;
-    }
-
-    .book-tile-number {
-      font-family: var(--font-display);
-      font-size: 4rem;
-      color: var(--paper-dark);
-      line-height: 1;
-      margin-bottom: 0.5rem;
-      transition: color 0.15s;
-    }
-
+    .book-tile-cover { width: 60px; height: 85px; object-fit: cover; border: 2px solid var(--paper-dark); margin-bottom: 1rem; display: block; }
+    .book-tile-number { font-family: var(--font-display); font-size: 4rem; color: var(--paper-dark); line-height: 1; margin-bottom: 0.5rem; transition: color 0.15s; }
     .book-tile:hover .book-tile-number { color: rgba(245,240,232,0.1); }
+    .book-tile-title { font-family: var(--font-serif); font-weight: 700; font-size: 1.05rem; line-height: 1.3; margin-bottom: 0.3rem; }
+    .book-tile-author { font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.08em; color: var(--gray); margin-bottom: 0.8rem; transition: color 0.15s; }
+    .book-tile-meta { font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gray); transition: color 0.15s; }
 
-    .book-tile-title {
-      font-family: var(--font-serif);
-      font-weight: 700;
-      font-size: 1.05rem;
-      line-height: 1.3;
-      margin-bottom: 0.3rem;
-    }
-
-    .book-tile-author {
-      font-family: var(--font-mono);
-      font-size: 0.65rem;
-      letter-spacing: 0.08em;
-      color: var(--gray);
-      margin-bottom: 0.8rem;
-      transition: color 0.15s;
-    }
-
-    .book-tile-meta {
-      font-family: var(--font-mono);
-      font-size: 0.6rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--gray);
-      transition: color 0.15s;
-    }
-
-    .tile-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.3rem;
-      margin-top: 0.6rem;
-    }
+    .tile-tags { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.6rem; }
 
     .tile-tag {
       font-family: var(--font-mono);
@@ -859,38 +775,11 @@
       transition: border-color 0.15s, color 0.15s;
     }
 
-    /* Loading state for grid */
-    .grid-loading {
-      grid-column: 1 / -1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 4rem;
-      gap: 1rem;
-      flex-direction: column;
-    }
+    .grid-loading { grid-column: 1 / -1; display: flex; align-items: center; justify-content: center; padding: 4rem; gap: 1rem; flex-direction: column; }
+    .grid-loading p { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gray); }
+    .grid-error { grid-column: 1 / -1; padding: 3rem; text-align: center; font-family: var(--font-mono); font-size: 0.75rem; color: var(--red); letter-spacing: 0.1em; }
 
-    .grid-loading p {
-      font-family: var(--font-mono);
-      font-size: 0.7rem;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: var(--gray);
-    }
-
-    .grid-error {
-      grid-column: 1 / -1;
-      padding: 3rem;
-      text-align: center;
-      font-family: var(--font-mono);
-      font-size: 0.75rem;
-      color: var(--red);
-      letter-spacing: 0.1em;
-    }
-
-    /* =============================================
-       FOOTER
-    ============================================= */
+    /* FOOTER */
     footer {
       background: var(--ink);
       color: var(--paper);
@@ -901,43 +790,12 @@
       border-top: 3px solid var(--border);
     }
 
-    .footer-brand {
-      font-family: var(--font-display);
-      font-size: 2.5rem;
-      letter-spacing: 0.05em;
-      margin-bottom: 0.8rem;
-    }
-
-    .footer-tagline {
-      font-family: var(--font-serif);
-      font-style: italic;
-      font-size: 0.95rem;
-      color: rgba(245,240,232,0.6);
-      line-height: 1.6;
-      max-width: 340px;
-    }
-
-    .footer-col h4 {
-      font-family: var(--font-mono);
-      font-size: 0.65rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--red);
-      margin-bottom: 1rem;
-    }
-
+    .footer-brand { font-family: var(--font-display); font-size: 2.5rem; letter-spacing: 0.05em; margin-bottom: 0.8rem; }
+    .footer-tagline { font-family: var(--font-serif); font-style: italic; font-size: 0.95rem; color: rgba(245,240,232,0.6); line-height: 1.6; max-width: 340px; }
+    .footer-col h4 { font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--red); margin-bottom: 1rem; }
     .footer-col ul { list-style: none; }
     .footer-col ul li + li { margin-top: 0.5rem; }
-
-    .footer-col ul li a {
-      font-family: var(--font-mono);
-      font-size: 0.75rem;
-      letter-spacing: 0.05em;
-      color: rgba(245,240,232,0.6);
-      text-decoration: none;
-      transition: color 0.2s;
-    }
-
+    .footer-col ul li a { font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.05em; color: rgba(245,240,232,0.6); text-decoration: none; transition: color 0.2s; }
     .footer-col ul li a:hover { color: var(--paper); }
 
     .footer-bottom {
@@ -949,17 +807,9 @@
       align-items: center;
     }
 
-    .footer-bottom p {
-      font-family: var(--font-mono);
-      font-size: 0.65rem;
-      letter-spacing: 0.1em;
-      color: rgba(245,240,232,0.35);
-      text-transform: uppercase;
-    }
+    .footer-bottom p { font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.1em; color: rgba(245,240,232,0.35); text-transform: uppercase; }
 
-    /* =============================================
-       RESPONSIVE
-    ============================================= */
+    /* RESPONSIVE */
     @media (max-width: 900px) {
       .hero { grid-template-columns: 1fr; min-height: auto; }
       .hero-right { border-left: none; border-top: 3px solid var(--border); }
@@ -968,35 +818,40 @@
       .about-main { padding: 2.5rem; }
       footer { grid-template-columns: 1fr; gap: 2rem; }
       .recent-section { padding: 3rem 2rem; }
+      .banned-section { padding: 3rem 2rem; }
       .site-nav { display: none; }
       .verdict-grid { grid-template-columns: 1fr; }
       .verdict-col:first-child { border-right: none; border-bottom: 2px solid var(--ink); }
+      .banned-row { grid-template-columns: 48px 1fr auto; gap: 1rem; padding: 1.2rem; }
     }
 
     @media (max-width: 600px) {
       .hero-stats { flex-wrap: wrap; }
       .modal-body { padding: 1.5rem; }
       .modal-header { padding: 1.5rem; }
+      .banned-row { grid-template-columns: 40px 1fr; }
+      .banned-rating-block { display: none; }
     }
   </style>
 </head>
 <body>
 
-  <!-- ===== HEADER ===== -->
+  <!-- HEADER -->
   <header class="site-header">
-    <a href="file:///C:/" class="site-logo">
+    <a href="/" class="site-logo">
       <span class="logo-mark"></span>
       The <span class="logo-accent">Whole</span> Book
     </a>
     <nav class="site-nav">
-      <a href="file:///C:/Users/marti/Downloads/index_2.html#search">Search</a>
-      <a href="file:///C:/Users/marti/Downloads/index_2.html#about">About</a>
-      <a href="file:///C:/Users/marti/Downloads/index_2.html#recently-added">Browse</a>
-      <a href="file:///C:/Users/marti/Downloads/index_2.html#contribute">Contribute</a>
+      <a href="#search">Search</a>
+      <a href="#about">About</a>
+      <a href="#most-banned">Most Banned</a>
+      <a href="#recently-added">Browse</a>
+      <a href="#contribute">Contribute</a>
     </nav>
   </header>
 
-  <!-- ===== HERO ===== -->
+  <!-- HERO -->
   <section class="hero" id="search">
     <div class="hero-left">
       <div class="hero-eyebrow">Counter-Database</div>
@@ -1013,7 +868,7 @@
       </p>
       <div class="hero-stats">
         <div class="stat">
-          <div class="stat-number" id="stat-books">3</div>
+          <div class="stat-number" id="stat-books">—</div>
           <div class="stat-label">Books Documented</div>
         </div>
         <div class="stat">
@@ -1021,7 +876,7 @@
           <div class="stat-label">States Affected</div>
         </div>
         <div class="stat">
-          <div class="stat-number" id="stat-challenged">3</div>
+          <div class="stat-number" id="stat-challenged">—</div>
           <div class="stat-label">Challenges Filed</div>
         </div>
       </div>
@@ -1044,12 +899,12 @@
     </div>
   </section>
 
-  <!-- ===== MARQUEE ===== -->
+  <!-- MARQUEE -->
   <div class="marquee-bar" aria-hidden="true">
-    <div class="marquee-track" id="marqueeTrack"><span class="marquee-item">Iron Flame <span class="marquee-sep">◆</span></span><span class="marquee-item">A Court of Silver Flames <span class="marquee-sep">◆</span></span><span class="marquee-item">Flamer <span class="marquee-sep">◆</span></span><span class="marquee-item">Iron Flame <span class="marquee-sep">◆</span></span><span class="marquee-item">A Court of Silver Flames <span class="marquee-sep">◆</span></span><span class="marquee-item">Flamer <span class="marquee-sep">◆</span></span><span class="marquee-item">Iron Flame <span class="marquee-sep">◆</span></span><span class="marquee-item">A Court of Silver Flames <span class="marquee-sep">◆</span></span><span class="marquee-item">Flamer <span class="marquee-sep">◆</span></span><span class="marquee-item">Iron Flame <span class="marquee-sep">◆</span></span><span class="marquee-item">A Court of Silver Flames <span class="marquee-sep">◆</span></span><span class="marquee-item">Flamer <span class="marquee-sep">◆</span></span></div>
+    <div class="marquee-track" id="marqueeTrack"></div>
   </div>
 
-  <!-- ===== ABOUT ===== -->
+  <!-- ABOUT -->
   <section class="about-section" id="about">
     <div class="about-sidebar">
       <div class="about-sidebar-title">Context<br>Matters</div>
@@ -1069,61 +924,32 @@
     </div>
   </section>
 
-  <!-- ===== RECENTLY ADDED ===== -->
+  <!-- MOST BANNED -->
+  <section class="banned-section" id="most-banned">
+    <div class="section-header">
+      <h2 class="section-title">Most <span>Banned</span></h2>
+      <span class="section-meta" id="bannedMeta">Sorted by ban rating</span>
+    </div>
+    <div class="banned-list" id="bannedList">
+      <div class="banned-loading">Loading most banned books…</div>
+    </div>
+  </section>
+
+  <!-- RECENTLY ADDED -->
   <section class="recent-section" id="recently-added">
     <div class="section-header">
       <h2 class="section-title">Recently Documented</h2>
-      <span class="section-meta" id="recentMeta">3 books in database</span>
+      <span class="section-meta" id="recentMeta">Loading…</span>
     </div>
     <div class="books-grid" id="recentBooks">
-          <div class="book-tile" onclick="openModal(&#39;8106777b-364c-48ce-a7b5-190dc786ce0b&#39;)">
-            <img class="book-tile-cover" src="./index_files/ironflame.jpg" alt="Cover of Iron Flame" onerror="this.style.display=&#39;none&#39;">
-            <div class="book-tile-title">Iron Flame</div>
-            <div class="book-tile-author">— Yarros, Rebecca</div>
-            <div class="book-tile-meta">
-              ⚠ Report on file
-               · 4 reviews
-            </div>
-            <div class="tile-tags">
-              <span class="tile-tag" style="border-color:var(--red);color:var(--red)">Flagged</span>
-              
-              <span class="tile-tag">Reviewed</span>
-            </div>
-          </div>
-        
-          <div class="book-tile" onclick="openModal(&#39;25aedca2-aca2-4f06-9aef-0cafa2f1262d&#39;)">
-            <img class="book-tile-cover" src="./index_files/a_court_of_silver.jpg" alt="Cover of A Court of Silver Flames" onerror="this.style.display=&#39;none&#39;">
-            <div class="book-tile-title">A Court of Silver Flames</div>
-            <div class="book-tile-author">— Maas, Sarah J.</div>
-            <div class="book-tile-meta">
-              ⚠ Report on file
-               · 4 reviews
-            </div>
-            <div class="tile-tags">
-              <span class="tile-tag" style="border-color:var(--red);color:var(--red)">Flagged</span>
-              
-              <span class="tile-tag">Reviewed</span>
-            </div>
-          </div>
-        
-          <div class="book-tile" onclick="openModal(&#39;a311a7eb-4995-49d7-aa6e-919d15358f03&#39;)">
-            <img class="book-tile-cover" src="./index_files/flamer.jpg" alt="Cover of Flamer" onerror="this.style.display=&#39;none&#39;">
-            <div class="book-tile-title">Flamer</div>
-            <div class="book-tile-author">— Curato, Curato</div>
-            <div class="book-tile-meta">
-              ⚠ Report on file
-               · 7 reviews
-            </div>
-            <div class="tile-tags">
-              <span class="tile-tag" style="border-color:var(--red);color:var(--red)">Flagged</span>
-              
-              <span class="tile-tag">Reviewed</span>
-            </div>
-          </div>
-        </div>
+      <div class="grid-loading">
+        <div class="spinner-ring"></div>
+        <p>Loading books…</p>
+      </div>
+    </div>
   </section>
 
-  <!-- ===== FOOTER ===== -->
+  <!-- FOOTER -->
   <footer id="contribute">
     <div>
       <div class="footer-brand">The Whole Book</div>
@@ -1132,9 +958,10 @@
     <div class="footer-col">
       <h4>Navigate</h4>
       <ul>
-        <li><a href="file:///C:/Users/marti/Downloads/index_2.html#search">Search Books</a></li>
-        <li><a href="file:///C:/Users/marti/Downloads/index_2.html#about">Our Mission</a></li>
-        <li><a href="file:///C:/Users/marti/Downloads/index_2.html#recently-added">Browse All</a></li>
+        <li><a href="#search">Search Books</a></li>
+        <li><a href="#about">Our Mission</a></li>
+        <li><a href="#most-banned">Most Banned</a></li>
+        <li><a href="#recently-added">Browse All</a></li>
       </ul>
     </div>
     <div class="footer-col">
@@ -1151,7 +978,7 @@
     </div>
   </footer>
 
-  <!-- ===== MODAL ===== -->
+  <!-- MODAL -->
   <div class="modal-overlay" id="modalOverlay" role="dialog" aria-modal="true">
     <div class="modal" id="modal">
       <div class="modal-header">
@@ -1161,20 +988,15 @@
         </div>
         <button class="modal-close" id="modalClose">✕ Close</button>
       </div>
-      <div class="modal-body" id="modalBody">
-      </div>
+      <div class="modal-body" id="modalBody"></div>
     </div>
   </div>
 
-  <!-- =============================================
-       JAVASCRIPT
-  ============================================= -->
   <script>
-    // =============================================
-    // SUPABASE CONFIG
-    // =============================================
+    // ── CONFIG ────────────────────────────────────────────────────────────
+    // ⚠️ Replace with your real anon key (eyJ…)
     const SUPABASE_URL = 'https://cqslqfztgtuuidgdkyyz.supabase.co';
-    const SUPABASE_KEY = 'sb_publishable_TBJdijzfEaYzBDBeqAy2CA_edJMKfgz';
+    const SUPABASE_KEY = 'PASTE_YOUR_FULL_ANON_KEY_HERE';
 
     async function supabaseFetch(path) {
       const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
@@ -1188,16 +1010,12 @@
       return res.json();
     }
 
-    // =============================================
-    // GLOBAL STATE
-    // =============================================
+    // ── STATE ─────────────────────────────────────────────────────────────
     let BOOKS = [];
     let RATED_REPORTS = [];
     let PRO_REVIEWS = [];
 
-    // =============================================
-    // LOAD ALL DATA FROM SUPABASE
-    // =============================================
+    // ── LOAD DATA ─────────────────────────────────────────────────────────
     async function loadData() {
       try {
         const [books, reports, reviews] = await Promise.all([
@@ -1211,75 +1029,62 @@
         PRO_REVIEWS = reviews;
 
         renderRecentBooks();
+        renderMostBanned();
         buildMarquee();
         updateStats();
       } catch (err) {
         console.error('Failed to load data:', err);
         document.getElementById('recentBooks').innerHTML =
-          `<div class="grid-error">⚠ Could not load books from database. Check your connection.</div>`;
-        document.getElementById('recentMeta').textContent = 'Error loading data';
-        // Still build marquee with fallback titles
+          `<div class="grid-error">⚠ Could not load books. Check your connection.</div>`;
+        document.getElementById('bannedList').innerHTML =
+          `<div class="banned-loading" style="color:rgba(235,87,87,0.7)">⚠ Could not load data.</div>`;
         buildMarqueeFallback();
       }
     }
 
-    // =============================================
-    // COUNTERS ANIMATION
-    // =============================================
+    // ── STATS ─────────────────────────────────────────────────────────────
     function animateCount(el, target, duration = 1800) {
       let start = 0;
       const step = target / (duration / 16);
       const timer = setInterval(() => {
         start += step;
-        if (start >= target) {
-          el.textContent = Math.round(target).toLocaleString();
-          clearInterval(timer);
-        } else {
-          el.textContent = Math.floor(start).toLocaleString();
-        }
+        if (start >= target) { el.textContent = Math.round(target).toLocaleString(); clearInterval(timer); }
+        else { el.textContent = Math.floor(start).toLocaleString(); }
       }, 16);
     }
 
     function updateStats() {
-      animateCount(document.getElementById('stat-books'), BOOKS.length || 847);
+      animateCount(document.getElementById('stat-books'), BOOKS.length);
       animateCount(document.getElementById('stat-states'), 42);
-      animateCount(document.getElementById('stat-challenged'), RATED_REPORTS.length || 4300);
+      animateCount(document.getElementById('stat-challenged'), RATED_REPORTS.length);
     }
 
-    // =============================================
-    // MARQUEE
-    // =============================================
+    // ── MARQUEE ───────────────────────────────────────────────────────────
     function buildMarquee() {
-      const titles = BOOKS.length > 0
-        ? BOOKS.map(b => b.title)
-        : getFallbackTitles();
+      const titles = BOOKS.length > 0 ? BOOKS.map(b => b.title) : getFallbackTitles();
       renderMarquee(titles);
     }
 
-    function buildMarqueeFallback() {
-      renderMarquee(getFallbackTitles());
-    }
+    function buildMarqueeFallback() { renderMarquee(getFallbackTitles()); }
 
     function getFallbackTitles() {
       return [
-        'The Kite Runner', 'And Tango Makes Three', 'The Bluest Eye',
-        'Speak', 'The Hate U Give', 'Gender Queer', 'All Boys Aren\'t Blue',
-        'Flamer', 'The Perks of Being a Wallflower', 'Beloved',
-        'Of Mice and Men', 'The Absolutely True Diary of a Part-Time Indian'
+        'The Kite Runner','And Tango Makes Three','The Bluest Eye',
+        'Speak','The Hate U Give','Gender Queer','All Boys Aren\'t Blue',
+        'Flamer','The Perks of Being a Wallflower','Beloved',
+        'Of Mice and Men','The Absolutely True Diary of a Part-Time Indian'
       ];
     }
 
     function renderMarquee(titles) {
-      const marqueeTrack = document.getElementById('marqueeTrack');
+      const track = document.getElementById('marqueeTrack');
       const doubled = [...titles, ...titles, ...titles, ...titles];
-      marqueeTrack.innerHTML = doubled.map(t =>
+      track.innerHTML = doubled.map(t =>
         `<span class="marquee-item">${t} <span class="marquee-sep">◆</span></span>`
       ).join('');
     }
 
-    // =============================================
-    // RECENT BOOKS GRID (from Supabase)
-    // =============================================
+    // ── HELPERS ───────────────────────────────────────────────────────────
     function getReportForBook(bookId) {
       return RATED_REPORTS.find(r => r.book_id === bookId);
     }
@@ -1288,6 +1093,59 @@
       return PRO_REVIEWS.filter(r => String(r.book_id) === String(bookId));
     }
 
+    // ── MOST BANNED ───────────────────────────────────────────────────────
+    function renderMostBanned() {
+      const container = document.getElementById('bannedList');
+      const meta = document.getElementById('bannedMeta');
+
+      // Only show books that have a rated report with a rating
+      const booksWithRating = BOOKS
+        .map(book => ({ book, report: getReportForBook(book.id) }))
+        .filter(({ report }) => report && report.rating != null)
+        .sort((a, b) => (b.report.rating || 0) - (a.report.rating || 0));
+
+      // Fall back to all books with any report if none have numeric ratings
+      const booksWithReport = booksWithRating.length > 0
+        ? booksWithRating
+        : BOOKS
+            .map(book => ({ book, report: getReportForBook(book.id) }))
+            .filter(({ report }) => !!report);
+
+      if (!booksWithReport.length) {
+        container.innerHTML = `<div class="banned-loading">No flagged books documented yet.</div>`;
+        meta.textContent = '0 flagged books';
+        return;
+      }
+
+      meta.textContent = `${booksWithReport.length} flagged book${booksWithReport.length !== 1 ? 's' : ''} · sorted by ban rating`;
+
+      container.innerHTML = booksWithReport.map(({ book, report }, i) => {
+        const reviews = getReviewsForBook(book.id);
+        return `
+          <div class="banned-row" onclick="openModal('${book.id}')" style="animation-delay:${i * 0.05}s">
+            <div class="banned-rank">${String(i + 1).padStart(2, '0')}</div>
+            <div class="banned-info">
+              <div class="banned-title">${book.title}</div>
+              <div class="banned-author">${book.author || 'Unknown Author'}</div>
+              <div class="banned-tags">
+                <span class="banned-tag banned-tag-flag">Flagged</span>
+                ${reviews.length > 0 ? `<span class="banned-tag banned-tag-review">${reviews.length} Review${reviews.length > 1 ? 's' : ''}</span>` : ''}
+                ${report.flagged_categories ? `<span class="banned-tag banned-tag-flag" style="opacity:0.7">${report.flagged_categories.split(',')[0].trim()}</span>` : ''}
+              </div>
+            </div>
+            <div class="banned-rating-block">
+              ${report.rating != null
+                ? `<div class="banned-rating-num">${report.rating}</div>
+                   <div class="banned-rating-label">Ban Rating</div>`
+                : `<div class="banned-no-rating">On file</div>`
+              }
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // ── RECENTLY ADDED ────────────────────────────────────────────────────
     function renderRecentBooks() {
       const container = document.getElementById('recentBooks');
       const meta = document.getElementById('recentMeta');
@@ -1303,34 +1161,29 @@
       container.innerHTML = BOOKS.map((book, i) => {
         const report = getReportForBook(book.id);
         const reviews = getReviewsForBook(book.id);
-        const hasReport = !!report;
-        const hasReviews = reviews.length > 0;
-
         return `
           <div class="book-tile" onclick="openModal('${book.id}')">
             ${book.cover_url
               ? `<img class="book-tile-cover" src="${book.cover_url}" alt="Cover of ${book.title}" onerror="this.style.display='none'" />`
-              : `<div class="book-tile-number">0${String(i + 1).padStart(2, '0')}</div>`
+              : `<div class="book-tile-number">${String(i + 1).padStart(2, '0')}</div>`
             }
             <div class="book-tile-title">${book.title}</div>
             <div class="book-tile-author">— ${book.author || 'Unknown Author'}</div>
             <div class="book-tile-meta">
-              ${hasReport ? `⚠ Report on file` : 'No report yet'}
-              ${hasReviews ? ` · ${reviews.length} review${reviews.length > 1 ? 's' : ''}` : ''}
+              ${report ? '⚠ Report on file' : 'No report yet'}
+              ${reviews.length > 0 ? ` · ${reviews.length} review${reviews.length > 1 ? 's' : ''}` : ''}
             </div>
             <div class="tile-tags">
-              ${hasReport ? `<span class="tile-tag" style="border-color:var(--red);color:var(--red)">Flagged</span>` : ''}
+              ${report ? `<span class="tile-tag" style="border-color:var(--red);color:var(--red)">Flagged</span>` : ''}
               ${book.award ? `<span class="tile-tag" style="border-color:var(--gold);color:var(--gold)">Award</span>` : ''}
-              ${hasReviews ? `<span class="tile-tag">Reviewed</span>` : ''}
+              ${reviews.length > 0 ? `<span class="tile-tag">Reviewed</span>` : ''}
             </div>
           </div>
         `;
       }).join('');
     }
 
-    // =============================================
-    // SEARCH (searches loaded BOOKS array)
-    // =============================================
+    // ── SEARCH ────────────────────────────────────────────────────────────
     const searchInput = document.getElementById('searchInput');
     const searchBtn = document.getElementById('searchBtn');
     const searchResults = document.getElementById('searchResults');
@@ -1342,24 +1195,20 @@
         searchResults.innerHTML = `<div class="search-placeholder"><div class="search-placeholder-icon">📚</div><p>Search a title above<br/>to see the real story</p></div>`;
         return;
       }
-
       if (!BOOKS.length) {
-        searchResults.innerHTML = `<div class="search-placeholder"><div class="search-placeholder-icon">⏳</div><p>Database still loading…<br/>Please wait a moment</p></div>`;
+        searchResults.innerHTML = `<div class="search-placeholder"><div class="search-placeholder-icon">⏳</div><p>Database still loading…</p></div>`;
         return;
       }
-
       const results = BOOKS.filter(b =>
         (b.title && b.title.toLowerCase().includes(q)) ||
         (b.author && b.author.toLowerCase().includes(q)) ||
         (b.isbn && b.isbn.toLowerCase().includes(q))
       );
-
-      if (results.length === 0) {
+      if (!results.length) {
         searchResults.classList.remove('has-results');
         searchResults.innerHTML = `<div class="search-placeholder"><div class="search-placeholder-icon">🔍</div><p>No results for "${query}"<br/><br/>This book may not be<br/>in our database yet</p></div>`;
         return;
       }
-
       searchResults.classList.add('has-results');
       searchResults.innerHTML = results.map(book => {
         const report = getReportForBook(book.id);
@@ -1386,9 +1235,7 @@
     searchBtn.addEventListener('click', () => doSearch(searchInput.value));
     searchInput.addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(searchInput.value); });
 
-    // =============================================
-    // MODAL
-    // =============================================
+    // ── MODAL ─────────────────────────────────────────────────────────────
     const modalOverlay = document.getElementById('modalOverlay');
     const modalClose = document.getElementById('modalClose');
     const modalTitle = document.getElementById('modalTitle');
@@ -1398,12 +1245,10 @@
     function openModal(id) {
       const book = BOOKS.find(b => String(b.id) === String(id));
       if (!book) return;
-
       modalTitle.textContent = book.title;
       modalAuthor.textContent = `by ${book.author || 'Unknown Author'}`;
       modalOverlay.classList.add('open');
       document.body.style.overflow = 'hidden';
-
       const report = getReportForBook(book.id);
       const reviews = getReviewsForBook(book.id);
       renderModal(book, report, reviews);
@@ -1422,7 +1267,9 @@
             <div class="verdict-col">
               <div class="verdict-label ban">Their Rating</div>
               <div class="verdict-rating">${report.rating || '?'}</div>
-              <div class="verdict-source">${report.report_url ? `<a href="${report.report_url}" target="_blank" style="color:var(--red)">View Source Report</a>` : 'Source on file'}</div>
+              <div class="verdict-source">${report.report_url
+                ? `<a href="${report.report_url}" target="_blank" style="color:var(--red)">View Source Report</a>`
+                : 'Source on file'}</div>
             </div>
             <div class="verdict-col">
               <div class="verdict-label real">Status</div>
@@ -1433,9 +1280,7 @@
 
           ${report.flagged_categories ? `
             <div class="section-label">Flagged Categories</div>
-            <div class="context-quote" style="font-style:normal;margin-bottom:2rem">
-              ${report.flagged_categories}
-            </div>
+            <div class="context-quote" style="font-style:normal;margin-bottom:2rem">${report.flagged_categories}</div>
           ` : ''}
 
           ${report.excerpts ? `
@@ -1451,7 +1296,7 @@
           </div>
         `}
 
-        ${(reviews && reviews.length > 0) ? `
+        ${reviews && reviews.length > 0 ? `
           <div class="section-label">Professional Reviews</div>
           ${reviews.map(r => `
             <div class="analysis-text" style="margin-bottom:1.5rem">
@@ -1479,11 +1324,9 @@
       document.body.style.overflow = '';
     }
 
-    // =============================================
-    // INIT
-    // =============================================
+    // ── INIT ──────────────────────────────────────────────────────────────
     loadData();
   </script>
 
-
-</body></html>
+</body>
+</html>
