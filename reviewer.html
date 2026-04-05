@@ -21,6 +21,8 @@
       --error: #eb5757;
       --pro: #7eb8f7;
       --rated: #b89df7;
+      --goodreads: #f47f3b;
+      --goodreads-glow: rgba(244,127,59,0.12);
     }
 
     body {
@@ -125,9 +127,10 @@
       border-radius: 4px 4px 0 0;
     }
 
-    .section.book-section::before   { background: var(--accent); }
-    .section.rated-section::before  { background: var(--rated); }
-    .section.pro-section::before    { background: var(--pro); }
+    .section.book-section::before      { background: var(--accent); }
+    .section.rated-section::before     { background: var(--rated); }
+    .section.pro-section::before       { background: var(--pro); }
+    .section.goodreads-section::before { background: var(--goodreads); }
 
     .section-label {
       font-size: 10px;
@@ -140,9 +143,10 @@
       gap: 8px;
     }
 
-    .section.book-section  .section-label { color: var(--accent); }
-    .section.rated-section .section-label { color: var(--rated); }
-    .section.pro-section   .section-label { color: var(--pro); }
+    .section.book-section      .section-label { color: var(--accent); }
+    .section.rated-section     .section-label { color: var(--rated); }
+    .section.pro-section       .section-label { color: var(--pro); }
+    .section.goodreads-section .section-label { color: var(--goodreads); }
 
     .section-label::after {
       content: '';
@@ -196,6 +200,13 @@
     input:focus, textarea:focus {
       border-color: var(--accent);
       box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    /* Goodreads-specific focus color */
+    .goodreads-section input:focus,
+    .goodreads-section textarea:focus {
+      border-color: var(--goodreads);
+      box-shadow: 0 0 0 3px var(--goodreads-glow);
     }
 
     input::placeholder, textarea::placeholder { color: var(--muted); }
@@ -347,7 +358,7 @@
   <main>
     <div class="page-header">
       <h1>Add a <span>Book</span></h1>
-      <p>Enter book details, rated report, and professional review in one submission.</p>
+      <p>Enter book details, rated report, Goodreads data, and professional reviews in one submission.</p>
     </div>
 
     <!-- Top row: Book Details (left) + Rated Report (right) -->
@@ -395,7 +406,28 @@
 
     </div>
 
-    <!-- Bottom row: Pro Reviews (full width, multiple) -->
+    <!-- Goodreads section (full width) -->
+    <div class="form-full">
+      <div class="section goodreads-section">
+        <div class="section-label">Goodreads</div>
+        <div class="field-row">
+          <div class="field">
+            <label>Average Rating <span class="optional">optional</span></label>
+            <input type="number" id="g-rating" min="1" max="5" step="0.01" placeholder="e.g. 4.12" />
+          </div>
+          <div class="field">
+            <label>Goodreads URL <span class="optional">optional</span></label>
+            <input type="url" id="g-url" placeholder="https://goodreads.com/book/show/…" />
+          </div>
+        </div>
+        <div class="field">
+          <label>Summary</label>
+          <textarea id="g-summary" style="min-height:120px" placeholder="Paste or write the Goodreads book summary here…"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pro Reviews (full width, multiple) -->
     <div class="form-full">
       <div class="section pro-section">
         <div class="section-label">Professional Reviews</div>
@@ -405,7 +437,7 @@
     </div>
 
     <div class="submit-row">
-      <span class="submit-hint">All three records will be saved together.</span>
+      <span class="submit-hint">All records will be saved together.</span>
       <button class="btn-submit" id="submitBtn" onclick="handleSubmit()">
         <span class="btn-label">Save Book</span>
         <div class="spinner"></div>
@@ -420,6 +452,8 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
+    // ⚠️ Replace SUPABASE_ANON_KEY with the full JWT key from:
+    // Supabase Dashboard → Project Settings → API → anon / public key
     const SUPABASE_URL      = 'https://cqslqfztgtuuidgdkyyz.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_TBJdijzfEaYzBDBeqAy2CA_edJMKfgz';
 
@@ -427,7 +461,6 @@
     const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     let currentUser = null;
-
     let proReviewCount = 0;
 
     function addProReview() {
@@ -474,7 +507,7 @@
       currentUser = session.user;
       document.getElementById('user-email-display').textContent = currentUser.email;
       document.body.classList.add('ready');
-      addProReview(); // start with one review block
+      addProReview();
     }
 
     async function handleLogout() {
@@ -524,7 +557,23 @@
           if (rErr) throw new Error('Rated report: ' + rErr.message);
         }
 
-        // 3. Insert all pro reviews
+        // 3. Insert Goodreads data if any entered
+        const gRating  = document.getElementById('g-rating').value;
+        const gSummary = document.getElementById('g-summary').value.trim();
+        const gUrl     = document.getElementById('g-url').value.trim();
+
+        if (gRating || gSummary || gUrl) {
+          const { error: gErr } = await sb.from('goodreads').insert({
+            book_id:        bookId,
+            user_id:        currentUser.id,
+            average_rating: gRating  ? parseFloat(gRating) : null,
+            summary:        gSummary || null,
+            url:            gUrl     || null,
+          });
+          if (gErr) throw new Error('Goodreads: ' + gErr.message);
+        }
+
+        // 4. Insert all pro reviews
         const reviewItems = document.querySelectorAll('.pro-review-item');
         for (const item of reviewItems) {
           const idx     = item.id.replace('pro-review-', '');
@@ -558,9 +607,9 @@
 
     function clearForm() {
       ['b-title','b-author','b-isbn','b-cover',
-       'r-rating','r-flagged','r-excerpts','r-report-url'
+       'r-rating','r-flagged','r-excerpts','r-report-url',
+       'g-rating','g-summary','g-url'
       ].forEach(id => document.getElementById(id).value = '');
-      // Reset pro reviews back to one empty block
       document.getElementById('pro-reviews-list').innerHTML = '';
       proReviewCount = 0;
       addProReview();

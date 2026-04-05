@@ -21,6 +21,8 @@
       --error: #eb5757;
       --pro: #7eb8f7;
       --rated: #b89df7;
+      --goodreads: #f47f3b;
+      --goodreads-glow: rgba(244,127,59,0.12);
     }
 
     body { min-height: 100vh; background: var(--bg); font-family: 'DM Sans', sans-serif; color: var(--text); opacity: 0; transition: opacity 0.4s; }
@@ -47,72 +49,42 @@
 
     /* Book picker */
     .book-picker {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      padding: 20px 24px;
-      margin-bottom: 32px;
-      display: flex;
-      align-items: center;
-      gap: 16px;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 4px;
+      padding: 20px 24px; margin-bottom: 32px;
+      display: flex; align-items: center; gap: 16px;
     }
-
-    .book-picker-label {
-      font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
-      color: var(--muted); white-space: nowrap; flex-shrink: 0;
-    }
-
+    .book-picker-label { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); white-space: nowrap; flex-shrink: 0; }
     .book-search-wrap { position: relative; flex: 1; }
-
-    .book-search-wrap input {
-      width: 100%; background: var(--surface2); border: 1px solid var(--border);
-      border-radius: 2px; padding: 10px 13px; color: var(--text);
-      font-family: 'DM Sans', sans-serif; font-size: 14px; outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
+    .book-search-wrap input { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 2px; padding: 10px 13px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
     .book-search-wrap input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
     .book-search-wrap input::placeholder { color: var(--muted); }
-
-    .book-results {
-      position: absolute; top: 100%; left: 0; right: 0;
-      background: var(--surface); border: 1px solid var(--border); border-top: none;
-      border-radius: 0 0 3px 3px; max-height: 200px; overflow-y: auto; z-index: 20; display: none;
-    }
+    .book-results { position: absolute; top: 100%; left: 0; right: 0; background: var(--surface); border: 1px solid var(--border); border-top: none; border-radius: 0 0 3px 3px; max-height: 200px; overflow-y: auto; z-index: 20; display: none; }
     .book-results.open { display: block; }
     .book-option { padding: 10px 14px; cursor: pointer; font-size: 13px; transition: background 0.15s; }
     .book-option:hover { background: rgba(232,184,109,0.08); }
     .book-option small { color: var(--muted); display: block; font-size: 11px; }
-
-    .btn-new {
-      background: none; border: 1px solid var(--border); color: var(--muted);
-      font-family: 'DM Sans', sans-serif; font-size: 12px; padding: 10px 18px;
-      border-radius: 2px; cursor: pointer; white-space: nowrap; flex-shrink: 0;
-      transition: border-color 0.2s, color 0.2s;
-    }
+    .btn-new { background: none; border: 1px solid var(--border); color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 12px; padding: 10px 18px; border-radius: 2px; cursor: pointer; white-space: nowrap; flex-shrink: 0; transition: border-color 0.2s, color 0.2s; }
     .btn-new:hover { border-color: var(--accent); color: var(--accent); }
-
-    .btn-delete-book {
-      background: none; border: 1px solid var(--border); color: var(--error);
-      font-family: 'DM Sans', sans-serif; font-size: 12px; padding: 10px 18px;
-      border-radius: 2px; cursor: pointer; white-space: nowrap; flex-shrink: 0;
-      transition: border-color 0.2s, background 0.2s;
-    }
+    .btn-delete-book { background: none; border: 1px solid var(--border); color: var(--error); font-family: 'DM Sans', sans-serif; font-size: 12px; padding: 10px 18px; border-radius: 2px; cursor: pointer; white-space: nowrap; flex-shrink: 0; transition: border-color 0.2s, background 0.2s; }
     .btn-delete-book:hover { border-color: var(--error); background: rgba(235,87,87,0.08); }
 
-    /* Form - identical to reviewer.html */
+    /* Form layout */
     .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
     .form-full { margin-bottom: 20px; }
 
+    /* Section cards */
     .section { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 28px 28px 24px; position: relative; }
     .section::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; border-radius: 4px 4px 0 0; }
-    .section.book-section::before  { background: var(--accent); }
-    .section.rated-section::before { background: var(--rated); }
-    .section.pro-section::before   { background: var(--pro); }
+    .section.book-section::before      { background: var(--accent); }
+    .section.rated-section::before     { background: var(--rated); }
+    .section.pro-section::before       { background: var(--pro); }
+    .section.goodreads-section::before { background: var(--goodreads); }
 
     .section-label { font-size: 10px; font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
-    .section.book-section  .section-label { color: var(--accent); }
-    .section.rated-section .section-label { color: var(--rated); }
-    .section.pro-section   .section-label { color: var(--pro); }
+    .section.book-section      .section-label { color: var(--accent); }
+    .section.rated-section     .section-label { color: var(--rated); }
+    .section.pro-section       .section-label { color: var(--pro); }
+    .section.goodreads-section .section-label { color: var(--goodreads); }
     .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 
     .field { margin-bottom: 16px; }
@@ -124,10 +96,11 @@
 
     input, textarea { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 2px; padding: 10px 13px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
     input:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+    .goodreads-section input:focus, .goodreads-section textarea:focus { border-color: var(--goodreads); box-shadow: 0 0 0 3px var(--goodreads-glow); }
     input::placeholder, textarea::placeholder { color: var(--muted); }
     textarea { resize: vertical; min-height: 100px; line-height: 1.6; }
 
-    /* Multi pro reviews */
+    /* Pro review blocks */
     .pro-review-item { border: 1px solid var(--border); border-radius: 3px; padding: 20px; margin-bottom: 16px; background: var(--surface2); animation: slideIn 0.25s ease both; }
     @keyframes slideIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
     .review-item-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
@@ -140,12 +113,10 @@
     /* Submit */
     .submit-row { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; padding-top: 28px; border-top: 1px solid var(--border); }
     .submit-hint { font-size: 12px; color: var(--muted); font-weight: 300; }
-
     .btn-submit { background: var(--accent); color: #111318; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; border: none; padding: 13px 36px; border-radius: 2px; cursor: pointer; transition: opacity 0.2s, transform 0.1s; display: flex; align-items: center; gap: 8px; }
     .btn-submit:hover { opacity: 0.88; }
     .btn-submit:active { transform: scale(0.98); }
     .btn-submit:disabled { opacity: 0.4; cursor: not-allowed; }
-
     .spinner { display: none; width: 13px; height: 13px; border: 2px solid rgba(17,19,24,0.3); border-top-color: #111318; border-radius: 50%; animation: spin 0.6s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
     .btn-submit.loading .spinner { display: block; }
@@ -203,7 +174,6 @@
         <div class="field"><label>Author</label><input type="text" id="b-author" placeholder="Author name"/></div>
         <div class="field"><label>ISBN</label><input type="text" id="b-isbn" placeholder="978-0-000-00000-0"/></div>
         <div class="field"><label>Cover Art URL <span class="optional">optional</span></label><input type="url" id="b-cover" placeholder="https://…"/></div>
-        <div class="field"><label>Goodreads Rating <span class="optional">optional</span></label><input type="text" id="b-goodreads" placeholder="e.g. 4.23"/></div>
       </div>
 
       <div class="section rated-section">
@@ -212,6 +182,27 @@
         <div class="field"><label>Flagged Categories <span class="optional">optional</span></label><input type="text" id="r-flagged" placeholder="e.g. Violence, Language, Sexual Content"/></div>
         <div class="field"><label>Excerpts <span class="optional">optional</span></label><textarea id="r-excerpts" placeholder="Notable excerpts from the book…"></textarea></div>
         <div class="field"><label>Report URL <span class="optional">optional</span></label><input type="url" id="r-report-url" placeholder="https://ratedbooks.org/…"/></div>
+      </div>
+    </div>
+
+    <!-- Goodreads section (full width) -->
+    <div class="form-full">
+      <div class="section goodreads-section">
+        <div class="section-label">Goodreads</div>
+        <div class="field-row">
+          <div class="field">
+            <label>Average Rating <span class="optional">optional</span></label>
+            <input type="number" id="g-rating" min="1" max="5" step="0.01" placeholder="e.g. 4.12"/>
+          </div>
+          <div class="field">
+            <label>Goodreads URL <span class="optional">optional</span></label>
+            <input type="url" id="g-url" placeholder="https://goodreads.com/book/show/…"/>
+          </div>
+        </div>
+        <div class="field">
+          <label>Summary</label>
+          <textarea id="g-summary" style="min-height:120px" placeholder="Paste or write the Goodreads book summary here…"></textarea>
+        </div>
       </div>
     </div>
 
@@ -240,18 +231,20 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    // ── CONFIG ── Replace with your actual Supabase project values ──────────
-    const SUPABASE_URL = 'https://cqslqfztgtuuidgdkyyz.supabase.co';
+    // ⚠️ Replace SUPABASE_ANON_KEY with the full JWT from:
+    // Supabase Dashboard → Project Settings → API → anon / public key
+    const SUPABASE_URL      = 'https://cqslqfztgtuuidgdkyyz.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_TBJdijzfEaYzBDBeqAy2CA_edJMKfgz';
 
     const { createClient } = supabase;
     const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    let currentUser    = null;
-    let allBooks       = [];
-    let currentBookId  = null;
-    let existingRatedId = null;
-    let proReviewCount = 0;
+    let currentUser      = null;
+    let allBooks         = [];
+    let currentBookId    = null;
+    let existingRatedId  = null;
+    let existingGoodreadsId = null;
+    let proReviewCount   = 0;
 
     // ── Auth ──────────────────────────────────────────────────────────────
     async function init() {
@@ -261,13 +254,12 @@
       document.getElementById('user-email-display').textContent = currentUser.email;
       document.body.classList.add('ready');
       await loadAllBooks();
-      // Check if a book ID was passed in the URL
       const params = new URLSearchParams(window.location.search);
       const bookId = params.get('book');
       if (bookId) {
         await loadBook(bookId);
       } else {
-        addProReview(); // start with one empty block
+        addProReview();
       }
     }
 
@@ -306,38 +298,44 @@
     async function loadBook(bookId) {
       document.getElementById('bookResults').classList.remove('open');
 
-      const [bookRes, ratedRes, proRes] = await Promise.all([
+      const [bookRes, ratedRes, goodreadsRes, proRes] = await Promise.all([
         sb.from('books').select('*').eq('id', bookId).single(),
         sb.from('rated_reports').select('*').eq('book_id', bookId).maybeSingle(),
+        sb.from('goodreads').select('*').eq('book_id', bookId).maybeSingle(),
         sb.from('pro_reviews').select('*').eq('book_id', bookId).order('created_at')
       ]);
 
       if (bookRes.error) { showToast('Could not load book.', 'error'); return; }
 
-      const book  = bookRes.data;
-      const rated = ratedRes.data;
-      const pros  = proRes.data || [];
+      const book      = bookRes.data;
+      const rated     = ratedRes.data;
+      const goodreads = goodreadsRes.data;
+      const pros      = proRes.data || [];
 
-      currentBookId   = book.id;
-      existingRatedId = rated?.id || null;
+      currentBookId        = book.id;
+      existingRatedId      = rated?.id || null;
+      existingGoodreadsId  = goodreads?.id || null;
 
-      // Update search box
       document.getElementById('bookSearch').value = `${book.title}${book.author ? ' — ' + book.author : ''}`;
 
-      // Fill book fields
-      document.getElementById('b-title').value  = book.title    || '';
-      document.getElementById('b-author').value = book.author   || '';
-      document.getElementById('b-isbn').value   = book.isbn     || '';
+      // Book fields
+      document.getElementById('b-title').value  = book.title     || '';
+      document.getElementById('b-author').value = book.author    || '';
+      document.getElementById('b-isbn').value   = book.isbn      || '';
       document.getElementById('b-cover').value  = book.cover_url || '';
-      document.getElementById('b-goodreads').value = book.goodreads_rating || '';
 
-      // Fill rated report
+      // Rated report fields
       document.getElementById('r-rating').value     = rated?.rating             || '';
       document.getElementById('r-flagged').value    = rated?.flagged_categories || '';
       document.getElementById('r-excerpts').value   = rated?.excerpts           || '';
       document.getElementById('r-report-url').value = rated?.report_url         || '';
 
-      // Fill pro reviews
+      // Goodreads fields
+      document.getElementById('g-rating').value  = goodreads?.average_rating || '';
+      document.getElementById('g-summary').value = goodreads?.summary        || '';
+      document.getElementById('g-url').value     = goodreads?.url            || '';
+
+      // Pro reviews
       document.getElementById('pro-reviews-list').innerHTML = '';
       proReviewCount = 0;
       if (pros.length > 0) {
@@ -346,7 +344,6 @@
         addProReview();
       }
 
-      // Update UI state
       document.getElementById('deleteBookBtn').style.display = 'inline-flex';
       document.getElementById('submitBtn').querySelector('.btn-label').textContent = 'Save Changes';
       document.getElementById('submit-hint').textContent = 'Changes save to all sections at once.';
@@ -399,18 +396,20 @@
 
     // ── Clear form (new book) ─────────────────────────────────────────────
     function clearForm() {
-      currentBookId   = null;
-      existingRatedId = null;
+      currentBookId        = null;
+      existingRatedId      = null;
+      existingGoodreadsId  = null;
       document.getElementById('bookSearch').value = '';
-      ['b-title','b-author','b-isbn','b-cover','b-goodreads',
-       'r-rating','r-flagged','r-excerpts','r-report-url'
+      ['b-title','b-author','b-isbn','b-cover',
+       'r-rating','r-flagged','r-excerpts','r-report-url',
+       'g-rating','g-summary','g-url'
       ].forEach(id => document.getElementById(id).value = '');
       document.getElementById('pro-reviews-list').innerHTML = '';
       proReviewCount = 0;
       addProReview();
       document.getElementById('deleteBookBtn').style.display = 'none';
       document.getElementById('submitBtn').querySelector('.btn-label').textContent = 'Save Book';
-      document.getElementById('submit-hint').textContent = 'All three records will be saved together.';
+      document.getElementById('submit-hint').textContent = 'All records will be saved together.';
     }
 
     // ── Save ──────────────────────────────────────────────────────────────
@@ -424,13 +423,13 @@
       try {
         let bookId;
 
+        // 1. Book
         if (currentBookId) {
           const { error } = await sb.from('books').update({
             title,
             author:    document.getElementById('b-author').value.trim() || null,
             isbn:      document.getElementById('b-isbn').value.trim()   || null,
             cover_url: document.getElementById('b-cover').value.trim()  || null,
-            goodreads_rating: document.getElementById('b-goodreads').value.trim() || null,
           }).eq('id', currentBookId);
           if (error) throw new Error('Book: ' + error.message);
           bookId = currentBookId;
@@ -440,14 +439,13 @@
             author:    document.getElementById('b-author').value.trim() || null,
             isbn:      document.getElementById('b-isbn').value.trim()   || null,
             cover_url: document.getElementById('b-cover').value.trim()  || null,
-            goodreads_rating: document.getElementById('b-goodreads').value.trim() || null,
           }).select('id').single();
           if (error) throw new Error('Book: ' + error.message);
           bookId = data.id;
           currentBookId = bookId;
         }
 
-        // Rated report
+        // 2. Rated report
         const rating    = document.getElementById('r-rating').value;
         const flagged   = document.getElementById('r-flagged').value.trim();
         const excerpts  = document.getElementById('r-excerpts').value.trim();
@@ -459,7 +457,6 @@
           excerpts: excerpts || null,
           report_url: reportUrl || null,
         };
-
         if (existingRatedId) {
           const { error } = await sb.from('rated_reports').update(ratedPayload).eq('id', existingRatedId);
           if (error) throw new Error('Rated report: ' + error.message);
@@ -469,7 +466,26 @@
           existingRatedId = data.id;
         }
 
-        // Pro reviews
+        // 3. Goodreads
+        const gRating  = document.getElementById('g-rating').value;
+        const gSummary = document.getElementById('g-summary').value.trim();
+        const gUrl     = document.getElementById('g-url').value.trim();
+        const goodreadsPayload = {
+          book_id: bookId, user_id: currentUser.id,
+          average_rating: gRating ? parseFloat(gRating) : null,
+          summary: gSummary || null,
+          url: gUrl || null,
+        };
+        if (existingGoodreadsId) {
+          const { error } = await sb.from('goodreads').update(goodreadsPayload).eq('id', existingGoodreadsId);
+          if (error) throw new Error('Goodreads: ' + error.message);
+        } else if (gRating || gSummary || gUrl) {
+          const { data, error } = await sb.from('goodreads').insert(goodreadsPayload).select('id').single();
+          if (error) throw new Error('Goodreads: ' + error.message);
+          existingGoodreadsId = data.id;
+        }
+
+        // 4. Pro reviews
         const reviewItems = document.querySelectorAll('.pro-review-item');
         for (const item of reviewItems) {
           const idx     = item.id.replace('pro-review-', '');
@@ -478,7 +494,6 @@
           const summary = document.getElementById('p-summary-' + idx)?.value.trim();
           const proUrl  = document.getElementById('p-url-'     + idx)?.value.trim();
           const rid     = item.dataset.reviewId;
-
           const payload = { book_id: bookId, user_id: currentUser.id, source: source||null, award: award||null, summary: summary||null, url: proUrl||null };
 
           if (rid) {
@@ -494,7 +509,7 @@
           }
         }
 
-        showToast(currentBookId === bookId && !currentBookId ? 'Book saved!' : 'Changes saved!', 'success');
+        showToast('Changes saved!', 'success');
         await loadAllBooks();
         document.getElementById('deleteBookBtn').style.display = 'inline-flex';
         document.getElementById('submitBtn').querySelector('.btn-label').textContent = 'Save Changes';
@@ -511,6 +526,7 @@
       if (!confirm('Delete this book and all its reviews? This cannot be undone.')) return;
       await sb.from('pro_reviews').delete().eq('book_id', currentBookId);
       await sb.from('rated_reports').delete().eq('book_id', currentBookId);
+      await sb.from('goodreads').delete().eq('book_id', currentBookId);
       const { error } = await sb.from('books').delete().eq('id', currentBookId);
       if (error) { showToast(error.message, 'error'); return; }
       showToast('Book deleted.', 'success');
