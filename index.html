@@ -1431,12 +1431,10 @@
             </div>
           </div>
 
-          ${report.flagged_categories && report.flagged_categories.length ? `
+          ${report.flagged_categories ? `
             <div class="section-label">Flagged Categories</div>
-            <div class="awards-list" style="margin-bottom:2rem">
-              ${report.flagged_categories.map(c =>
-                `<span class="award-badge" style="border-color:var(--red);color:var(--red);background:rgba(192,57,43,0.05)">⚠ ${c}</span>`
-              ).join('')}
+            <div class="context-quote" style="font-style:normal;margin-bottom:2rem">
+              ${report.flagged_categories}
             </div>
           ` : ''}
 
