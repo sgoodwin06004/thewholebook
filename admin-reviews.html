@@ -803,9 +803,13 @@
     async function deleteReview(reviewId) {
       if (!confirm('Delete this review?')) return;
       try {
-        await fetch(`${SUPABASE_URL}/rest/v1/pro_reviews?id=eq.${reviewId}`, {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/pro_reviews?id=eq.${reviewId}`, {
           method: 'DELETE', headers
         });
+        if (!res.ok) {
+          const err = await res.text();
+          throw new Error(err);
+        }
         allReviews = allReviews.filter(r => r.id !== reviewId);
         updateStats();
         renderExistingReviews();

@@ -331,6 +331,31 @@
     }
     .btn-add-review:hover { border-color: var(--pro); background: rgba(126,184,247,0.05); }
 
+    .cover-upload-row {
+      display: flex;
+      gap: 8px;
+      align-items: stretch;
+    }
+    .cover-upload-row input[type="url"] { flex: 1; }
+
+    .cover-upload-area {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      padding: 0 14px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--pro);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      white-space: nowrap;
+      transition: border-color 0.2s, background 0.2s;
+      letter-spacing: 0.04em;
+    }
+    .cover-upload-area:hover { border-color: var(--pro); background: rgba(126,184,247,0.07); }
+    .cover-upload-area.uploading { opacity: 0.6; cursor: not-allowed; pointer-events: none; }
+
     @media (max-width: 768px) {
       .form-grid, .field-row { grid-template-columns: 1fr; }
       main { padding: 32px 16px 60px; }
@@ -370,8 +395,17 @@
           <input type="text" id="b-isbn" placeholder="978-0-000-00000-0" />
         </div>
         <div class="field">
-          <label>Cover Art URL <span class="optional">optional</span></label>
-          <input type="url" id="b-cover" placeholder="https://…" />
+          <label>Cover Art <span class="optional">optional</span></label>
+          <div class="cover-upload-row">
+            <input type="url" id="b-cover" placeholder="https://… or upload below" />
+            <div class="cover-upload-area" id="coverUploadArea" onclick="document.getElementById('coverFileInput').click()">
+              <input type="file" id="coverFileInput" accept="image/*" style="display:none" onchange="handleCoverUpload(this)" />
+              <span id="coverUploadLabel">Upload Image</span>
+            </div>
+          </div>
+          <div id="coverPreviewWrap" style="display:none;margin-top:10px">
+            <img id="coverPreview" src="" alt="Cover preview" style="height:80px;border-radius:2px;border:1px solid var(--border);object-fit:cover;" />
+          </div>
         </div>
       </div>
 
@@ -488,6 +522,38 @@
       if (el) el.remove();
     }
 
+    async function handleCoverUpload(input) {
+      const file = input.files[0];
+      if (!file) return;
+
+      const area = document.getElementById('coverUploadArea');
+      const label = document.getElementById('coverUploadLabel');
+      area.classList.add('uploading');
+      label.textContent = 'Uploading…';
+
+      try {
+        const ext = file.name.split('.').pop();
+        const fileName = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
+        const { data, error } = await sb.storage.from('covers').upload(fileName, file, { upsert: true });
+        if (error) throw error;
+
+        const { data: { publicUrl } } = sb.storage.from('covers').getPublicUrl(data.path);
+        document.getElementById('b-cover').value = publicUrl;
+
+        const preview = document.getElementById('coverPreview');
+        preview.src = publicUrl;
+        document.getElementById('coverPreviewWrap').style.display = 'block';
+
+        label.textContent = 'Change Image';
+      } catch (e) {
+        showToast('Cover upload failed: ' + e.message, 'error');
+        label.textContent = 'Upload Image';
+      } finally {
+        area.classList.remove('uploading');
+        input.value = '';
+      }
+    }
+
     async function prefillForm(bookId) {
       try {
         const [{ data: book }, { data: rated }, { data: proRevs }] = await Promise.all([
@@ -502,6 +568,11 @@
           document.getElementById('b-isbn').value   = book.isbn              || '';
           document.getElementById('b-cover').value  = book.cover_url         || '';
           document.getElementById('g-rating').value = book.goodreads_rating  || '';
+          if (book.cover_url) {
+            document.getElementById('coverPreview').src = book.cover_url;
+            document.getElementById('coverPreviewWrap').style.display = 'block';
+            document.getElementById('coverUploadLabel').textContent = 'Change Image';
+          }
         }
 
         if (rated) {
@@ -672,15 +743,16 @@
                 .eq('id', existingId);
               if (pErr) throw new Error('Pro review: ' + pErr.message);
             } else {
-              const { error: pErr } = await sb.from('pro_reviews').insert({
+              const { data: newReview, error: pErr } = await sb.from('pro_reviews').insert({
                 book_id: bookId,
                 user_id: currentUser.id,
                 source:  source  || null,
                 award:   award   || null,
                 summary: summary || null,
                 url:     proUrl  || null,
-              });
+              }).select('id').single();
               if (pErr) throw new Error('Pro review: ' + pErr.message);
+              item.dataset.reviewId = newReview.id;
             }
           }
         }
