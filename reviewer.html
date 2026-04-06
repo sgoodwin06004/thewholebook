@@ -350,7 +350,7 @@
 
   <main>
     <div class="page-header">
-      <h1>Add a <span>Book</span></h1>
+      <h1 id="page-title">Add a <span>Book</span></h1>
       <p>Enter book details, rated report, Goodreads data, and professional reviews in one submission.</p>
     </div>
 
@@ -448,6 +448,7 @@
 
     let currentUser = null;
     let proReviewCount = 0;
+    let editingBookId = null;
 
     function addProReview() {
       proReviewCount++;
@@ -487,6 +488,46 @@
       if (el) el.remove();
     }
 
+    async function prefillForm(bookId) {
+      try {
+        const [{ data: book }, { data: rated }, { data: proRevs }] = await Promise.all([
+          sb.from('books').select('*').eq('id', bookId).single(),
+          sb.from('rated_reports').select('*').eq('book_id', bookId).maybeSingle(),
+          sb.from('pro_reviews').select('*').eq('book_id', bookId)
+        ]);
+
+        if (book) {
+          document.getElementById('b-title').value  = book.title             || '';
+          document.getElementById('b-author').value = book.author            || '';
+          document.getElementById('b-isbn').value   = book.isbn              || '';
+          document.getElementById('b-cover').value  = book.cover_url         || '';
+          document.getElementById('g-rating').value = book.goodreads_rating  || '';
+        }
+
+        if (rated) {
+          document.getElementById('r-rating').value     = rated.rating             || '';
+          document.getElementById('r-flagged').value    = rated.flagged_categories || '';
+          document.getElementById('r-excerpts').value   = rated.excerpts           || '';
+          document.getElementById('r-report-url').value = rated.report_url         || '';
+        }
+
+        if (proRevs && proRevs.length > 0) {
+          document.getElementById('pro-reviews-list').innerHTML = '';
+          proReviewCount = 0;
+          proRevs.forEach(r => {
+            addProReview();
+            const idx = proReviewCount;
+            document.getElementById(`p-source-${idx}`).value  = r.source  || '';
+            document.getElementById(`p-award-${idx}`).value   = r.award   || '';
+            document.getElementById(`p-summary-${idx}`).value = r.summary || '';
+            document.getElementById(`p-url-${idx}`).value     = r.url     || '';
+          });
+        }
+      } catch(e) {
+        showToast('Failed to load book data: ' + e.message, 'error');
+      }
+    }
+
     async function init() {
       const { data: { session } } = await sb.auth.getSession();
       if (!session) { window.location.href = '/login.html'; return; }
@@ -494,8 +535,18 @@
       document.getElementById('user-email-display').textContent = currentUser.email;
       document.body.classList.add('ready');
       addProReview();
-      if (new URLSearchParams(window.location.search).get('from') === 'admin') {
+
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('from') === 'admin' || params.get('id')) {
         document.getElementById('back-link').style.display = 'inline';
+      }
+
+      const bookId = params.get('id');
+      if (bookId) {
+        editingBookId = bookId;
+        document.getElementById('page-title').innerHTML = 'Edit a <span>Book</span>';
+        document.querySelector('.btn-label').textContent = 'Update Book';
+        await prefillForm(bookId);
       }
     }
 
@@ -503,48 +554,7 @@
       await sb.auth.signOut();
       window.location.href = '/login.html';
     }
-let editingBookId = null;
 
-async function prefillForm(bookId) {
-  editingBookId = bookId;
-  try {
-    const [{ data: book }, { data: rated }, { data: proRevs }] = await Promise.all([
-      sb.from('books').select('*').eq('id', bookId).single(),
-      sb.from('rated_reports').select('*').eq('book_id', bookId).maybeSingle(),
-      sb.from('pro_reviews').select('*').eq('book_id', bookId)
-    ]);
-
-    if (book) {
-      document.getElementById('b-title').value  = book.title      || '';
-      document.getElementById('b-author').value = book.author     || '';
-      document.getElementById('b-isbn').value   = book.isbn       || '';
-      document.getElementById('b-cover').value  = book.cover_url  || '';
-      document.getElementById('g-rating').value = book.goodreads_rating || '';
-    }
-
-    if (rated) {
-      document.getElementById('r-rating').value     = rated.rating             || '';
-      document.getElementById('r-flagged').value    = rated.flagged_categories || '';
-      document.getElementById('r-excerpts').value   = rated.excerpts           || '';
-      document.getElementById('r-report-url').value = rated.report_url         || '';
-    }
-
-    if (proRevs && proRevs.length > 0) {
-      document.getElementById('pro-reviews-list').innerHTML = '';
-      proReviewCount = 0;
-      proRevs.forEach(r => {
-        addProReview();
-        const idx = proReviewCount;
-        document.getElementById(`p-source-${idx}`).value  = r.source  || '';
-        document.getElementById(`p-award-${idx}`).value   = r.award   || '';
-        document.getElementById(`p-summary-${idx}`).value = r.summary || '';
-        document.getElementById(`p-url-${idx}`).value     = r.url     || '';
-      });
-    }
-  } catch(e) {
-    showToast('Failed to load book data: ' + e.message, 'error');
-  }
-}
     async function handleSubmit() {
       const title = document.getElementById('b-title').value.trim();
       if (!title) { showToast('Please enter a book title.', 'error'); return; }
@@ -555,33 +565,36 @@ async function prefillForm(bookId) {
 
       try {
         let bookId;
-if (editingBookId) {
-  const { error: bookErr } = await sb
-    .from('books')
-    .update({
-      title,
-      author:    document.getElementById('b-author').value.trim() || null,
-      isbn:      document.getElementById('b-isbn').value.trim()   || null,
-      cover_url: document.getElementById('b-cover').value.trim()  || null,
-      goodreads_rating: document.getElementById('g-rating').value || null,
-    })
-    .eq('id', editingBookId);
-  if (bookErr) throw new Error('Book: ' + bookErr.message);
-  bookId = editingBookId;
-} else {
-  const { data: book, error: bookErr } = await sb
-    .from('books')
-    .insert({
-      title,
-      author:    document.getElementById('b-author').value.trim() || null,
-      isbn:      document.getElementById('b-isbn').value.trim()   || null,
-      cover_url: document.getElementById('b-cover').value.trim()  || null,
-    })
-    .select('id')
-    .single();
-  if (bookErr) throw new Error('Book: ' + bookErr.message);
-  bookId = book.id;
-}
+
+        if (editingBookId) {
+          // ── UPDATE existing book ──
+          const { error: bookErr } = await sb
+            .from('books')
+            .update({
+              title,
+              author:           document.getElementById('b-author').value.trim() || null,
+              isbn:             document.getElementById('b-isbn').value.trim()   || null,
+              cover_url:        document.getElementById('b-cover').value.trim()  || null,
+              goodreads_rating: document.getElementById('g-rating').value        || null,
+            })
+            .eq('id', editingBookId);
+          if (bookErr) throw new Error('Book: ' + bookErr.message);
+          bookId = editingBookId;
+        } else {
+          // ── INSERT new book ──
+          const { data: book, error: bookErr } = await sb
+            .from('books')
+            .insert({
+              title,
+              author:    document.getElementById('b-author').value.trim() || null,
+              isbn:      document.getElementById('b-isbn').value.trim()   || null,
+              cover_url: document.getElementById('b-cover').value.trim()  || null,
+            })
+            .select('id')
+            .single();
+          if (bookErr) throw new Error('Book: ' + bookErr.message);
+          bookId = book.id;
+        }
 
         const rating    = document.getElementById('r-rating').value;
         const flagged   = document.getElementById('r-flagged').value.trim();
@@ -589,30 +602,52 @@ if (editingBookId) {
         const reportUrl = document.getElementById('r-report-url').value.trim();
 
         if (rating || flagged || excerpts || reportUrl) {
-          const { error: rErr } = await sb.from('rated_reports').insert({
-            book_id:            bookId,
-            user_id:            currentUser.id,
-            rating:             rating ? parseInt(rating) : null,
-            flagged_categories: flagged   || null,
-            excerpts:           excerpts  || null,
-            report_url:         reportUrl || null,
-          });
-          if (rErr) throw new Error('Rated report: ' + rErr.message);
+          if (editingBookId) {
+            await sb.from('rated_reports')
+              .upsert({
+                book_id:            bookId,
+                user_id:            currentUser.id,
+                rating:             rating    ? parseInt(rating) : null,
+                flagged_categories: flagged   || null,
+                excerpts:           excerpts  || null,
+                report_url:         reportUrl || null,
+              }, { onConflict: 'book_id' });
+          } else {
+            const { error: rErr } = await sb.from('rated_reports').insert({
+              book_id:            bookId,
+              user_id:            currentUser.id,
+              rating:             rating    ? parseInt(rating) : null,
+              flagged_categories: flagged   || null,
+              excerpts:           excerpts  || null,
+              report_url:         reportUrl || null,
+            });
+            if (rErr) throw new Error('Rated report: ' + rErr.message);
+          }
         }
 
-        const gRating  = document.getElementById('g-rating').value;
         const gSummary = document.getElementById('g-summary').value.trim();
         const gUrl     = document.getElementById('g-url').value.trim();
 
-        if (gRating || gSummary || gUrl) {
-          const { error: gErr } = await sb.from('goodreads').insert({
-            book_id:        bookId,
-            user_id:        currentUser.id,
-            average_rating: gRating  ? parseFloat(gRating) : null,
-            summary:        gSummary || null,
-            url:            gUrl     || null,
-          });
-          if (gErr) throw new Error('Goodreads: ' + gErr.message);
+        if (gSummary || gUrl) {
+          if (editingBookId) {
+            await sb.from('goodreads')
+              .upsert({
+                book_id: bookId,
+                user_id: currentUser.id,
+                summary: gSummary || null,
+                url:     gUrl     || null,
+              }, { onConflict: 'book_id' });
+          } else {
+            const gRating = document.getElementById('g-rating').value;
+            const { error: gErr } = await sb.from('goodreads').insert({
+              book_id:        bookId,
+              user_id:        currentUser.id,
+              average_rating: gRating  ? parseFloat(gRating) : null,
+              summary:        gSummary || null,
+              url:            gUrl     || null,
+            });
+            if (gErr) throw new Error('Goodreads: ' + gErr.message);
+          }
         }
 
         const reviewItems = document.querySelectorAll('.pro-review-item');
@@ -636,7 +671,7 @@ if (editingBookId) {
         }
 
         showToast(editingBookId ? 'Book updated!' : 'Book saved successfully!', 'success');
-        clearForm();
+        if (!editingBookId) clearForm();
 
       } catch (err) {
         showToast(err.message, 'error');
@@ -665,24 +700,7 @@ if (editingBookId) {
       toastTimer = setTimeout(() => toast.classList.remove('show'), 4000);
     }
 
-    async function init() {
-  const { data: { session } } = await sb.auth.getSession();
-  if (!session) { window.location.href = '/login.html'; return; }
-  currentUser = session.user;
-  document.getElementById('user-email-display').textContent = currentUser.email;
-  document.body.classList.add('ready');
-  addProReview();
-  const params = new URLSearchParams(window.location.search);
-  if (params.get('from') === 'admin' || params.get('id')) {
-    document.getElementById('back-link').style.display = 'inline';
-  }
-  const bookId = params.get('id');
-  if (bookId) {
-    document.querySelector('.page-header h1').innerHTML = 'Edit a <span>Book</span>';
-    document.querySelector('.btn-label').textContent = 'Update Book';
-    await prefillForm(bookId);
-  }
-}
+    init();
   </script>
 </body>
 </html>
