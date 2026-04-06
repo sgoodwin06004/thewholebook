@@ -84,9 +84,7 @@
       padding: 52px 32px 80px;
     }
 
-    .page-header {
-      margin-bottom: 48px;
-    }
+    .page-header { margin-bottom: 48px; }
 
     .page-header h1 {
       font-family: 'Cormorant Garamond', serif;
@@ -100,7 +98,6 @@
     .page-header h1 span { color: var(--accent); }
     .page-header p { color: var(--muted); font-size: 14px; font-weight: 300; }
 
-    /* Two-column grid for top row */
     .form-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -110,7 +107,6 @@
 
     .form-full { margin-bottom: 20px; }
 
-    /* Section cards */
     .section {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -202,7 +198,6 @@
       box-shadow: 0 0 0 3px var(--accent-glow);
     }
 
-    /* Goodreads-specific focus color */
     .goodreads-section input:focus,
     .goodreads-section textarea:focus {
       border-color: var(--goodreads);
@@ -212,7 +207,6 @@
     input::placeholder, textarea::placeholder { color: var(--muted); }
     textarea { resize: vertical; min-height: 100px; line-height: 1.6; }
 
-    /* Submit */
     .submit-row {
       display: flex;
       align-items: center;
@@ -258,7 +252,6 @@
     .btn-submit.loading .spinner { display: block; }
     .btn-submit.loading .btn-label { display: none; }
 
-    /* Toast */
     .toast {
       position: fixed;
       bottom: 32px;
@@ -284,7 +277,6 @@
     .toast.success .toast-dot { background: var(--success); }
     .toast.error   .toast-dot { background: var(--error); }
 
-    /* Multi-review items */
     .pro-review-item {
       border: 1px solid var(--border);
       border-radius: 3px;
@@ -350,6 +342,7 @@
   <nav>
     <div class="nav-brand">The Whole<span>Book</span></div>
     <div class="nav-right">
+      <a id="back-link" href="/admin.html" style="display:none;font-size:12px;color:var(--muted);text-decoration:none;transition:color 0.2s" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--muted)'">← Admin</a>
       <span id="user-email-display"></span>
       <button class="btn-ghost" onclick="handleLogout()">Sign Out</button>
     </div>
@@ -361,9 +354,7 @@
       <p>Enter book details, rated report, Goodreads data, and professional reviews in one submission.</p>
     </div>
 
-    <!-- Top row: Book Details (left) + Rated Report (right) -->
     <div class="form-grid">
-
       <div class="section book-section">
         <div class="section-label">Book Details</div>
         <div class="field">
@@ -403,10 +394,8 @@
           <input type="url" id="r-report-url" placeholder="https://ratedbooks.org/…" />
         </div>
       </div>
-
     </div>
 
-    <!-- Goodreads section (full width) -->
     <div class="form-full">
       <div class="section goodreads-section">
         <div class="section-label">Goodreads</div>
@@ -427,7 +416,6 @@
       </div>
     </div>
 
-    <!-- Pro Reviews (full width, multiple) -->
     <div class="form-full">
       <div class="section pro-section">
         <div class="section-label">Professional Reviews</div>
@@ -452,8 +440,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    // ⚠️ Replace SUPABASE_ANON_KEY with the full JWT key from:
-    // Supabase Dashboard → Project Settings → API → anon / public key
     const SUPABASE_URL      = 'https://cqslqfztgtuuidgdkyyz.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_TBJdijzfEaYzBDBeqAy2CA_edJMKfgz';
 
@@ -508,6 +494,9 @@
       document.getElementById('user-email-display').textContent = currentUser.email;
       document.body.classList.add('ready');
       addProReview();
+      if (new URLSearchParams(window.location.search).get('from') === 'admin') {
+        document.getElementById('back-link').style.display = 'inline';
+      }
     }
 
     async function handleLogout() {
@@ -524,7 +513,6 @@
       btn.disabled = true;
 
       try {
-        // 1. Insert book
         const { data: book, error: bookErr } = await sb
           .from('books')
           .insert({
@@ -539,7 +527,6 @@
         if (bookErr) throw new Error('Book: ' + bookErr.message);
         const bookId = book.id;
 
-        // 2. Insert rated report if any data entered
         const rating    = document.getElementById('r-rating').value;
         const flagged   = document.getElementById('r-flagged').value.trim();
         const excerpts  = document.getElementById('r-excerpts').value.trim();
@@ -557,7 +544,6 @@
           if (rErr) throw new Error('Rated report: ' + rErr.message);
         }
 
-        // 3. Insert Goodreads data if any entered
         const gRating  = document.getElementById('g-rating').value;
         const gSummary = document.getElementById('g-summary').value.trim();
         const gUrl     = document.getElementById('g-url').value.trim();
@@ -573,7 +559,6 @@
           if (gErr) throw new Error('Goodreads: ' + gErr.message);
         }
 
-        // 4. Insert all pro reviews
         const reviewItems = document.querySelectorAll('.pro-review-item');
         for (const item of reviewItems) {
           const idx     = item.id.replace('pro-review-', '');
