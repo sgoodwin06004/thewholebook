@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Reviews — The Whole Book</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #111318;
+      --surface: #1a1d24;
+      --surface2: #20242d;
+      --border: #2e3240;
+      --accent: #e8b86d;
+      --accent-glow: rgba(232,184,109,0.15);
+      --text: #edeef2;
+      --muted: #6b7080;
+      --success: #6fcf97;
+      --error: #eb5757;
+      --pro: #7eb8f7;
+    }
+
+    body { min-height: 100vh; background: var(--bg); font-family: 'DM Sans', sans-serif; color: var(--text); opacity: 0; transition: opacity 0.4s; }
+    body.ready { opacity: 1; }
+
+    nav {
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(17,19,24,0.92); backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 40px; display: flex; align-items: center;
+      justify-content: space-between; height: 58px;
+    }
+    .nav-brand { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 700; color: var(--text); }
+    .nav-brand span { color: var(--accent); }
+    .nav-right { display: flex; align-items: center; gap: 16px; font-size: 13px; color: var(--muted); }
+    .nav-link { font-size: 12px; color: var(--muted); text-decoration: none; transition: color 0.2s; }
+    .nav-link:hover { color: var(--accent); }
+    .btn-ghost { background: none; border: 1px solid var(--border); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 12px; padding: 6px 14px; border-radius: 2px; cursor: pointer; transition: border-color 0.2s, color 0.2s; }
+    .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+    main { max-width: 860px; margin: 0 auto; padding: 52px 32px 80px; }
+
+    .page-header { margin-bottom: 40px; }
+    .page-header h1 { font-family: 'Cormorant Garamond', serif; font-size: 48px; font-weight: 700; line-height: 1; margin-bottom: 8px; }
+    .page-header h1 span { color: var(--accent); }
+    .page-header p { color: var(--muted); font-size: 14px; font-weight: 300; }
+
+    /* ── Book group ── */
+    .book-group { margin-bottom: 28px; }
+    .book-group-header {
+      display: flex; align-items: baseline; justify-content: space-between;
+      padding-bottom: 10px; border-bottom: 1px solid var(--border); margin-bottom: 12px;
+    }
+    .book-group-title { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 600; }
+    .book-group-author { color: var(--muted); font-size: 13px; font-style: italic; }
+
+    /* ── Review card ── */
+    .review-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 4px; margin-bottom: 10px; overflow: hidden;
+    }
+    .review-card-body { padding: 18px 20px; }
+    .review-meta {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 10px; flex-wrap: wrap;
+    }
+    .review-source { font-size: 14px; font-weight: 500; color: var(--pro); }
+    .review-award {
+      font-size: 11px; background: rgba(232,184,109,0.1); color: var(--accent);
+      border: 1px solid rgba(232,184,109,0.25); padding: 2px 8px;
+      border-radius: 99px; font-weight: 500;
+    }
+    .review-summary { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 10px; }
+    .review-url { font-size: 12px; color: var(--pro); text-decoration: none; word-break: break-all; }
+    .review-url:hover { text-decoration: underline; }
+    .review-timestamps { font-size: 11px; color: var(--muted); margin-top: 8px; opacity: 0.7; }
+
+    .review-card-actions {
+      padding: 10px 20px; border-top: 1px solid var(--border);
+      background: var(--surface2); display: flex; gap: 8px;
+    }
+    .btn-edit-review {
+      background: none; border: 1px solid var(--border); color: var(--muted);
+      font-family: 'DM Sans', sans-serif; font-size: 12px; padding: 5px 14px;
+      border-radius: 2px; cursor: pointer; transition: border-color 0.2s, color 0.2s;
+    }
+    .btn-edit-review:hover { border-color: var(--pro); color: var(--pro); }
+    .btn-delete-review {
+      background: none; border: 1px solid var(--border); color: var(--muted);
+      font-family: 'DM Sans', sans-serif; font-size: 12px; padding: 5px 14px;
+      border-radius: 2px; cursor: pointer; transition: border-color 0.2s, color 0.2s;
+    }
+    .btn-delete-review:hover { border-color: var(--error); color: var(--error); }
+
+    /* ── Inline edit form ── */
+    .edit-form {
+      display: none; padding: 20px; border-top: 1px solid var(--border);
+      background: var(--surface2);
+    }
+    .edit-form.open { display: block; }
+    .edit-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+    .edit-form-field { display: flex; flex-direction: column; gap: 5px; }
+    .edit-form-field.full { grid-column: span 2; }
+    .edit-form-field label { font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+    .edit-form-field input, .edit-form-field textarea {
+      background: var(--bg); border: 1px solid var(--border); border-radius: 2px;
+      padding: 9px 12px; color: var(--text); font-family: 'DM Sans', sans-serif;
+      font-size: 13px; outline: none; transition: border-color 0.2s;
+    }
+    .edit-form-field input:focus, .edit-form-field textarea:focus { border-color: var(--pro); }
+    .edit-form-field textarea { resize: vertical; min-height: 90px; line-height: 1.6; }
+    .edit-form-actions { display: flex; gap: 8px; }
+    .btn-save-edit {
+      background: var(--pro); color: #111318; border: none;
+      font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600;
+      padding: 8px 20px; border-radius: 2px; cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .btn-save-edit:hover { opacity: 0.85; }
+    .btn-save-edit:disabled { opacity: 0.45; cursor: not-allowed; }
+    .btn-cancel-edit {
+      background: none; border: 1px solid var(--border); color: var(--muted);
+      font-family: 'DM Sans', sans-serif; font-size: 12px; padding: 8px 20px;
+      border-radius: 2px; cursor: pointer; transition: border-color 0.2s, color 0.2s;
+    }
+    .btn-cancel-edit:hover { border-color: var(--text); color: var(--text); }
+
+    .empty-state { text-align: center; padding: 60px 20px; color: var(--muted); }
+    .empty-state p { font-size: 15px; margin-bottom: 8px; }
+    .empty-state a { color: var(--accent); text-decoration: none; font-size: 13px; }
+    .empty-state a:hover { text-decoration: underline; }
+
+    .toast {
+      position: fixed; bottom: 32px; right: 32px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 4px; padding: 14px 20px; font-size: 13px;
+      display: flex; align-items: center; gap: 10px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      transform: translateY(80px); opacity: 0;
+      transition: transform 0.3s ease, opacity 0.3s ease; z-index: 200;
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast.success { border-color: var(--success); }
+    .toast.error   { border-color: var(--error); }
+    .toast-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .toast.success .toast-dot { background: var(--success); }
+    .toast.error   .toast-dot { background: var(--error); }
+
+    @media (max-width: 600px) {
+      main { padding: 32px 16px 60px; }
+      nav  { padding: 0 16px; }
+      .edit-form-grid { grid-template-columns: 1fr; }
+      .edit-form-field.full { grid-column: span 1; }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <div class="nav-brand">The Whole<span>Book</span></div>
+    <div class="nav-right">
+      <a class="nav-link" href="/reviewer.html">+ Add Book</a>
+      <span id="user-email-display"></span>
+      <button class="btn-ghost" onclick="handleLogout()">Sign Out</button>
+    </div>
+  </nav>
+
+  <main>
+    <div class="page-header">
+      <h1>My <span>Reviews</span></h1>
+      <p>Professional reviews you have submitted.</p>
+    </div>
+    <div id="content"><p style="color:var(--muted);font-size:14px">Loading…</p></div>
+  </main>
+
+  <div class="toast" id="toast"><div class="toast-dot"></div><span id="toast-msg"></span></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL      = 'https://cqslqfztgtuuidgdkyyz.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_TBJdijzfEaYzBDBeqAy2CA_edJMKfgz';
+    const { createClient } = supabase;
+    const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    let currentUser = null;
+
+    async function init() {
+      const { data: { session } } = await sb.auth.getSession();
+      if (!session) { window.location.href = '/login.html'; return; }
+      currentUser = session.user;
+      document.getElementById('user-email-display').textContent = currentUser.email;
+      document.body.classList.add('ready');
+      await loadReviews();
+    }
+
+    async function loadReviews() {
+      const { data, error } = await sb
+        .from('pro_reviews')
+        .select('*, books(id, title, author)')
+        .eq('user_id', currentUser.id)
+        .order('created_at', { ascending: false });
+
+      const container = document.getElementById('content');
+
+      if (error) {
+        container.innerHTML = `<p style="color:var(--error)">Failed to load: ${error.message}</p>`;
+        return;
+      }
+
+      if (!data || data.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <p>You haven't submitted any reviews yet.</p>
+            <a href="/reviewer.html">Add your first book →</a>
+          </div>`;
+        return;
+      }
+
+      // Group by book
+      const byBook = {};
+      data.forEach(r => {
+        const bookId = r.book_id;
+        if (!byBook[bookId]) byBook[bookId] = { book: r.books, reviews: [] };
+        byBook[bookId].reviews.push(r);
+      });
+
+      container.innerHTML = Object.values(byBook).map(({ book, reviews }) => `
+        <div class="book-group">
+          <div class="book-group-header">
+            <div>
+              <div class="book-group-title">${esc(book?.title || 'Unknown Book')}</div>
+              ${book?.author ? `<div class="book-group-author">${esc(book.author)}</div>` : ''}
+            </div>
+            <a class="nav-link" href="/reviewer.html?id=${esc(book?.id || '')}">Edit Book →</a>
+          </div>
+          ${reviews.map(r => renderReviewCard(r)).join('')}
+        </div>
+      `).join('');
+    }
+
+    function renderReviewCard(r) {
+      const added   = r.created_at ? new Date(r.created_at).toLocaleDateString('en-US', { year:'numeric', month:'short', day:'numeric' }) : '';
+      const updated = r.updated_at && r.updated_at !== r.created_at
+        ? new Date(r.updated_at).toLocaleDateString('en-US', { year:'numeric', month:'short', day:'numeric' })
+        : null;
+
+      return `
+        <div class="review-card" id="card-${r.id}">
+          <div class="review-card-body">
+            <div class="review-meta">
+              <span class="review-source">${esc(r.source || 'Unknown source')}</span>
+              ${r.award ? `<span class="review-award">★ ${esc(r.award)}</span>` : ''}
+            </div>
+            ${r.summary ? `<div class="review-summary">${esc(r.summary)}</div>` : ''}
+            ${r.url ? `<a class="review-url" href="${esc(r.url)}" target="_blank" rel="noopener">${esc(r.url)}</a>` : ''}
+            <div class="review-timestamps">
+              Added ${added}${updated ? ` · Updated ${updated}` : ''}
+            </div>
+          </div>
+          <div class="review-card-actions">
+            <button class="btn-edit-review" onclick="toggleEdit('${r.id}')">Edit</button>
+            <button class="btn-delete-review" onclick="deleteReview('${r.id}')">Delete</button>
+          </div>
+          <div class="edit-form" id="edit-${r.id}">
+            <div class="edit-form-grid">
+              <div class="edit-form-field">
+                <label>Source</label>
+                <input type="text" id="es-${r.id}" value="${esc(r.source || '')}" placeholder="e.g. Publishers Weekly" />
+              </div>
+              <div class="edit-form-field">
+                <label>Award <span style="opacity:.6;font-weight:400;text-transform:none;letter-spacing:0">optional</span></label>
+                <input type="text" id="ea-${r.id}" value="${esc(r.award || '')}" placeholder="e.g. Newbery Medal" />
+              </div>
+              <div class="edit-form-field full">
+                <label>Summary</label>
+                <textarea id="em-${r.id}">${esc(r.summary || '')}</textarea>
+              </div>
+              <div class="edit-form-field full">
+                <label>URL <span style="opacity:.6;font-weight:400;text-transform:none;letter-spacing:0">optional</span></label>
+                <input type="url" id="eu-${r.id}" value="${esc(r.url || '')}" placeholder="https://…" />
+              </div>
+            </div>
+            <div class="edit-form-actions">
+              <button class="btn-save-edit" id="save-${r.id}" onclick="saveReview('${r.id}')">Save Changes</button>
+              <button class="btn-cancel-edit" onclick="toggleEdit('${r.id}')">Cancel</button>
+            </div>
+          </div>
+        </div>`;
+    }
+
+    function toggleEdit(reviewId) {
+      const form = document.getElementById('edit-' + reviewId);
+      form.classList.toggle('open');
+      if (form.classList.contains('open')) {
+        form.querySelector('input').focus();
+      }
+    }
+
+    async function saveReview(reviewId) {
+      const source  = document.getElementById('es-' + reviewId).value.trim();
+      const award   = document.getElementById('ea-' + reviewId).value.trim();
+      const summary = document.getElementById('em-' + reviewId).value.trim();
+      const url     = document.getElementById('eu-' + reviewId).value.trim();
+
+      if (!source) { showToast('Source is required.', 'error'); return; }
+
+      const btn = document.getElementById('save-' + reviewId);
+      btn.disabled = true;
+      btn.textContent = 'Saving…';
+
+      const { error } = await sb.from('pro_reviews')
+        .update({ source, award: award || null, summary: summary || null, url: url || null })
+        .eq('id', reviewId);
+
+      btn.disabled = false;
+      btn.textContent = 'Save Changes';
+
+      if (error) { showToast('Save failed: ' + error.message, 'error'); return; }
+
+      showToast('Review updated.', 'success');
+      await loadReviews();
+    }
+
+    async function deleteReview(reviewId) {
+      if (!confirm('Delete this review? This cannot be undone.')) return;
+      const { error } = await sb.from('pro_reviews').delete().eq('id', reviewId);
+      if (error) { showToast('Delete failed: ' + error.message, 'error'); return; }
+      showToast('Review deleted.', 'success');
+      await loadReviews();
+    }
+
+    async function handleLogout() {
+      await sb.auth.signOut();
+      window.location.href = '/login.html';
+    }
+
+    let toastTimer;
+    function showToast(msg, type) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toast-msg').textContent = msg;
+      toast.className = `toast ${type} show`;
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove('show'), 4000);
+    }
+
+    function esc(str) {
+      return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    init();
+  </script>
+</body>
+</html>
