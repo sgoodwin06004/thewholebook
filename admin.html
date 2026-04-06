@@ -318,16 +318,13 @@
     async function loadBooks() {
       const { data, error } = await sb
         .from('books')
-        .select('id, title, author, isbn, rated_reports(user_id)')
+        .select('id, title, author, isbn, user_id')
         .order('title');
       if (error) {
         document.getElementById('bookList').innerHTML = `<div class="empty-state">${error.message}</div>`;
         return;
       }
-      allBooks = (data || []).map(b => ({
-        ...b,
-        submitter_id: b.rated_reports?.[0]?.user_id || null
-      }));
+      allBooks = (data || []).map(b => ({ ...b, submitter_id: b.user_id || null }));
       document.getElementById('book-count').textContent = `(${allBooks.length})`;
       renderBooks(allBooks);
     }

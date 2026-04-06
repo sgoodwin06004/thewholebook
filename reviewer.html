@@ -675,6 +675,7 @@
               author:    document.getElementById('b-author').value.trim() || null,
               isbn:      document.getElementById('b-isbn').value.trim()   || null,
               cover_url: document.getElementById('b-cover').value.trim()  || null,
+              user_id:   currentUser.id,
             })
             .select('id')
             .single();
