@@ -22,6 +22,27 @@
     .site-nav{display:flex;gap:0}
     .site-nav a{font-family:var(--font-mono);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.15em;color:var(--paper);text-decoration:none;padding:1.1rem 1.2rem;border-left:1px solid rgba(255,255,255,0.1);transition:background 0.2s,color 0.2s}
     .site-nav a:hover{background:var(--red);color:var(--white)}
+    .what-we-do-section{border-bottom:3px solid var(--border)}
+    .wwd-header{background:var(--ink);color:var(--paper);padding:3rem 4rem 2.5rem;border-bottom:3px solid var(--border);display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:1rem}
+    .wwd-header-title{font-family:var(--font-display);font-size:clamp(2.5rem,5vw,4rem);letter-spacing:0.03em;line-height:1}
+    .wwd-header-sub{font-family:var(--font-mono);font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;color:rgba(245,240,232,0.45);max-width:400px;line-height:1.7}
+    .wwd-steps{display:grid;grid-template-columns:repeat(3,1fr);border-bottom:3px solid var(--border)}
+    .wwd-step{padding:3rem;border-right:3px solid var(--border);position:relative}
+    .wwd-step:last-child{border-right:none}
+    .wwd-step-num{font-family:var(--font-display);font-size:6rem;color:var(--paper-dark);line-height:1;margin-bottom:0.5rem}
+    .wwd-step-title{font-family:var(--font-display);font-size:1.8rem;letter-spacing:0.03em;margin-bottom:1rem;line-height:1}
+    .wwd-step-body{font-family:var(--font-serif);font-size:0.95rem;line-height:1.75;color:#333}
+    .wwd-step-tag{display:inline-block;font-family:var(--font-mono);font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;border:1.5px solid var(--red);color:var(--red);padding:0.2rem 0.6rem;margin-top:1.2rem}
+    .wwd-callout{background:var(--red);color:var(--white);padding:3rem 4rem;display:grid;grid-template-columns:1fr auto;align-items:center;gap:2rem}
+    .wwd-callout-text{font-family:var(--font-serif);font-style:italic;font-size:clamp(1.1rem,2vw,1.4rem);line-height:1.6;max-width:600px}
+    .wwd-callout-text strong{font-style:normal;font-weight:700}
+    .wwd-callout-cta{font-family:var(--font-mono);font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;background:var(--white);color:var(--red);border:none;padding:0.9rem 1.8rem;cursor:pointer;text-decoration:none;flex-shrink:0;transition:opacity 0.2s;display:inline-block}
+    .wwd-callout-cta:hover{opacity:0.88}
+    .wwd-intro{padding:3rem 4rem;border-bottom:3px solid var(--border);max-width:860px}
+    .wwd-intro p{font-family:var(--font-serif);font-size:1.1rem;line-height:1.85;color:#333;margin-bottom:1rem}
+    .wwd-intro p:last-child{margin-bottom:0}
+    .wwd-intro p strong{color:var(--red)}
+    @media(max-width:900px){.wwd-intro{padding:2rem}.wwd-steps{grid-template-columns:1fr}.wwd-step{border-right:none;border-bottom:3px solid var(--border)}.wwd-step:last-child{border-bottom:none}.wwd-header{padding:2rem}.wwd-callout{grid-template-columns:1fr;gap:1.5rem}.wwd-callout-cta{align-self:flex-start}}
     .hero{min-height:90vh;display:grid;grid-template-columns:1fr 1fr;border-bottom:3px solid var(--border);position:relative;overflow:hidden}
     .hero-left{background:var(--ink);color:var(--paper);padding:clamp(3rem,6vw,6rem) clamp(2rem,5vw,5rem);display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden}
     .hero-left::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(-45deg,transparent,transparent 40px,rgba(192,57,43,0.06) 40px,rgba(192,57,43,0.06) 41px);pointer-events:none}
@@ -207,6 +228,7 @@
   <nav class="site-nav">
     <a href="#search">Search</a>
     <a href="#about">About</a>
+    <a href="#what-we-do">What We Do</a>
     <a href="#most-banned">Most Banned</a>
     <a href="#recently-added">Browse</a>
     <a href="#contribute">Contribute</a>
@@ -255,6 +277,41 @@
     <p>Across America, AI-powered tools are being used to generate book challenge reports — scanning for keywords, producing "ratings," and flooding school districts with paperwork designed to overwhelm librarians and remove books from shelves.</p>
     <p><strong>The Whole Book</strong> is a counter-database. For every book flagged by groups like Moms for Liberty and tools like BLOCKADE, we document the full picture: the literary merit, the awards, the professional reviews, the readers whose lives were changed.</p>
     <p>Because a paragraph torn from its context is not a review. <strong>It's a weapon.</strong> And context is the antidote.</p>
+  </div>
+</section>
+
+<section class="what-we-do-section" id="what-we-do">
+  <div class="wwd-header">
+    <div class="wwd-header-title">What We Do</div>
+    <div class="wwd-header-sub">A three-step counter-response to every politically motivated book challenge in America.</div>
+  </div>
+  <div class="wwd-intro">
+    <p>We shine a light on the darkness that is book banning and censorship. By providing all the information we can find on a challenged book, we give you the information you need to decide for yourself.</p>
+    <p>The censors look at keywords and out-of-context quotes. They are afraid of profanity, sex, gender, and ideas that challenge their narrow viewpoints. <strong>Here you learn the truth.</strong></p>
+  </div>
+  <div class="wwd-steps">
+    <div class="wwd-step">
+      <div class="wwd-step-num">01</div>
+      <div class="wwd-step-title">We Document the Challenge</div>
+      <p class="wwd-step-body">When a book is challenged or removed from a school or library, we record it — the district, the state, the tool or group behind the challenge, and the excerpts used to justify it. Every ban has a paper trail. We follow it.</p>
+      <span class="wwd-step-tag">Evidence-based</span>
+    </div>
+    <div class="wwd-step">
+      <div class="wwd-step-num">02</div>
+      <div class="wwd-step-title">We Restore the Context</div>
+      <p class="wwd-step-body">Tools like BLOCKADE strip passages from their narrative context to manufacture outrage. We document the full picture: professional reviews, literary awards, reader impact statements, and what these books actually say when read in full.</p>
+      <span class="wwd-step-tag">Full context</span>
+    </div>
+    <div class="wwd-step">
+      <div class="wwd-step-num">03</div>
+      <div class="wwd-step-title">We Build the Counter-Record</div>
+      <p class="wwd-step-body">Our reviewers submit detailed reports for every flagged title. The database is publicly searchable — so parents, educators, librarians, and journalists can find the real story behind any challenged book within seconds.</p>
+      <span class="wwd-step-tag">Publicly searchable</span>
+    </div>
+  </div>
+  <div class="wwd-callout">
+    <p class="wwd-callout-text">A paragraph torn from its context is not a review. <strong>It's a weapon.</strong> The Whole Book exists to make sure every challenge has an answer.</p>
+    <a href="#search" class="wwd-callout-cta">Search the database →</a>
   </div>
 </section>
 
@@ -330,6 +387,7 @@
     <ul>
       <li><a href="#search">Search Books</a></li>
       <li><a href="#about">Our Mission</a></li>
+      <li><a href="#what-we-do">What We Do</a></li>
       <li><a href="#most-banned">Most Banned</a></li>
       <li><a href="#recently-added">Browse All</a></li>
     </ul>
