@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Admin Dashboard</title>
+  <title>Admin — The Whole Book</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -24,183 +24,272 @@
     body { min-height: 100vh; background: var(--bg); font-family: 'DM Mono', monospace; color: var(--text); opacity: 0; transition: opacity 0.3s; }
     body.ready { opacity: 1; }
 
+    /* ── Nav ── */
     nav {
       display: flex; align-items: center; justify-content: space-between;
-      padding: 16px 32px; border-bottom: 1px solid var(--border);
+      padding: 0 32px; border-bottom: 1px solid var(--border);
       background: var(--surface); position: sticky; top: 0; z-index: 50;
+      height: 52px;
     }
     .nav-brand { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 18px; letter-spacing: -0.02em; }
     .nav-brand span { color: var(--accent); }
     .nav-right { display: flex; align-items: center; gap: 16px; font-size: 12px; color: var(--muted); }
-    .logout-btn { background: none; border: 1px solid var(--border); color: var(--text); font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; padding: 6px 14px; border-radius: 3px; cursor: pointer; transition: border-color 0.2s, color 0.2s; }
-    .logout-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-ghost { background: none; border: 1px solid var(--border); color: var(--text); font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; padding: 6px 14px; border-radius: 3px; cursor: pointer; transition: border-color 0.2s, color 0.2s; }
+    .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
 
-    main { max-width: 900px; margin: 0 auto; padding: 48px 32px 80px; }
-
-    .welcome { margin-bottom: 40px; }
-    .welcome h1 { font-family: 'Syne', sans-serif; font-size: 32px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 8px; }
-    .welcome p { color: var(--muted); font-size: 13px; }
-
-    /* Quick actions */
-    .quick-actions {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      margin-bottom: 32px;
-    }
-
-    .action-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      padding: 20px 24px;
-      text-decoration: none;
-      color: var(--text);
+    /* ── Tabs ── */
+    .tab-bar {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      transition: border-color 0.2s, box-shadow 0.2s;
+      padding: 0 32px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      gap: 4px;
     }
-    .action-card:hover { border-color: var(--accent); box-shadow: 0 0 20px var(--accent-glow); }
-    .action-card-label { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
-    .action-card-title { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; }
-    .action-card-arrow { font-size: 20px; color: var(--accent); }
+    .tab {
+      background: none; border: none; border-bottom: 2px solid transparent;
+      color: var(--muted); font-family: 'DM Mono', monospace; font-size: 11px;
+      letter-spacing: 0.1em; text-transform: uppercase; padding: 14px 16px 12px;
+      cursor: pointer; transition: color 0.15s, border-color 0.15s;
+    }
+    .tab:hover { color: var(--text); }
+    .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
 
-    /* Panel */
-    .panel { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; margin-bottom: 24px; }
-    .panel-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 24px; border-bottom: 1px solid var(--border); }
-    .panel-title { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+    /* ── Layout ── */
+    main { max-width: 960px; margin: 0 auto; padding: 40px 32px 80px; }
+    .tab-pane { display: none; }
+    .tab-pane.active { display: block; }
 
-    .invite-btn { background: var(--accent); color: #fff; font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; border: none; padding: 7px 16px; border-radius: 3px; cursor: pointer; transition: opacity 0.2s; }
-    .invite-btn:hover { opacity: 0.85; }
+    .pane-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 24px; gap: 12px;
+    }
+    .pane-title { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; letter-spacing: -0.02em; }
 
-    .invite-form { display: none; padding: 16px 24px; border-bottom: 1px solid var(--border); background: rgba(124,106,255,0.05); gap: 10px; align-items: center; }
-    .invite-form.open { display: flex; }
-    .invite-form input { flex: 1; background: var(--bg); border: 1px solid var(--border); border-radius: 3px; padding: 8px 12px; color: var(--text); font-family: 'DM Mono', monospace; font-size: 13px; outline: none; }
-    .invite-form input:focus { border-color: var(--accent); }
-    .invite-form input::placeholder { color: var(--muted); }
+    /* ── Buttons ── */
+    .btn-primary {
+      background: var(--accent); color: #fff; border: none;
+      font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500;
+      letter-spacing: 0.08em; text-transform: uppercase; padding: 8px 18px;
+      border-radius: 3px; cursor: pointer; text-decoration: none;
+      display: inline-flex; align-items: center; gap: 6px;
+      transition: opacity 0.2s;
+    }
+    .btn-primary:hover { opacity: 0.85; }
 
-    .send-btn { background: none; border: 1px solid var(--accent); color: var(--accent); font-family: 'DM Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; padding: 8px 18px; border-radius: 3px; cursor: pointer; white-space: nowrap; transition: background 0.2s, color 0.2s; }
-    .send-btn:hover { background: var(--accent); color: #fff; }
+    .btn-outline {
+      background: none; border: 1px solid var(--border); color: var(--muted);
+      font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.08em;
+      text-transform: uppercase; padding: 7px 14px; border-radius: 3px;
+      cursor: pointer; transition: border-color 0.2s, color 0.2s;
+    }
+    .btn-outline:hover { border-color: var(--success); color: var(--success); }
 
-    .invite-msg { font-size: 11px; padding: 0 24px 10px; display: none; }
-    .invite-msg.error { color: var(--error); display: block; }
-    .invite-msg.success { color: var(--success); display: block; }
+    .btn-danger {
+      background: none; border: 1px solid var(--border); color: var(--muted);
+      font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.06em;
+      text-transform: uppercase; padding: 4px 10px; border-radius: 3px;
+      cursor: pointer; transition: border-color 0.2s, color 0.2s;
+    }
+    .btn-danger:hover { border-color: var(--error); color: var(--error); }
 
-    .data-row { display: flex; align-items: center; justify-content: space-between; padding: 13px 24px; border-bottom: 1px solid var(--border); font-size: 12px; gap: 12px; transition: background 0.15s; }
-    .data-row:last-child { border-bottom: none; }
-    .data-row:hover { background: rgba(255,255,255,0.02); }
+    /* ── Panel ── */
+    .panel { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; }
 
-    .row-email { color: var(--text); font-size: 13px; }
-    .row-meta  { color: var(--muted); font-size: 11px; margin-top: 2px; }
+    /* ── Search bar ── */
+    .search-bar { padding: 12px 20px; border-bottom: 1px solid var(--border); }
+    .search-bar input {
+      width: 100%; background: var(--bg); border: 1px solid var(--border);
+      border-radius: 3px; padding: 8px 12px; color: var(--text);
+      font-family: 'DM Mono', monospace; font-size: 12px; outline: none;
+      transition: border-color 0.2s;
+    }
+    .search-bar input:focus { border-color: var(--accent); }
+    .search-bar input::placeholder { color: var(--muted); }
 
-    .user-badge { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; padding: 3px 8px; border-radius: 2px; }
-    .badge-confirmed { background: rgba(107,255,184,0.1); color: var(--success); border: 1px solid rgba(107,255,184,0.3); }
-    .badge-pending   { background: rgba(255,200,100,0.1); color: #ffc864; border: 1px solid rgba(255,200,100,0.3); }
-
-    .role-select { background: var(--bg); border: 1px solid var(--border); border-radius: 3px; color: var(--text); font-family: 'DM Mono', monospace; font-size: 11px; padding: 5px 10px; cursor: pointer; outline: none; transition: border-color 0.2s; }
-    .role-select:focus { border-color: var(--accent); }
-
-    .empty-state { padding: 32px 24px; text-align: center; color: var(--muted); font-size: 12px; }
-    .loading-row  { padding: 20px 24px; color: var(--muted); font-size: 12px; }
-
-    /* Book list */
-    .book-search-bar { padding: 12px 24px; border-bottom: 1px solid var(--border); background: rgba(124,106,255,0.03); }
-    .book-search-bar input { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 3px; padding: 8px 12px; color: var(--text); font-family: 'DM Mono', monospace; font-size: 12px; outline: none; transition: border-color 0.2s; }
-    .book-search-bar input:focus { border-color: var(--accent); }
-    .book-search-bar input::placeholder { color: var(--muted); }
-
-    .book-row { display: grid; grid-template-columns: 2fr 1.2fr 1fr 1.2fr 80px; align-items: center; padding: 11px 24px; border-bottom: 1px solid var(--border); font-size: 12px; gap: 12px; transition: background 0.15s; }
+    /* ── Book list ── */
+    .book-row {
+      display: grid;
+      grid-template-columns: 2fr 1.2fr 1fr 1.2fr 70px;
+      align-items: center; padding: 11px 20px;
+      border-bottom: 1px solid var(--border); font-size: 12px;
+      gap: 12px; transition: background 0.15s;
+    }
     .book-row:last-child { border-bottom: none; }
     .book-row:hover { background: rgba(255,255,255,0.02); }
-    .book-row.header { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); background: rgba(255,255,255,0.02); padding: 9px 24px; }
+    .book-row.header {
+      font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--muted); background: rgba(255,255,255,0.02); padding: 9px 20px;
+    }
     .book-title     { color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .book-author    { color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .book-isbn      { color: var(--muted); }
-    .book-submitter { color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 11px; }
-    .book-edit { background: none; border: 1px solid var(--border); color: var(--text); font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; padding: 4px 10px; border-radius: 2px; cursor: pointer; text-decoration: none; display: inline-block; text-align: center; transition: border-color 0.2s, color 0.2s; }
-    .book-edit:hover { border-color: var(--accent); color: var(--accent); }
-    .export-btn { background: none; border: 1px solid var(--border); color: var(--muted); font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; padding: 7px 14px; border-radius: 3px; cursor: pointer; transition: border-color 0.2s, color 0.2s; }
-    .export-btn:hover { border-color: var(--success); color: var(--success); }
+    .book-submitter { color: var(--muted); font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .btn-edit {
+      background: none; border: 1px solid var(--border); color: var(--text);
+      font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.06em;
+      text-transform: uppercase; padding: 4px 10px; border-radius: 2px;
+      cursor: pointer; text-decoration: none; display: inline-block;
+      text-align: center; transition: border-color 0.2s, color 0.2s;
+    }
+    .btn-edit:hover { border-color: var(--accent); color: var(--accent); }
+
+    .empty-state { padding: 32px 20px; text-align: center; color: var(--muted); font-size: 12px; }
+    .loading-row  { padding: 20px; color: var(--muted); font-size: 12px; }
+
+    /* ── User list ── */
+    .user-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center; padding: 14px 20px;
+      border-bottom: 1px solid var(--border); gap: 16px;
+      transition: background 0.15s;
+    }
+    .user-row:last-child { border-bottom: none; }
+    .user-row:hover { background: rgba(255,255,255,0.02); }
+    .user-email { color: var(--text); font-size: 13px; margin-bottom: 3px; }
+    .user-meta  { color: var(--muted); font-size: 11px; }
+    .user-actions { display: flex; align-items: center; gap: 8px; }
+
+    .badge {
+      font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 3px 8px; border-radius: 2px;
+    }
+    .badge-active  { background: rgba(107,255,184,0.1); color: var(--success); border: 1px solid rgba(107,255,184,0.3); }
+    .badge-pending { background: rgba(255,200,100,0.1); color: #ffc864;       border: 1px solid rgba(255,200,100,0.3); }
+
+    .role-select {
+      background: var(--bg); border: 1px solid var(--border); border-radius: 3px;
+      color: var(--text); font-family: 'DM Mono', monospace; font-size: 11px;
+      padding: 5px 10px; cursor: pointer; outline: none; transition: border-color 0.2s;
+    }
+    .role-select:focus { border-color: var(--accent); }
+
+    /* ── Invite form ── */
+    .invite-bar {
+      display: none; padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(124,106,255,0.04);
+      align-items: center; gap: 10px;
+    }
+    .invite-bar.open { display: flex; }
+    .invite-bar input {
+      flex: 1; background: var(--bg); border: 1px solid var(--border);
+      border-radius: 3px; padding: 8px 12px; color: var(--text);
+      font-family: 'DM Mono', monospace; font-size: 13px; outline: none;
+      transition: border-color 0.2s;
+    }
+    .invite-bar input:focus { border-color: var(--accent); }
+    .invite-bar input::placeholder { color: var(--muted); }
+    .btn-send {
+      background: none; border: 1px solid var(--accent); color: var(--accent);
+      font-family: 'DM Mono', monospace; font-size: 11px; text-transform: uppercase;
+      letter-spacing: 0.08em; padding: 8px 18px; border-radius: 3px; cursor: pointer;
+      white-space: nowrap; transition: background 0.2s, color 0.2s;
+    }
+    .btn-send:hover { background: var(--accent); color: #fff; }
+
+    .invite-msg { font-size: 11px; padding: 0 20px 12px; display: none; }
+    .invite-msg.error   { color: var(--error);   display: block; }
+    .invite-msg.success { color: var(--success);  display: block; }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed; bottom: 28px; right: 28px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 4px; padding: 12px 18px; font-size: 12px;
+      display: flex; align-items: center; gap: 10px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+      transform: translateY(60px); opacity: 0;
+      transition: transform 0.3s ease, opacity 0.3s ease; z-index: 200;
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast.success { border-color: var(--success); }
+    .toast.error   { border-color: var(--error); }
+    .toast-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .toast.success .toast-dot { background: var(--success); }
+    .toast.error   .toast-dot { background: var(--error); }
   </style>
 </head>
 <body>
+
   <nav>
     <div class="nav-brand">Admin<span>.</span></div>
     <div class="nav-right">
       <span id="user-email-display"></span>
-      <button class="logout-btn" onclick="handleLogout()">Sign Out</button>
+      <button class="btn-ghost" onclick="handleLogout()">Sign Out</button>
     </div>
   </nav>
 
+  <div class="tab-bar">
+    <button class="tab active" data-tab="books">Books</button>
+    <button class="tab" data-tab="users">Users</button>
+  </div>
+
   <main>
-    <div class="welcome">
-      <h1>Dashboard</h1>
-      <p>Manage users and reviews.</p>
-    </div>
 
-    <!-- Quick actions -->
-    <div class="quick-actions">
-  <a class="action-card" href="/admin-reviews.html">
-    <div>
-      <div class="action-card-label">Content</div>
-      <div class="action-card-title">Manage Reviews</div>
-    </div>
-    <div class="action-card-arrow">→</div>
-  </a>
-  <a class="action-card" href="/reviewer.html?from=admin">
-    <div>
-      <div class="action-card-label">Content</div>
-      <div class="action-card-title">Add New Book</div>
-    </div>
-    <div class="action-card-arrow">→</div>
-  </a>
-</div>
-
-    <!-- Book List -->
-    <div class="panel">
-      <div class="panel-header">
-        <span class="panel-title">All Books <span id="book-count" style="color:var(--muted)"></span></span>
-        <button class="export-btn" onclick="exportCSV()">Export CSV</button>
+    <!-- ── BOOKS TAB ── -->
+    <div id="tab-books" class="tab-pane active">
+      <div class="pane-header">
+        <span class="pane-title">Books <span id="book-count" style="font-size:14px;color:var(--muted);font-weight:400"></span></span>
+        <div style="display:flex;gap:8px">
+          <button class="btn-outline" onclick="exportCSV()">Export CSV</button>
+          <a class="btn-primary" href="/reviewer.html?from=admin">+ Add Book</a>
+        </div>
       </div>
-      <div class="book-search-bar">
-        <input type="text" id="bookFilterInput" placeholder="Filter by title or author…" oninput="filterBookList(this.value)"/>
-      </div>
-      <div id="bookListPanel">
-        <div class="loading-row">Loading books…</div>
+      <div class="panel">
+        <div class="search-bar">
+          <input type="text" id="bookSearch" placeholder="Filter by title or author…" oninput="filterBooks(this.value)" />
+        </div>
+        <div id="bookList"><div class="loading-row">Loading books…</div></div>
       </div>
     </div>
 
-    <!-- Users -->
-    <div class="panel">
-      <div class="panel-header">
-        <span class="panel-title">All Users</span>
-        <button class="invite-btn" onclick="toggleInvite()">+ Invite User</button>
+    <!-- ── USERS TAB ── -->
+    <div id="tab-users" class="tab-pane">
+      <div class="pane-header">
+        <span class="pane-title">Users</span>
+        <button class="btn-primary" onclick="toggleInvite()">+ Invite User</button>
       </div>
-      <div class="invite-form" id="inviteForm">
-        <input type="email" id="inviteEmail" placeholder="colleague@example.com"/>
-        <button class="send-btn" onclick="sendInvite()">Send Invite</button>
+      <div class="panel">
+        <div class="invite-bar" id="inviteBar">
+          <input type="email" id="inviteEmail" placeholder="colleague@example.com" onkeydown="if(event.key==='Enter')sendInvite()" />
+          <button class="btn-send" onclick="sendInvite()">Send Invite</button>
+          <button class="btn-ghost" onclick="toggleInvite()">Cancel</button>
+        </div>
+        <div class="invite-msg" id="inviteMsg"></div>
+        <div id="userList"><div class="loading-row">Loading users…</div></div>
       </div>
-      <div class="invite-msg" id="inviteMsg"></div>
-      <div id="userList"><div class="loading-row">Loading users…</div></div>
     </div>
+
   </main>
+
+  <div class="toast" id="toast">
+    <div class="toast-dot"></div>
+    <span id="toast-msg"></span>
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-  // ── CONFIG ── Replace with your actual Supabase project values ──────────
-    const SUPABASE_URL = 'https://cqslqfztgtuuidgdkyyz.supabase.co';
+    const SUPABASE_URL     = 'https://cqslqfztgtuuidgdkyyz.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_TBJdijzfEaYzBDBeqAy2CA_edJMKfgz';
 
     const { createClient } = supabase;
     const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+    let allBooks = [];
+    let userMap  = {};
+    let authToken = '';
+
+    // ── AUTH ──────────────────────────────────────────────────────────────
     async function init() {
       const { data: { session } } = await sb.auth.getSession();
       if (!session) { window.location.href = '/login.html'; return; }
+      authToken = session.access_token;
       document.getElementById('user-email-display').textContent = session.user.email;
       document.body.classList.add('ready');
-      loadUsers();
+      await loadUsers();
+      loadBooks();
     }
 
     async function handleLogout() {
@@ -208,73 +297,156 @@
       window.location.href = '/login.html';
     }
 
-    async function getToken() {
-      const { data } = await sb.auth.getSession();
-      return data.session?.access_token;
+    // ── TABS ──────────────────────────────────────────────────────────────
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+      });
+    });
+
+    // ── BOOKS ─────────────────────────────────────────────────────────────
+    async function loadBooks() {
+      const { data, error } = await sb
+        .from('books')
+        .select('id, title, author, isbn, rated_reports(user_id)')
+        .order('title');
+      if (error) {
+        document.getElementById('bookList').innerHTML = `<div class="empty-state">${error.message}</div>`;
+        return;
+      }
+      allBooks = (data || []).map(b => ({
+        ...b,
+        submitter_id: b.rated_reports?.[0]?.user_id || null
+      }));
+      document.getElementById('book-count').textContent = `(${allBooks.length})`;
+      renderBooks(allBooks);
     }
 
+    function renderBooks(books) {
+      const el = document.getElementById('bookList');
+      if (!books.length) { el.innerHTML = '<div class="empty-state">No books found.</div>'; return; }
+      el.innerHTML =
+        `<div class="book-row header">
+          <div>Title</div><div>Author</div><div>ISBN</div><div>Submitted By</div><div></div>
+        </div>` +
+        books.map(b => {
+          const email = b.submitter_id ? (userMap[b.submitter_id] || '—') : '—';
+          return `<div class="book-row">
+            <div class="book-title">${esc(b.title || '')}</div>
+            <div class="book-author">${esc(b.author || '—')}</div>
+            <div class="book-isbn">${esc(b.isbn || '—')}</div>
+            <div class="book-submitter">${esc(email)}</div>
+            <a class="btn-edit" href="/reviewer.html?id=${b.id}">Edit</a>
+          </div>`;
+        }).join('');
+    }
+
+    function filterBooks(q) {
+      const lq = q.toLowerCase();
+      renderBooks(allBooks.filter(b =>
+        (b.title||'').toLowerCase().includes(lq) ||
+        (b.author||'').toLowerCase().includes(lq)
+      ));
+    }
+
+    function exportCSV() {
+      if (!allBooks.length) return;
+      const rows = [['Title','Author','ISBN','ID']];
+      allBooks.forEach(b => rows.push([
+        `"${(b.title ||'').replace(/"/g,'""')}"`,
+        `"${(b.author||'').replace(/"/g,'""')}"`,
+        `"${(b.isbn  ||'').replace(/"/g,'""')}"`,
+        b.id
+      ]));
+      const blob = new Blob([rows.map(r => r.join(',')).join('\n')], { type: 'text/csv' });
+      const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: 'books.csv' });
+      a.click(); URL.revokeObjectURL(a.href);
+    }
+
+    // ── USERS ─────────────────────────────────────────────────────────────
     async function loadUsers() {
       const list = document.getElementById('userList');
       try {
-        const token = await getToken();
-        const res = await fetch('/api/admin/users', { headers: { Authorization: `Bearer ${token}` } });
+        const res = await fetch('/api/admin/users', { headers: { Authorization: `Bearer ${authToken}` } });
         if (!res.ok) throw new Error('Could not load users');
         const { users } = await res.json();
-        // Build userMap so book list can show submitter emails
+        userMap = {};
         (users || []).forEach(u => { userMap[u.id] = u.email; });
         list.innerHTML = '';
         if (!users?.length) { list.innerHTML = '<div class="empty-state">No users found.</div>'; return; }
-        users.forEach(u => {
-          const row = document.createElement('div');
-          row.className = 'data-row';
-          const confirmed = !!u.email_confirmed_at;
-          const role = u.role || 'reviewer';
-          row.innerHTML = `
-            <div>
-              <div class="row-email">${u.email}</div>
-              <div class="row-meta">Added ${new Date(u.created_at).toLocaleDateString()}</div>
-            </div>
-            <div style="display:flex;align-items:center;gap:8px">
-              <select class="role-select" data-id="${u.id}" onchange="updateRole(this)">
-                <option value="reviewer" ${role==='reviewer'?'selected':''}>Reviewer</option>
-                <option value="admin"    ${role==='admin'   ?'selected':''}>Admin</option>
-              </select>
-              <span class="user-badge ${confirmed?'badge-confirmed':'badge-pending'}">
-                ${confirmed?'Active':'Pending'}
-              </span>
-            </div>`;
-          list.appendChild(row);
-        });
+        users.forEach(u => list.appendChild(buildUserRow(u)));
       } catch(e) {
         list.innerHTML = `<div class="empty-state">${e.message}</div>`;
       }
     }
 
+    function buildUserRow(u) {
+      const confirmed = !!u.email_confirmed_at;
+      const role = u.role || 'reviewer';
+      const row = document.createElement('div');
+      row.className = 'user-row';
+      row.id = 'user-row-' + u.id;
+      row.innerHTML = `
+        <div>
+          <div class="user-email">${esc(u.email)}</div>
+          <div class="user-meta">Added ${new Date(u.created_at).toLocaleDateString()}</div>
+        </div>
+        <div class="user-actions">
+          <span class="badge ${confirmed ? 'badge-active' : 'badge-pending'}">${confirmed ? 'Active' : 'Pending'}</span>
+          <select class="role-select" data-id="${u.id}" onchange="updateRole(this)">
+            <option value="reviewer" ${role==='reviewer'?'selected':''}>Reviewer</option>
+            <option value="admin"    ${role==='admin'   ?'selected':''}>Admin</option>
+          </select>
+          <button class="btn-danger" onclick="deleteUser('${u.id}', '${esc(u.email)}')">Delete</button>
+        </div>`;
+      return row;
+    }
+
     async function updateRole(select) {
-      const token = await getToken();
       const res = await fetch('/api/admin/set-role', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${authToken}` },
         body: JSON.stringify({ userId: select.dataset.id, role: select.value })
       });
       const data = await res.json();
-      if (!res.ok) alert('Error: ' + data.error);
+      if (!res.ok) { showToast('Error: ' + data.error, 'error'); return; }
+      showToast('Role updated.', 'success');
     }
 
+    async function deleteUser(userId, email) {
+      if (!confirm(`Delete user ${email}? This cannot be undone.`)) return;
+      const res = await fetch('/api/admin/delete-user', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${authToken}` },
+        body: JSON.stringify({ userId })
+      });
+      const data = await res.json();
+      if (!res.ok) { showToast('Error: ' + data.error, 'error'); return; }
+      document.getElementById('user-row-' + userId)?.remove();
+      delete userMap[userId];
+      showToast(`${email} deleted.`, 'success');
+    }
+
+    // ── INVITE ────────────────────────────────────────────────────────────
     function toggleInvite() {
-      const f = document.getElementById('inviteForm');
-      f.classList.toggle('open');
-      if (f.classList.contains('open')) document.getElementById('inviteEmail').focus();
+      const bar = document.getElementById('inviteBar');
+      bar.classList.toggle('open');
+      if (bar.classList.contains('open')) {
+        document.getElementById('inviteEmail').focus();
+        document.getElementById('inviteMsg').className = 'invite-msg';
+      }
     }
 
     async function sendInvite() {
       const email = document.getElementById('inviteEmail').value.trim();
       if (!email) { showInviteMsg('Please enter an email.', 'error'); return; }
       showInviteMsg('Sending…', '');
-      const token = await getToken();
       const res = await fetch('/api/admin/invite', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${authToken}` },
         body: JSON.stringify({ email })
       });
       const data = await res.json();
@@ -283,8 +455,7 @@
       } else {
         showInviteMsg(`Invite sent to ${email}`, 'success');
         document.getElementById('inviteEmail').value = '';
-        document.getElementById('inviteForm').classList.remove('open');
-        setTimeout(loadUsers, 1500);
+        setTimeout(() => { toggleInvite(); loadUsers(); }, 1500);
       }
     }
 
@@ -294,80 +465,20 @@
       el.className = 'invite-msg ' + type;
     }
 
-    // ── Books ─────────────────────────────────────────────────────────────
-    let allBooks = [];
-    let userMap = {};
-
-    async function loadBooks() {
-      const panel = document.getElementById('bookListPanel');
-      const { data, error } = await sb
-        .from('books')
-        .select('id, title, author, isbn, rated_reports(user_id)')
-        .order('title');
-      if (error) { panel.innerHTML = `<div class="empty-state">${error.message}</div>`; return; }
-      allBooks = (data || []).map(b => ({
-        ...b,
-        submitter_id: b.rated_reports?.[0]?.user_id || null
-      }));
-      document.getElementById('book-count').textContent = `(${allBooks.length})`;
-      renderBookList(allBooks);
+    // ── TOAST ─────────────────────────────────────────────────────────────
+    let toastTimer;
+    function showToast(msg, type) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toast-msg').textContent = msg;
+      toast.className = `toast ${type} show`;
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove('show'), 3500);
     }
 
-    function renderBookList(books) {
-      const panel = document.getElementById('bookListPanel');
-      if (!books.length) { panel.innerHTML = '<div class="empty-state">No books found.</div>'; return; }
-      panel.innerHTML = `
-        <div class="book-row header">
-          <div>Title</div><div>Author</div><div>ISBN</div><div>Submitted By</div><div></div>
-        </div>` +
-        books.map(b => {
-          const email = b.submitter_id ? (userMap[b.submitter_id] || '—') : '—';
-          return `
-          <div class="book-row">
-            <div class="book-title">${b.title || ''}</div>
-            <div class="book-author">${b.author || '—'}</div>
-            <div class="book-isbn">${b.isbn || '—'}</div>
-            <div class="book-submitter">${email}</div>
-            <a class="book-edit" href="/reviewer.html?id=${b.id}">Edit</a>
-          </div>`;
-        }).join('');
+    function esc(str) {
+      return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
     }
 
-    function filterBookList(query) {
-      const filtered = allBooks.filter(b =>
-        (b.title||'').toLowerCase().includes(query.toLowerCase()) ||
-        (b.author||'').toLowerCase().includes(query.toLowerCase())
-      );
-      renderBookList(filtered);
-    }
-
-    function exportCSV() {
-      if (!allBooks.length) return;
-      const rows = [['Title','Author','ISBN','ID']];
-      allBooks.forEach(b => rows.push([
-        `"${(b.title||'').replace(/"/g,'""')}"`,
-        `"${(b.author||'').replace(/"/g,'""')}"`,
-        `"${(b.isbn||'').replace(/"/g,'""')}"`,
-        b.id
-      ]));
-      const csv  = rows.map(r => r.join(',')).join('\n');
-      const blob = new Blob([csv], { type: 'text/csv' });
-      const url  = URL.createObjectURL(blob);
-      const a    = document.createElement('a');
-      a.href = url; a.download = 'books.csv'; a.click();
-      URL.revokeObjectURL(url);
-    }
-
-    async function initAll() {
-      const { data: { session } } = await sb.auth.getSession();
-      if (!session) { window.location.href = '/login.html'; return; }
-      document.getElementById('user-email-display').textContent = session.user.email;
-      document.body.classList.add('ready');
-      await loadUsers();   // populate userMap first
-      loadBooks();         // then render books with submitter emails
-    }
-
-    init = initAll;
     init();
   </script>
 </body>
