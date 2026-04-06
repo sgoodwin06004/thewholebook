@@ -285,6 +285,13 @@
     async function init() {
       const { data: { session } } = await sb.auth.getSession();
       if (!session) { window.location.href = '/login.html'; return; }
+
+      const { data: profile } = await sb.from('profiles').select('role').eq('id', session.user.id).single();
+      if (!profile || profile.role !== 'admin') {
+        window.location.href = '/reviewer.html';
+        return;
+      }
+
       authToken = session.access_token;
       document.getElementById('user-email-display').textContent = session.user.email;
       document.body.classList.add('ready');

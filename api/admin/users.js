@@ -24,6 +24,11 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: 'Invalid session' });
   }
 
+  const { data: profile } = await sb.from('profiles').select('role').eq('id', user.id).single();
+  if (!profile || profile.role !== 'admin') {
+    return res.status(403).json({ error: 'Admins only' });
+  }
+
   // Fetch all users via admin API
   const { data, error } = await sb.auth.admin.listUsers();
   if (error) return res.status(500).json({ error: error.message });

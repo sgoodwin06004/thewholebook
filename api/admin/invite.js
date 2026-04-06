@@ -19,6 +19,11 @@ export default async function handler(req, res) {
   const { data: { user }, error: authError } = await sb.auth.getUser(token);
   if (authError || !user) return res.status(401).json({ error: 'Invalid session' });
 
+  const { data: profile } = await sb.from('profiles').select('role').eq('id', user.id).single();
+  if (!profile || profile.role !== 'admin') {
+    return res.status(403).json({ error: 'Admins only' });
+  }
+
   const { email } = req.body;
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return res.status(400).json({ error: 'Valid email required' });
