@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact — The Whole Book</title>
+  <meta name="description" content="Get in touch with The Whole Book team.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:ital,wght@0,700;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root{--ink:#0a0a0a;--paper:#f5f0e8;--paper-dark:#ede7d5;--red:#c0392b;--red-dark:#922b21;--gold:#d4a017;--white:#fefefe;--gray:#6b6b6b;--border:#0a0a0a;--font-display:'Bebas Neue',sans-serif;--font-serif:'Playfair Display',Georgia,serif;--font-mono:'Space Mono',monospace}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{background:var(--paper);color:var(--ink);font-family:var(--font-serif);overflow-x:hidden;min-height:100vh;display:flex;flex-direction:column}
+    body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:0.4}
+    .site-header{border-bottom:3px solid var(--border);background:var(--ink);color:var(--paper);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+    .site-logo{font-family:var(--font-display);font-size:clamp(1.4rem,3vw,2rem);letter-spacing:0.05em;color:var(--paper);text-decoration:none;padding:0.8rem 0;display:flex;align-items:center;gap:0.6rem}
+    .site-logo .logo-accent{color:var(--red)}
+    .site-logo .logo-mark{display:inline-block;width:8px;height:8px;background:var(--red);border-radius:50%;margin-right:4px;animation:pulse 2s ease-in-out infinite}
+    @keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.4);opacity:0.7}}
+    .site-nav{display:flex;gap:0}
+    .site-nav a{font-family:var(--font-mono);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.15em;color:var(--paper);text-decoration:none;padding:1.1rem 1.2rem;border-left:1px solid rgba(255,255,255,0.1);transition:background 0.2s,color 0.2s}
+    .site-nav a:hover,.site-nav a.active{background:var(--red);color:var(--white)}
+
+    .page-hero{background:var(--ink);color:var(--paper);padding:4rem;border-bottom:3px solid var(--border)}
+    .page-eyebrow{font-family:var(--font-mono);font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--red);margin-bottom:1rem;display:flex;align-items:center;gap:0.8rem}
+    .page-eyebrow::before{content:'';display:block;width:40px;height:2px;background:var(--red)}
+    .page-title{font-family:var(--font-display);font-size:clamp(4rem,8vw,7rem);line-height:0.95;letter-spacing:0.02em;margin-bottom:1rem}
+    .page-subtitle{font-family:var(--font-serif);font-style:italic;font-size:1.1rem;line-height:1.65;color:rgba(245,240,232,0.7);max-width:520px}
+
+    .contact-layout{display:grid;grid-template-columns:1fr 2fr;flex:1}
+    .contact-sidebar{background:var(--red);color:var(--white);padding:4rem 3rem;border-right:3px solid var(--border)}
+    .contact-sidebar h2{font-family:var(--font-display);font-size:2.5rem;letter-spacing:0.03em;line-height:1;margin-bottom:2rem}
+    .contact-detail{margin-bottom:2rem}
+    .contact-detail-label{font-family:var(--font-mono);font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;opacity:0.7;margin-bottom:0.4rem}
+    .contact-detail-value{font-family:var(--font-serif);font-size:1rem;line-height:1.6}
+    .contact-detail-value a{color:var(--white);text-decoration:none;border-bottom:1px solid rgba(255,255,255,0.4);transition:border-color 0.2s}
+    .contact-detail-value a:hover{border-color:var(--white)}
+    .contact-note{font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.05em;line-height:1.8;opacity:0.7;margin-top:3rem;padding-top:2rem;border-top:1px solid rgba(255,255,255,0.2)}
+
+    .contact-form-wrap{padding:4rem}
+    .contact-form-wrap h2{font-family:var(--font-display);font-size:2.5rem;letter-spacing:0.03em;margin-bottom:2rem}
+    .form-group{margin-bottom:1.6rem}
+    .form-label{font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--gray);display:block;margin-bottom:0.5rem}
+    .form-input,.form-textarea{width:100%;border:3px solid var(--ink);background:var(--white);font-family:var(--font-serif);font-size:1rem;padding:0.85rem 1rem;outline:none;color:var(--ink);transition:border-color 0.2s,box-shadow 0.2s;-webkit-appearance:none;border-radius:0;resize:none}
+    .form-input::placeholder,.form-textarea::placeholder{color:#bbb;font-style:italic}
+    .form-input:focus,.form-textarea:focus{border-color:var(--red);box-shadow:4px 4px 0 var(--red)}
+    .form-textarea{min-height:160px;line-height:1.65}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem}
+    .form-submit{font-family:var(--font-mono);font-size:0.75rem;letter-spacing:0.15em;text-transform:uppercase;background:var(--ink);color:var(--paper);border:3px solid var(--ink);padding:1rem 2.5rem;cursor:pointer;transition:background 0.2s,color 0.2s;display:inline-block}
+    .form-submit:hover{background:var(--red);border-color:var(--red)}
+    .form-success{display:none;background:#f0fdf4;border:3px solid #1a7a3c;padding:1.5rem;margin-top:1.5rem}
+    .form-success p{font-family:var(--font-mono);font-size:0.75rem;letter-spacing:0.08em;color:#1a7a3c}
+    .form-error{display:none;background:#fff5f5;border:3px solid var(--red);padding:1.5rem;margin-top:1.5rem}
+    .form-error p{font-family:var(--font-mono);font-size:0.75rem;letter-spacing:0.08em;color:var(--red)}
+    .form-error a{color:var(--red)}
+
+    footer{background:var(--ink);color:var(--paper);padding:2.5rem 4rem;display:flex;align-items:center;justify-content:space-between;border-top:3px solid var(--border);flex-wrap:wrap;gap:1rem}
+    .footer-brand{font-family:var(--font-display);font-size:1.8rem;letter-spacing:0.05em}
+    .footer-copy{font-family:var(--font-mono);font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:rgba(245,240,232,0.35)}
+
+    @media(max-width:900px){
+      .contact-layout{grid-template-columns:1fr}
+      .contact-sidebar{border-right:none;border-bottom:3px solid var(--border)}
+      .contact-form-wrap{padding:2.5rem 2rem}
+      .form-row{grid-template-columns:1fr}
+      .page-hero{padding:2.5rem 2rem}
+      .site-nav{display:none}
+    }
+  </style>
+</head>
+<body>
+
+<header class="site-header">
+  <a href="/" class="site-logo"><span class="logo-mark"></span>The <span class="logo-accent">Whole</span> Book</a>
+  <nav class="site-nav">
+    <a href="/#search">Search</a>
+    <a href="/#about">About</a>
+    <a href="/#what-we-do">What We Do</a>
+    <a href="/#most-banned">Most Banned</a>
+    <a href="/#recently-added">Browse</a>
+    <a href="/contact.html" class="active">Contact</a>
+  </nav>
+</header>
+
+<div class="page-hero">
+  <div class="page-eyebrow">Get in Touch</div>
+  <h1 class="page-title">Contact</h1>
+  <p class="page-subtitle">Questions, tips, corrections, or just want to help? We read every message.</p>
+</div>
+
+<div class="contact-layout">
+  <aside class="contact-sidebar">
+    <h2>Reach Us Directly</h2>
+    <div class="contact-detail">
+      <div class="contact-detail-label">Email</div>
+      <div class="contact-detail-value"><a href="mailto:sgoodwin06004@proton.me">sgoodwin06004@proton.me</a></div>
+    </div>
+    <div class="contact-detail">
+      <div class="contact-detail-label">What to send us</div>
+      <div class="contact-detail-value">Book challenges we've missed, corrections to existing entries, media inquiries, or general feedback.</div>
+    </div>
+    <p class="contact-note">We are a volunteer project. We will do our best to respond promptly, but please allow a few days.</p>
+  </aside>
+
+  <div class="contact-form-wrap">
+    <h2>Send a Message</h2>
+    <form id="contactForm" novalidate>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="contactName">Your Name</label>
+          <input class="form-input" id="contactName" type="text" placeholder="Jane Smith" autocomplete="name">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="contactEmail">Your Email</label>
+          <input class="form-input" id="contactEmail" type="email" placeholder="you@example.com" autocomplete="email">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="contactSubject">Subject</label>
+        <input class="form-input" id="contactSubject" type="text" placeholder="Book challenge, correction, question…">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="contactMessage">Message</label>
+        <textarea class="form-textarea" id="contactMessage" placeholder="Tell us what's on your mind…"></textarea>
+      </div>
+      <button class="form-submit" id="formSubmitBtn" type="submit">Send Message →</button>
+      <div class="form-success" id="formSuccess">
+        <p>Your message has been sent. Thank you for reaching out — we'll be in touch soon.</p>
+      </div>
+      <div class="form-error" id="formError">
+        <p>Something went wrong. Please try again or email us directly at <a href="mailto:sgoodwin06004@proton.me">sgoodwin06004@proton.me</a>.</p>
+      </div>
+    </form>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-brand">The Whole Book</div>
+  <p class="footer-copy">© 2025 The Whole Book — All books deserve to be read in full</p>
+</footer>
+
+<script>
+  const FORMSPREE_ENDPOINT = 'https://formspree.io/f/mykboyla';
+
+  document.getElementById('contactForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const btn     = document.getElementById('formSubmitBtn');
+    const success = document.getElementById('formSuccess');
+    const error   = document.getElementById('formError');
+
+    success.style.display = 'none';
+    error.style.display   = 'none';
+    btn.textContent       = 'Sending…';
+    btn.disabled          = true;
+
+    const data = {
+      name:    document.getElementById('contactName').value.trim(),
+      email:   document.getElementById('contactEmail').value.trim(),
+      subject: document.getElementById('contactSubject').value.trim(),
+      message: document.getElementById('contactMessage').value.trim()
+    };
+
+    try {
+      const res = await fetch(FORMSPREE_ENDPOINT, {
+        method:  'POST',
+        headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+        body:    JSON.stringify(data)
+      });
+
+      if (res.ok) {
+        success.style.display = 'block';
+        this.reset();
+      } else {
+        error.style.display = 'block';
+      }
+    } catch {
+      error.style.display = 'block';
+    } finally {
+      btn.textContent = 'Send Message →';
+      btn.disabled    = false;
+    }
+  });
+</script>
+
+</body>
+</html>
