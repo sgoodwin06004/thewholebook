@@ -517,6 +517,8 @@
           proRevs.forEach(r => {
             addProReview();
             const idx = proReviewCount;
+            const itemEl = document.getElementById(`pro-review-${idx}`);
+            itemEl.dataset.reviewId = r.id;
             document.getElementById(`p-source-${idx}`).value  = r.source  || '';
             document.getElementById(`p-award-${idx}`).value   = r.award   || '';
             document.getElementById(`p-summary-${idx}`).value = r.summary || '';
@@ -652,21 +654,34 @@
 
         const reviewItems = document.querySelectorAll('.pro-review-item');
         for (const item of reviewItems) {
-          const idx     = item.id.replace('pro-review-', '');
+          const idx       = item.id.replace('pro-review-', '');
+          const existingId = item.dataset.reviewId || null;
           const source  = (document.getElementById('p-source-'  + idx) || {}).value?.trim();
           const award   = (document.getElementById('p-award-'   + idx) || {}).value?.trim();
           const summary = (document.getElementById('p-summary-' + idx) || {}).value?.trim();
           const proUrl  = (document.getElementById('p-url-'     + idx) || {}).value?.trim();
           if (source || summary || proUrl) {
-            const { error: pErr } = await sb.from('pro_reviews').insert({
-              book_id: bookId,
-              user_id: currentUser.id,
-              source:  source  || null,
-              award:   award   || null,
-              summary: summary || null,
-              url:     proUrl  || null,
-            });
-            if (pErr) throw new Error('Pro review: ' + pErr.message);
+            if (existingId) {
+              const { error: pErr } = await sb.from('pro_reviews')
+                .update({
+                  source:  source  || null,
+                  award:   award   || null,
+                  summary: summary || null,
+                  url:     proUrl  || null,
+                })
+                .eq('id', existingId);
+              if (pErr) throw new Error('Pro review: ' + pErr.message);
+            } else {
+              const { error: pErr } = await sb.from('pro_reviews').insert({
+                book_id: bookId,
+                user_id: currentUser.id,
+                source:  source  || null,
+                award:   award   || null,
+                summary: summary || null,
+                url:     proUrl  || null,
+              });
+              if (pErr) throw new Error('Pro review: ' + pErr.message);
+            }
           }
         }
 
