@@ -680,7 +680,7 @@
         updateStats();
         renderList();
       } catch (e) {
-        document.getElementById('bookList').innerHTM<a class="book-edit" href="/admin-reviews.html?book=${b.id}">Edit</a>L =
+        document.getElementById('bookList').innerHTML =
           `<div class="loading-state">⚠ Failed to load: ${e.message}</div>`;
       }
     }
