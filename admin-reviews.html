@@ -918,6 +918,21 @@
     });
 
     loadAll();
+    // AFTER
+async function autoOpenFromParam() {
+  const bookId = new URLSearchParams(window.location.search).get('book');
+  if (!bookId) return;
+  await loadAll();
+  const book = allBooks.find(b => b.id === bookId);
+  if (book) openModal(bookId);
+}
+
+// If there's a ?book= param, auto-open; otherwise just load normally
+if (new URLSearchParams(window.location.search).get('book')) {
+  autoOpenFromParam();
+} else {
+  loadAll();
+}
   </script>
 </body>
 </html>
