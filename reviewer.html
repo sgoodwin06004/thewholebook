@@ -556,9 +556,10 @@
 
     async function prefillForm(bookId) {
       try {
-        const [{ data: book }, { data: rated }, { data: proRevs }] = await Promise.all([
+        const [{ data: book }, { data: rated }, { data: goodreads }, { data: proRevs }] = await Promise.all([
           sb.from('books').select('*').eq('id', bookId).single(),
           sb.from('rated_reports').select('*').eq('book_id', bookId).maybeSingle(),
+          sb.from('goodreads').select('*').eq('book_id', bookId).maybeSingle(),
           sb.from('pro_reviews').select('*').eq('book_id', bookId)
         ]);
 
@@ -580,6 +581,11 @@
           document.getElementById('r-flagged').value    = rated.flagged_categories || '';
           document.getElementById('r-excerpts').value   = rated.excerpts           || '';
           document.getElementById('r-report-url').value = rated.report_url         || '';
+        }
+
+        if (goodreads) {
+          document.getElementById('g-summary').value = goodreads.summary || '';
+          document.getElementById('g-url').value     = goodreads.url     || '';
         }
 
         if (proRevs && proRevs.length > 0) {
@@ -676,7 +682,7 @@
 
         if (rating || flagged || excerpts || reportUrl) {
           if (editingBookId) {
-            await sb.from('rated_reports')
+            const { error: rErr } = await sb.from('rated_reports')
               .upsert({
                 book_id:            bookId,
                 user_id:            currentUser.id,
@@ -685,6 +691,7 @@
                 excerpts:           excerpts  || null,
                 report_url:         reportUrl || null,
               }, { onConflict: 'book_id' });
+            if (rErr) throw new Error('Rated report: ' + rErr.message);
           } else {
             const { error: rErr } = await sb.from('rated_reports').insert({
               book_id:            bookId,
@@ -703,13 +710,14 @@
 
         if (gSummary || gUrl) {
           if (editingBookId) {
-            await sb.from('goodreads')
+            const { error: gErr } = await sb.from('goodreads')
               .upsert({
                 book_id: bookId,
                 user_id: currentUser.id,
                 summary: gSummary || null,
                 url:     gUrl     || null,
               }, { onConflict: 'book_id' });
+            if (gErr) throw new Error('Goodreads: ' + gErr.message);
           } else {
             const gRating = document.getElementById('g-rating').value;
             const { error: gErr } = await sb.from('goodreads').insert({
