@@ -419,7 +419,11 @@
       font-size: 0.7rem;
       color: var(--muted);
       font-family: var(--mono);
-      margin-top: 0.3rem;
+      margin-top: 0.4rem;
+      line-height: 1.6;
+    }
+    .review-date span {
+      color: var(--text);
     }
     .review-item-actions {
       display: flex;
@@ -640,9 +644,13 @@
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     const SUPABASE_URL = 'https://cqslqfztgtuuidgdkyyz.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_TBJdijzfEaYzBDBeqAy2CA_edJMKfgz';
+
+    const { createClient } = supabase;
+    const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
 
     const headers = {
       'apikey': SUPABASE_KEY,
@@ -663,6 +671,7 @@
     // ── STATE ──
     let allBooks = [];
     let allReviews = [];
+    let userMap = {};
     let activeFilter = 'all';
     let searchQuery = '';
     let currentBookId = null;
@@ -784,7 +793,11 @@
                 ${r.award ? `<span class="review-award">★ ${escHtml(r.award)}</span>` : ''}
               </div>
               <div class="review-summary">${escHtml(r.summary || '')}</div>
-              <div class="review-date">${r.created_at ? new Date(r.created_at).toLocaleDateString('en-US', { year:'numeric', month:'short', day:'numeric' }) : ''}</div>
+              <div class="review-date">
+                ${r.user_id && userMap[r.user_id] ? `<span>${escHtml(userMap[r.user_id])}</span> · ` : ''}
+                Added ${r.created_at ? new Date(r.created_at).toLocaleDateString('en-US', { year:'numeric', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' }) : '—'}
+                ${r.updated_at && r.updated_at !== r.created_at ? ` · Updated ${new Date(r.updated_at).toLocaleDateString('en-US', { year:'numeric', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' })}` : ''}
+              </div>
             </div>
             <div class="review-item-actions">
               <button class="btn-sm" onclick="editReview('${r.id}')">Edit</button>
@@ -914,6 +927,19 @@
 
     // ── INIT: load data, then auto-open modal if ?book= param is present ──
     async function init() {
+      const { data: { session } } = await sb.auth.getSession();
+      if (!session) { window.location.href = '/login.html'; return; }
+
+      try {
+        const res = await fetch('/api/admin/users', {
+          headers: { Authorization: `Bearer ${session.access_token}` }
+        });
+        if (res.ok) {
+          const { users } = await res.json();
+          (users || []).forEach(u => { userMap[u.id] = u.email; });
+        }
+      } catch (_) {}
+
       await loadAll();
       const bookId = new URLSearchParams(window.location.search).get('book');
       if (bookId && allBooks.find(b => b.id === bookId)) {
