@@ -617,8 +617,14 @@
       addProReview();
 
       const params = new URLSearchParams(window.location.search);
-      if (params.get('from') === 'admin' || params.get('id')) {
-        document.getElementById('back-link').style.display = 'inline';
+      const fromParam = params.get('from');
+      const backLink = document.getElementById('back-link');
+      if (fromParam === 'reviews') {
+        backLink.href = '/my-reviews.html';
+        backLink.textContent = '← My Reviews';
+        backLink.style.display = 'inline';
+      } else if (fromParam === 'admin' || params.get('id')) {
+        backLink.style.display = 'inline';
       }
 
       const bookId = params.get('id');

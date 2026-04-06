@@ -72,7 +72,7 @@
       border: 1px solid rgba(232,184,109,0.25); padding: 2px 8px;
       border-radius: 99px; font-weight: 500;
     }
-    .review-summary { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 10px; }
+    .review-summary { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 10px; white-space: pre-wrap; }
     .review-url { font-size: 12px; color: var(--pro); text-decoration: none; word-break: break-all; }
     .review-url:hover { text-decoration: underline; }
     .review-timestamps { font-size: 11px; color: var(--muted); margin-top: 8px; opacity: 0.7; }
@@ -232,7 +232,7 @@
               <div class="book-group-title">${esc(book?.title || 'Unknown Book')}</div>
               ${book?.author ? `<div class="book-group-author">${esc(book.author)}</div>` : ''}
             </div>
-            <a class="nav-link" href="/reviewer.html?id=${esc(book?.id || '')}">Edit Book →</a>
+            <a class="nav-link" href="/reviewer.html?id=${esc(book?.id || '')}&from=reviews">Edit Book →</a>
           </div>
           ${reviews.map(r => renderReviewCard(r)).join('')}
         </div>
