@@ -415,6 +415,12 @@
       -webkit-box-orient: vertical;
       overflow: hidden;
     }
+    .review-date {
+      font-size: 0.7rem;
+      color: var(--muted);
+      font-family: var(--mono);
+      margin-top: 0.3rem;
+    }
     .review-item-actions {
       display: flex;
       gap: 0.4rem;
@@ -667,7 +673,7 @@
       try {
         const [books, reviews] = await Promise.all([
           sbFetch('books?select=id,title,author,cover_url&order=title.asc'),
-          sbFetch('pro_reviews?select=*')
+          sbFetch('pro_reviews?select=*&order=created_at.asc')
         ]);
         allBooks = books;
         allReviews = reviews;
@@ -778,6 +784,7 @@
                 ${r.award ? `<span class="review-award">★ ${escHtml(r.award)}</span>` : ''}
               </div>
               <div class="review-summary">${escHtml(r.summary || '')}</div>
+              <div class="review-date">${r.created_at ? new Date(r.created_at).toLocaleDateString('en-US', { year:'numeric', month:'short', day:'numeric' }) : ''}</div>
             </div>
             <div class="review-item-actions">
               <button class="btn-sm" onclick="editReview('${r.id}')">Edit</button>

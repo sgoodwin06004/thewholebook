@@ -110,13 +110,14 @@
     .book-search-bar input:focus { border-color: var(--accent); }
     .book-search-bar input::placeholder { color: var(--muted); }
 
-    .book-row { display: grid; grid-template-columns: 2fr 1.5fr 1fr 80px; align-items: center; padding: 11px 24px; border-bottom: 1px solid var(--border); font-size: 12px; gap: 12px; transition: background 0.15s; }
+    .book-row { display: grid; grid-template-columns: 2fr 1.2fr 1fr 1.2fr 80px; align-items: center; padding: 11px 24px; border-bottom: 1px solid var(--border); font-size: 12px; gap: 12px; transition: background 0.15s; }
     .book-row:last-child { border-bottom: none; }
     .book-row:hover { background: rgba(255,255,255,0.02); }
     .book-row.header { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); background: rgba(255,255,255,0.02); padding: 9px 24px; }
-    .book-title  { color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .book-author { color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .book-isbn   { color: var(--muted); }
+    .book-title     { color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .book-author    { color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .book-isbn      { color: var(--muted); }
+    .book-submitter { color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 11px; }
     .book-edit { background: none; border: 1px solid var(--border); color: var(--text); font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; padding: 4px 10px; border-radius: 2px; cursor: pointer; text-decoration: none; display: inline-block; text-align: center; transition: border-color 0.2s, color 0.2s; }
     .book-edit:hover { border-color: var(--accent); color: var(--accent); }
     .export-btn { background: none; border: 1px solid var(--border); color: var(--muted); font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; padding: 7px 14px; border-radius: 3px; cursor: pointer; transition: border-color 0.2s, color 0.2s; }
@@ -219,6 +220,8 @@
         const res = await fetch('/api/admin/users', { headers: { Authorization: `Bearer ${token}` } });
         if (!res.ok) throw new Error('Could not load users');
         const { users } = await res.json();
+        // Build userMap so book list can show submitter emails
+        (users || []).forEach(u => { userMap[u.id] = u.email; });
         list.innerHTML = '';
         if (!users?.length) { list.innerHTML = '<div class="empty-state">No users found.</div>'; return; }
         users.forEach(u => {
@@ -293,12 +296,19 @@
 
     // ── Books ─────────────────────────────────────────────────────────────
     let allBooks = [];
+    let userMap = {};
 
     async function loadBooks() {
       const panel = document.getElementById('bookListPanel');
-      const { data, error } = await sb.from('books').select('id, title, author, isbn').order('title');
+      const { data, error } = await sb
+        .from('books')
+        .select('id, title, author, isbn, rated_reports(user_id)')
+        .order('title');
       if (error) { panel.innerHTML = `<div class="empty-state">${error.message}</div>`; return; }
-      allBooks = data || [];
+      allBooks = (data || []).map(b => ({
+        ...b,
+        submitter_id: b.rated_reports?.[0]?.user_id || null
+      }));
       document.getElementById('book-count').textContent = `(${allBooks.length})`;
       renderBookList(allBooks);
     }
@@ -308,15 +318,19 @@
       if (!books.length) { panel.innerHTML = '<div class="empty-state">No books found.</div>'; return; }
       panel.innerHTML = `
         <div class="book-row header">
-          <div>Title</div><div>Author</div><div>ISBN</div><div></div>
+          <div>Title</div><div>Author</div><div>ISBN</div><div>Submitted By</div><div></div>
         </div>` +
-        books.map(b => `
+        books.map(b => {
+          const email = b.submitter_id ? (userMap[b.submitter_id] || '—') : '—';
+          return `
           <div class="book-row">
             <div class="book-title">${b.title || ''}</div>
             <div class="book-author">${b.author || '—'}</div>
             <div class="book-isbn">${b.isbn || '—'}</div>
+            <div class="book-submitter">${email}</div>
             <a class="book-edit" href="/reviewer.html?id=${b.id}">Edit</a>
-          </div>`).join('');
+          </div>`;
+        }).join('');
     }
 
     function filterBookList(query) {
@@ -349,8 +363,8 @@
       if (!session) { window.location.href = '/login.html'; return; }
       document.getElementById('user-email-display').textContent = session.user.email;
       document.body.classList.add('ready');
-      loadUsers();
-      loadBooks();
+      await loadUsers();   // populate userMap first
+      loadBooks();         // then render books with submitter emails
     }
 
     init = initAll;
