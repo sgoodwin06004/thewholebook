@@ -545,12 +545,13 @@
           <input type="number" id="b-pub-year" min="1000" max="2099" placeholder="e.g. 1960" />
         </div>
         <div class="field">
-          <label>Audience <span class="optional">optional — select all that apply</span></label>
-          <div class="checkbox-group">
-            <label class="checkbox-label"><input type="checkbox" id="cat-juvenile" value="Juvenile" /> Juvenile</label>
-            <label class="checkbox-label"><input type="checkbox" id="cat-ya" value="Young Adult" /> Young Adult</label>
-            <label class="checkbox-label"><input type="checkbox" id="cat-adult" value="Adult" /> Adult</label>
-          </div>
+          <label>Audience <span class="optional">optional</span></label>
+          <select id="cat-audience">
+            <option value="">— select —</option>
+            <option value="Juvenile">Juvenile</option>
+            <option value="Young Adult">Young Adult</option>
+            <option value="Adult">Adult</option>
+          </select>
         </div>
         <div class="field">
           <label>Cover Art <span class="optional">optional</span></label>
@@ -803,9 +804,7 @@
           document.getElementById('b-cover').value    = book.cover_url        || '';
           document.getElementById('g-rating').value   = book.goodreads_rating || '';
           const cats = book.categories || [];
-          document.getElementById('cat-juvenile').checked = cats.includes('Juvenile');
-          document.getElementById('cat-ya').checked       = cats.includes('Young Adult');
-          document.getElementById('cat-adult').checked    = cats.includes('Adult');
+          document.getElementById('cat-audience').value = cats[0] || '';
           if (book.cover_url) {
             document.getElementById('coverPreview').src = book.cover_url;
             document.getElementById('coverPreviewWrap').style.display = 'block';
@@ -927,9 +926,7 @@
         if (editingBookId) {
           // ── UPDATE existing book ──
           if (canEditBookFields) {
-          const selectedCats = ['cat-juvenile','cat-ya','cat-adult']
-            .filter(id => document.getElementById(id).checked)
-            .map(id => document.getElementById(id).value);
+          const selectedCat = document.getElementById('cat-audience').value;
           const { error: bookErr } = await sb
             .from('books')
             .update({
@@ -939,7 +936,7 @@
               cover_url:        document.getElementById('b-cover').value.trim()   || null,
               goodreads_rating: document.getElementById('g-rating').value         || null,
               publication_year: document.getElementById('b-pub-year').value ? parseInt(document.getElementById('b-pub-year').value) : null,
-              categories:       selectedCats.length ? selectedCats : null,
+              categories:       selectedCat ? [selectedCat] : null,
             })
             .eq('id', editingBookId);
           if (bookErr) throw new Error('Book: ' + bookErr.message);
@@ -947,9 +944,7 @@
           bookId = editingBookId;
         } else {
           // ── INSERT new book ──
-          const newCats = ['cat-juvenile','cat-ya','cat-adult']
-            .filter(id => document.getElementById(id).checked)
-            .map(id => document.getElementById(id).value);
+          const newCat = document.getElementById('cat-audience').value;
           const { data: book, error: bookErr } = await sb
             .from('books')
             .insert({
@@ -958,7 +953,7 @@
               isbn:             document.getElementById('b-isbn').value.trim()     || null,
               cover_url:        document.getElementById('b-cover').value.trim()   || null,
               publication_year: document.getElementById('b-pub-year').value ? parseInt(document.getElementById('b-pub-year').value) : null,
-              categories:       newCats.length ? newCats : null,
+              categories:       newCat ? [newCat] : null,
               user_id:          currentUser.id,
             })
             .select('id')
@@ -1102,7 +1097,7 @@
     function disableBookFields() {
       const ids = ['b-title','b-author','b-isbn','b-pub-year','b-cover',
         'r-rating','r-flagged','r-excerpts','r-report-url',
-        'g-rating','g-summary','g-url','cat-juvenile','cat-ya','cat-adult'];
+        'g-rating','g-summary','g-url','cat-audience'];
       ids.forEach(id => {
         const el = document.getElementById(id);
         if (el) { el.disabled = true; el.style.opacity = '0.45'; }
@@ -1178,7 +1173,7 @@
        'r-rating','r-flagged','r-excerpts','r-report-url',
        'g-rating','g-summary','g-url'
       ].forEach(id => document.getElementById(id).value = '');
-      ['cat-juvenile','cat-ya','cat-adult'].forEach(id => document.getElementById(id).checked = false);
+      document.getElementById('cat-audience').value = '';
       document.getElementById('pro-reviews-list').innerHTML = '';
       proReviewCount = 0;
       addProReview();
