@@ -608,7 +608,7 @@
     const container=document.getElementById('recentBooks');const meta=document.getElementById('recentMeta');
     if(!BOOKS.length){container.innerHTML=`<div class="grid-error">No books found.</div>`;meta.textContent='0 books';return;}
     meta.textContent=`${BOOKS.length} book${BOOKS.length!==1?'s':''} in database`;
-    container.innerHTML=BOOKS.map((book,i)=>{const report=getReportForBook(book.id);const reviews=getReviewsForBook(book.id);return`<div class="book-tile" onclick="openModal('${book.id}')">${book.cover_url?`<img class="book-tile-cover" src="${book.cover_url}" alt="Cover of ${book.title}" onerror="this.style.display='none'" />`:`<div class="book-tile-number">${String(i+1).padStart(2,'0')}</div>`}<div class="book-tile-title">${book.title}</div><div class="book-tile-author">— ${book.author||'Unknown Author'}</div><div class="book-tile-meta">${report?'⚠ Report on file':'No report yet'}${reviews.length>0?` · ${reviews.length} review${reviews.length>1?'s':''}`:''}</div><div class="tile-tags">${report?`<span class="tile-tag" style="border-color:var(--red);color:var(--red)">Flagged</span>`:''}${book.award?`<span class="tile-tag" style="border-color:var(--gold);color:var(--gold)">Award</span>`:''}${reviews.length>0?'<span class="tile-tag">Reviewed</span>':''}</div></div>`;}).join('');
+    container.innerHTML=BOOKS.map((book,i)=>{const report=getReportForBook(book.id);const reviews=getReviewsForBook(book.id);const cats=(book.categories||[]).join(' · ');return`<div class="book-tile" onclick="openModal('${book.id}')">${book.cover_url?`<img class="book-tile-cover" src="${book.cover_url}" alt="Cover of ${book.title}" onerror="this.style.display='none'" />`:`<div class="book-tile-number">${String(i+1).padStart(2,'0')}</div>`}<div class="book-tile-title">${book.title}</div><div class="book-tile-author">— ${book.author||'Unknown Author'}</div><div class="book-tile-meta">${book.publication_year?`${book.publication_year} · `:''}${cats?`${cats} · `:''}${report?'⚠ Report on file':'No report yet'}${reviews.length>0?` · ${reviews.length} review${reviews.length>1?'s':''}`:''}</div><div class="tile-tags">${report?`<span class="tile-tag" style="border-color:var(--red);color:var(--red)">Flagged</span>`:''}${book.award?`<span class="tile-tag" style="border-color:var(--gold);color:var(--gold)">Award</span>`:''}${reviews.length>0?'<span class="tile-tag">Reviewed</span>':''}${(book.categories||[]).map(c=>`<span class="tile-tag">${c}</span>`).join('')}</div></div>`;}).join('');
   }
 
   const searchInput=document.getElementById('searchInput');
@@ -623,7 +623,7 @@
     const results=BOOKS.filter(b=>(b.title&&b.title.toLowerCase().includes(q))||(b.author&&b.author.toLowerCase().includes(q))||(b.isbn&&b.isbn.toLowerCase().includes(q)));
     if(!results.length){searchResults.classList.remove('has-results');searchResults.innerHTML=`<div class="search-placeholder"><div class="search-placeholder-icon">🔍</div><p>No results for "${query}"<br/><br/>Not in our database yet</p></div>`;return;}
     searchResults.classList.add('has-results');
-    searchResults.innerHTML=results.map(book=>{const report=getReportForBook(book.id);return`<div class="book-card" onclick="openModal('${book.id}')"><div><div class="book-card-title">${book.title}</div><div class="book-card-author">by ${book.author||'Unknown'}</div><div class="book-card-tags">${book.award?'<span class="tag tag-award">Award</span>':''}${report?'<span class="tag tag-banned">Flagged</span>':''}</div></div><div class="book-card-scores">${report?`<span class="score-pill score-ban">Rating: ${report.rating||'N/A'}</span>`:''}<span class="score-pill score-real">📖 In Database</span></div></div>`;}).join('');
+    searchResults.innerHTML=results.map(book=>{const report=getReportForBook(book.id);return`<div class="book-card" onclick="openModal('${book.id}')"><div><div class="book-card-title">${book.title}</div><div class="book-card-author">by ${book.author||'Unknown'}${book.publication_year?` · ${book.publication_year}`:''}</div><div class="book-card-tags">${book.award?'<span class="tag tag-award">Award</span>':''}${report?'<span class="tag tag-banned">Flagged</span>':''}${(book.categories||[]).map(c=>`<span class="tag" style="border-color:var(--gray);color:var(--gray)">${c}</span>`).join('')}</div></div><div class="book-card-scores">${report?`<span class="score-pill score-ban">Rating: ${report.rating||'N/A'}</span>`:''}<span class="score-pill score-real">📖 In Database</span></div></div>`;}).join('');
   }
 
   searchInput.addEventListener('input',e=>doSearch(e.target.value));
@@ -637,7 +637,9 @@
 
   function openModal(id){
     const book=BOOKS.find(b=>String(b.id)===String(id));if(!book)return;
-    modalTitle.textContent=book.title;modalAuthor.textContent=`by ${book.author||'Unknown Author'}`;
+    modalTitle.textContent=book.title;
+    const authorLine=[`by ${book.author||'Unknown Author'}`,book.publication_year,( book.categories||[]).join(' · ')].filter(Boolean).join(' · ');
+    modalAuthor.textContent=authorLine;
     modalOverlay.classList.add('open');document.body.style.overflow='hidden';
     renderModal(book,getReportForBook(book.id),getReviewsForBook(book.id));
   }

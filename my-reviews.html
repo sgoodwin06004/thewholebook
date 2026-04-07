@@ -195,20 +195,41 @@
     }
 
     async function loadReviews() {
-      const { data, error } = await sb
-        .from('pro_reviews')
-        .select('*, books(id, title, author)')
-        .eq('user_id', currentUser.id)
-        .order('created_at', { ascending: false });
-
       const container = document.getElementById('content');
+
+      // Load own reviews + collaborated books in parallel
+      const [{ data: ownReviews, error }, { data: collabBooks }] = await Promise.all([
+        sb.from('pro_reviews')
+          .select('*, books(id, title, author)')
+          .eq('user_id', currentUser.id)
+          .order('created_at', { ascending: false }),
+        sb.from('book_collaborators')
+          .select('book_id, books(id, title, author)')
+          .eq('user_id', currentUser.id)
+      ]);
 
       if (error) {
         container.innerHTML = `<p style="color:var(--error)">Failed to load: ${error.message}</p>`;
         return;
       }
 
-      if (!data || data.length === 0) {
+      // Group own reviews by book
+      const byBook = {};
+      (ownReviews || []).forEach(r => {
+        const bookId = r.book_id;
+        if (!byBook[bookId]) byBook[bookId] = { book: r.books, reviews: [], isCollab: false };
+        byBook[bookId].reviews.push(r);
+      });
+
+      // Build collab book groups (books where user is co-reviewer but may not have own reviews)
+      const collabGroups = (collabBooks || [])
+        .filter(c => !byBook[c.book_id]) // don't duplicate books already shown
+        .map(c => ({ book: c.books, reviews: [], isCollab: true, bookId: c.book_id }));
+
+      const hasOwn = Object.keys(byBook).length > 0;
+      const hasCollab = collabGroups.length > 0;
+
+      if (!hasOwn && !hasCollab) {
         container.innerHTML = `
           <div class="empty-state">
             <p>You haven't submitted any reviews yet.</p>
@@ -217,26 +238,42 @@
         return;
       }
 
-      // Group by book
-      const byBook = {};
-      data.forEach(r => {
-        const bookId = r.book_id;
-        if (!byBook[bookId]) byBook[bookId] = { book: r.books, reviews: [] };
-        byBook[bookId].reviews.push(r);
-      });
+      let html = '';
 
-      container.innerHTML = Object.values(byBook).map(({ book, reviews }) => `
-        <div class="book-group">
-          <div class="book-group-header">
-            <div>
-              <div class="book-group-title">${esc(book?.title || 'Unknown Book')}</div>
-              ${book?.author ? `<div class="book-group-author">${esc(book.author)}</div>` : ''}
+      if (hasOwn) {
+        html += Object.values(byBook).map(({ book, reviews }) => `
+          <div class="book-group">
+            <div class="book-group-header">
+              <div>
+                <div class="book-group-title">${esc(book?.title || 'Unknown Book')}</div>
+                ${book?.author ? `<div class="book-group-author">${esc(book.author)}</div>` : ''}
+              </div>
+              <a class="nav-link" href="/reviewer.html?id=${esc(book?.id || '')}&from=reviews">Edit Book →</a>
             </div>
-            <a class="nav-link" href="/reviewer.html?id=${esc(book?.id || '')}&from=reviews">Edit Book →</a>
+            ${reviews.map(r => renderReviewCard(r)).join('')}
           </div>
-          ${reviews.map(r => renderReviewCard(r)).join('')}
-        </div>
-      `).join('');
+        `).join('');
+      }
+
+      if (hasCollab) {
+        html += `<div style="margin-top:40px;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--border)">
+          <span style="font-size:11px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--pro)">Co-reviewing</span>
+        </div>`;
+        html += collabGroups.map(({ book, bookId }) => `
+          <div class="book-group">
+            <div class="book-group-header">
+              <div>
+                <div class="book-group-title">${esc(book?.title || 'Unknown Book')}</div>
+                ${book?.author ? `<div class="book-group-author">${esc(book.author)}</div>` : ''}
+              </div>
+              <a class="nav-link" href="/reviewer.html?id=${esc(book?.id || bookId)}&from=reviews">Add Reviews →</a>
+            </div>
+            <p style="font-size:13px;color:var(--muted);padding:12px 0">You are a co-reviewer on this book. Open it to add or edit reviews.</p>
+          </div>
+        `).join('');
+      }
+
+      container.innerHTML = html;
     }
 
     function renderReviewCard(r) {

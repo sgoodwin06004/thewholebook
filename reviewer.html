@@ -25,6 +25,8 @@
       --goodreads-glow: rgba(244,127,59,0.12);
       --experience: #e87b9a;
       --experience-glow: rgba(232,123,154,0.12);
+      --collab: #6bcfb0;
+      --collab-glow: rgba(107,207,176,0.12);
     }
 
     body {
@@ -130,6 +132,7 @@
     .section.pro-section::before         { background: var(--pro); }
     .section.goodreads-section::before   { background: var(--goodreads); }
     .section.experience-section::before  { background: var(--experience); }
+    .section.collab-section::before      { background: var(--collab); }
 
     .section-label {
       font-size: 10px;
@@ -147,6 +150,7 @@
     .section.pro-section         .section-label { color: var(--pro); }
     .section.goodreads-section   .section-label { color: var(--goodreads); }
     .section.experience-section  .section-label { color: var(--experience); }
+    .section.collab-section      .section-label { color: var(--collab); }
 
     .section-label::after {
       content: '';
@@ -212,6 +216,64 @@
     .experience-section textarea:focus {
       border-color: var(--experience);
       box-shadow: 0 0 0 3px var(--experience-glow);
+    }
+
+    .collab-section input:focus {
+      border-color: var(--collab);
+      box-shadow: 0 0 0 3px var(--collab-glow);
+    }
+
+    .collab-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      margin-bottom: 8px;
+    }
+    .collab-email { font-size: 13px; color: var(--text); }
+    .btn-remove-collab {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 18px;
+      cursor: pointer;
+      line-height: 1;
+      padding: 0 4px;
+      transition: color 0.15s;
+    }
+    .btn-remove-collab:hover { color: var(--error); }
+
+    .collab-add-row {
+      display: flex;
+      gap: 10px;
+      align-items: stretch;
+      margin-top: 12px;
+    }
+    .collab-add-row input { flex: 1; }
+    .btn-add-collab {
+      background: none;
+      border: 1px solid var(--collab);
+      color: var(--collab);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 0 20px;
+      border-radius: 2px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.2s;
+    }
+    .btn-add-collab:hover { background: rgba(107,207,176,0.08); }
+    .btn-add-collab:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .collab-note {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 14px;
+      line-height: 1.5;
     }
 
     input::placeholder, textarea::placeholder { color: var(--muted); }
@@ -416,6 +478,29 @@
     .cover-upload-area:hover { border-color: var(--pro); background: rgba(126,184,247,0.07); }
     .cover-upload-area.uploading { opacity: 0.6; cursor: not-allowed; pointer-events: none; }
 
+    .checkbox-group {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      padding: 4px 0;
+    }
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 13px;
+      font-weight: 400;
+      letter-spacing: 0;
+      text-transform: none;
+      color: var(--text);
+      cursor: pointer;
+    }
+    .checkbox-label input[type="checkbox"] {
+      width: auto;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+
     @media (max-width: 768px) {
       .form-grid, .field-row { grid-template-columns: 1fr; }
       main { padding: 32px 16px 60px; }
@@ -454,6 +539,18 @@
         <div class="field">
           <label>ISBN</label>
           <input type="text" id="b-isbn" placeholder="978-0-000-00000-0" />
+        </div>
+        <div class="field">
+          <label>Publication Year <span class="optional">optional</span></label>
+          <input type="number" id="b-pub-year" min="1000" max="2099" placeholder="e.g. 1960" />
+        </div>
+        <div class="field">
+          <label>Audience <span class="optional">optional — select all that apply</span></label>
+          <div class="checkbox-group">
+            <label class="checkbox-label"><input type="checkbox" id="cat-juvenile" value="Juvenile" /> Juvenile</label>
+            <label class="checkbox-label"><input type="checkbox" id="cat-ya" value="Young Adult" /> Young Adult</label>
+            <label class="checkbox-label"><input type="checkbox" id="cat-adult" value="Adult" /> Adult</label>
+          </div>
         </div>
         <div class="field">
           <label>Cover Art <span class="optional">optional</span></label>
@@ -527,6 +624,18 @@
       </div>
     </div>
 
+    <div class="form-full" id="collab-section" style="display:none">
+      <div class="section collab-section">
+        <div class="section-label">Co-reviewers</div>
+        <p class="collab-note">Co-reviewers can add and edit professional reviews and reader experiences on this book. They cannot edit book details, the rated report, or Goodreads data.</p>
+        <div id="collab-list"></div>
+        <div class="collab-add-row">
+          <input type="email" id="collab-email" placeholder="reviewer@example.com" />
+          <button type="button" class="btn-add-collab" id="btnAddCollab" onclick="addCollaborator()">+ Add Co-reviewer</button>
+        </div>
+      </div>
+    </div>
+
     <div class="submit-row">
       <span class="submit-hint">All records will be saved together.</span>
       <button class="btn-submit" id="submitBtn" onclick="handleSubmit()">
@@ -553,6 +662,10 @@
     let proReviewCount = 0;
     let experienceCount = 0;
     let editingBookId = null;
+    let isAdmin = false;
+    let isBookOwner = false;
+    let allUsers = [];
+    let currentCollaborators = [];
 
     function addProReview() {
       proReviewCount++;
@@ -669,11 +782,30 @@
         ]);
 
         if (book) {
-          document.getElementById('b-title').value  = book.title             || '';
-          document.getElementById('b-author').value = book.author            || '';
-          document.getElementById('b-isbn').value   = book.isbn              || '';
-          document.getElementById('b-cover').value  = book.cover_url         || '';
-          document.getElementById('g-rating').value = book.goodreads_rating  || '';
+          // Determine access level
+          isBookOwner = book.user_id === currentUser.id;
+          if (!isBookOwner && !isAdmin) {
+            const { data: collab } = await sb.from('book_collaborators')
+              .select('id').eq('book_id', bookId).eq('user_id', currentUser.id).maybeSingle();
+            if (!collab) {
+              showToast('You do not have access to this book.', 'error');
+              setTimeout(() => window.location.href = '/my-reviews.html', 2000);
+              return;
+            }
+            // Collaborator: disable book-level fields
+            disableBookFields();
+          }
+
+          document.getElementById('b-title').value    = book.title            || '';
+          document.getElementById('b-author').value   = book.author           || '';
+          document.getElementById('b-isbn').value     = book.isbn             || '';
+          document.getElementById('b-pub-year').value = book.publication_year || '';
+          document.getElementById('b-cover').value    = book.cover_url        || '';
+          document.getElementById('g-rating').value   = book.goodreads_rating || '';
+          const cats = book.categories || [];
+          document.getElementById('cat-juvenile').checked = cats.includes('Juvenile');
+          document.getElementById('cat-ya').checked       = cats.includes('Young Adult');
+          document.getElementById('cat-adult').checked    = cats.includes('Adult');
           if (book.cover_url) {
             document.getElementById('coverPreview').src = book.cover_url;
             document.getElementById('coverPreviewWrap').style.display = 'block';
@@ -721,6 +853,11 @@
             document.getElementById(`e-story-${idx}`).value  = e.story       || '';
           });
         }
+        // Admin: show and load co-reviewer section
+        if (isAdmin) {
+          document.getElementById('collab-section').style.display = 'block';
+          await loadCollaborators(bookId);
+        }
       } catch(e) {
         showToast('Failed to load book data: ' + e.message, 'error');
       }
@@ -731,6 +868,21 @@
       if (!session) { window.location.href = '/login.html'; return; }
       currentUser = session.user;
       document.getElementById('user-email-display').textContent = currentUser.email;
+
+      // Check admin role
+      const { data: profile } = await sb.from('profiles').select('role').eq('id', currentUser.id).single();
+      isAdmin = profile?.role === 'admin';
+
+      // Admins: fetch full user list for co-reviewer lookup
+      if (isAdmin) {
+        try {
+          const res = await fetch('/api/admin/users', {
+            headers: { Authorization: `Bearer ${session.access_token}` }
+          });
+          if (res.ok) { const { users } = await res.json(); allUsers = users || []; }
+        } catch(_) {}
+      }
+
       document.body.classList.add('ready');
       addProReview();
       addReaderExperience();
@@ -770,31 +922,44 @@
 
       try {
         let bookId;
+        const canEditBookFields = isBookOwner || isAdmin || !editingBookId;
 
         if (editingBookId) {
           // ── UPDATE existing book ──
+          if (canEditBookFields) {
+          const selectedCats = ['cat-juvenile','cat-ya','cat-adult']
+            .filter(id => document.getElementById(id).checked)
+            .map(id => document.getElementById(id).value);
           const { error: bookErr } = await sb
             .from('books')
             .update({
               title,
-              author:           document.getElementById('b-author').value.trim() || null,
-              isbn:             document.getElementById('b-isbn').value.trim()   || null,
-              cover_url:        document.getElementById('b-cover').value.trim()  || null,
-              goodreads_rating: document.getElementById('g-rating').value        || null,
+              author:           document.getElementById('b-author').value.trim()  || null,
+              isbn:             document.getElementById('b-isbn').value.trim()     || null,
+              cover_url:        document.getElementById('b-cover').value.trim()   || null,
+              goodreads_rating: document.getElementById('g-rating').value         || null,
+              publication_year: document.getElementById('b-pub-year').value ? parseInt(document.getElementById('b-pub-year').value) : null,
+              categories:       selectedCats.length ? selectedCats : null,
             })
             .eq('id', editingBookId);
           if (bookErr) throw new Error('Book: ' + bookErr.message);
+          } // end canEditBookFields
           bookId = editingBookId;
         } else {
           // ── INSERT new book ──
+          const newCats = ['cat-juvenile','cat-ya','cat-adult']
+            .filter(id => document.getElementById(id).checked)
+            .map(id => document.getElementById(id).value);
           const { data: book, error: bookErr } = await sb
             .from('books')
             .insert({
               title,
-              author:    document.getElementById('b-author').value.trim() || null,
-              isbn:      document.getElementById('b-isbn').value.trim()   || null,
-              cover_url: document.getElementById('b-cover').value.trim()  || null,
-              user_id:   currentUser.id,
+              author:           document.getElementById('b-author').value.trim()  || null,
+              isbn:             document.getElementById('b-isbn').value.trim()     || null,
+              cover_url:        document.getElementById('b-cover').value.trim()   || null,
+              publication_year: document.getElementById('b-pub-year').value ? parseInt(document.getElementById('b-pub-year').value) : null,
+              categories:       newCats.length ? newCats : null,
+              user_id:          currentUser.id,
             })
             .select('id')
             .single();
@@ -807,7 +972,7 @@
         const excerpts  = document.getElementById('r-excerpts').value.trim();
         const reportUrl = document.getElementById('r-report-url').value.trim();
 
-        if (rating || flagged || excerpts || reportUrl) {
+        if (canEditBookFields && (rating || flagged || excerpts || reportUrl)) {
           if (editingBookId) {
             const { error: rErr } = await sb.from('rated_reports')
               .upsert({
@@ -835,7 +1000,7 @@
         const gSummary = document.getElementById('g-summary').value.trim();
         const gUrl     = document.getElementById('g-url').value.trim();
 
-        if (gSummary || gUrl) {
+        if (canEditBookFields && (gSummary || gUrl)) {
           if (editingBookId) {
             const { error: gErr } = await sb.from('goodreads')
               .upsert({
@@ -934,11 +1099,86 @@
       }
     }
 
+    function disableBookFields() {
+      const ids = ['b-title','b-author','b-isbn','b-pub-year','b-cover',
+        'r-rating','r-flagged','r-excerpts','r-report-url',
+        'g-rating','g-summary','g-url','cat-juvenile','cat-ya','cat-adult'];
+      ids.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) { el.disabled = true; el.style.opacity = '0.45'; }
+      });
+      const uploadArea = document.getElementById('coverUploadArea');
+      if (uploadArea) { uploadArea.style.pointerEvents = 'none'; uploadArea.style.opacity = '0.45'; }
+    }
+
+    async function loadCollaborators(bookId) {
+      const { data } = await sb.from('book_collaborators')
+        .select('id, user_id, created_at')
+        .eq('book_id', bookId);
+      currentCollaborators = data || [];
+      renderCollaborators();
+    }
+
+    function renderCollaborators() {
+      const list = document.getElementById('collab-list');
+      if (!list) return;
+      if (!currentCollaborators.length) {
+        list.innerHTML = '<p style="font-size:13px;color:var(--muted);margin-bottom:12px">No co-reviewers assigned yet.</p>';
+        return;
+      }
+      list.innerHTML = currentCollaborators.map(c => {
+        const user = allUsers.find(u => u.id === c.user_id);
+        const label = user ? user.email : c.user_id;
+        return `<div class="collab-item" id="ci-${c.id}">
+          <span class="collab-email">${esc(label)}</span>
+          <button type="button" class="btn-remove-collab" onclick="removeCollaborator('${c.id}')" title="Remove">×</button>
+        </div>`;
+      }).join('');
+    }
+
+    async function addCollaborator() {
+      const email = document.getElementById('collab-email').value.trim().toLowerCase();
+      if (!email) return;
+
+      const user = allUsers.find(u => u.email.toLowerCase() === email);
+      if (!user) { showToast('No reviewer found with that email.', 'error'); return; }
+      if (user.id === currentUser.id) { showToast('You are already the book owner.', 'error'); return; }
+      if (currentCollaborators.find(c => c.user_id === user.id)) {
+        showToast('Already a co-reviewer on this book.', 'error'); return;
+      }
+
+      const btn = document.getElementById('btnAddCollab');
+      btn.disabled = true;
+
+      const { data, error } = await sb.from('book_collaborators').insert({
+        book_id: editingBookId,
+        user_id: user.id,
+        added_by: currentUser.id,
+      }).select('id, user_id, created_at').single();
+
+      btn.disabled = false;
+
+      if (error) { showToast('Failed to add: ' + error.message, 'error'); return; }
+      currentCollaborators.push(data);
+      renderCollaborators();
+      document.getElementById('collab-email').value = '';
+      showToast(`${email} added as co-reviewer.`, 'success');
+    }
+
+    async function removeCollaborator(id) {
+      const { error } = await sb.from('book_collaborators').delete().eq('id', id);
+      if (error) { showToast('Failed to remove: ' + error.message, 'error'); return; }
+      currentCollaborators = currentCollaborators.filter(c => c.id !== id);
+      renderCollaborators();
+      showToast('Co-reviewer removed.', 'success');
+    }
+
     function clearForm() {
-      ['b-title','b-author','b-isbn','b-cover',
+      ['b-title','b-author','b-isbn','b-pub-year','b-cover',
        'r-rating','r-flagged','r-excerpts','r-report-url',
        'g-rating','g-summary','g-url'
       ].forEach(id => document.getElementById(id).value = '');
+      ['cat-juvenile','cat-ya','cat-adult'].forEach(id => document.getElementById(id).checked = false);
       document.getElementById('pro-reviews-list').innerHTML = '';
       proReviewCount = 0;
       addProReview();
