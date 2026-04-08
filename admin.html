@@ -325,6 +325,7 @@
         return;
       }
       allBooks = (data || []).map(b => ({ ...b, submitter_id: b.user_id || null }));
+      allBooks.sort((a,b) => sortKey(a.title).localeCompare(sortKey(b.title)));
       document.getElementById('book-count').textContent = `(${allBooks.length})`;
       renderBooks(allBooks);
     }
@@ -478,6 +479,8 @@
       clearTimeout(toastTimer);
       toastTimer = setTimeout(() => toast.classList.remove('show'), 3500);
     }
+
+    function sortKey(title) { return (title||'').replace(/^(the|a|an)\s+/i,'').toLowerCase(); }
 
     function esc(str) {
       return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');

@@ -551,6 +551,7 @@
     {t:"Year of Wonders",a:"Geraldine Brooks"}
   ];
 
+  function sortKey(title){return(title||'').replace(/^(the|a|an)\s+/i,'').toLowerCase();}
   let BOOKS=[], RATED_REPORTS=[], PRO_REVIEWS=[];
   let alaFilter='';
 
@@ -614,7 +615,7 @@
     const container=document.getElementById('bookListItems');const label=document.getElementById('bookListLabel');
     if(!BOOKS.length){container.innerHTML=`<div class="book-list-loading">No books yet.</div>`;return;}
     label.textContent=`${BOOKS.length} Book${BOOKS.length!==1?'s':''} Documented`;
-    container.innerHTML=BOOKS.slice(0,5).map(book=>{const report=getReportForBook(book.id);return`<div class="book-list-item" onclick="openModal('${book.id}')"><div class="book-list-item-info"><div class="book-list-item-title">${book.title}</div><div class="book-list-item-author">${book.author||''}</div></div>${report?'<span class="book-list-flag">Flagged</span>':''}</div>`;}).join('');
+    container.innerHTML=[...BOOKS].sort((a,b)=>sortKey(a.title).localeCompare(sortKey(b.title))).slice(0,5).map(book=>{const report=getReportForBook(book.id);return`<div class="book-list-item" onclick="openModal('${book.id}')"><div class="book-list-item-info"><div class="book-list-item-title">${book.title}</div><div class="book-list-item-author">${book.author||''}</div></div>${report?'<span class="book-list-flag">Flagged</span>':''}</div>`;}).join('');
   }
 
   function renderRecentBooks(){
