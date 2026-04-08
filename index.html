@@ -108,7 +108,13 @@
     .modal-book-author{font-family:var(--font-mono);font-size:0.75rem;letter-spacing:0.12em;color:rgba(245,240,232,0.6);text-transform:uppercase}
     .modal-close{background:none;border:2px solid rgba(255,255,255,0.3);color:var(--paper);font-family:var(--font-mono);font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;padding:0.5rem 0.8rem;cursor:pointer;flex-shrink:0;transition:border-color 0.2s,background 0.2s}
     .modal-close:hover{background:var(--red);border-color:var(--red)}
-    .modal-body{padding:2.5rem}
+    .modal-body{padding:0}
+    .modal-tabs{display:flex;border-bottom:2px solid rgba(255,255,255,0.12);background:var(--ink);padding:0 2rem;gap:0}
+    .modal-tab{font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;padding:1rem 1.4rem;cursor:pointer;border:none;background:none;color:rgba(245,240,232,0.4);transition:color 0.2s;border-bottom:2px solid transparent;margin-bottom:-2px;flex-shrink:0}
+    .modal-tab:hover{color:rgba(245,240,232,0.75)}
+    .modal-tab.active{color:var(--paper);border-bottom-color:var(--red)}
+    .modal-tab-panel{display:none;padding:2.5rem}
+    .modal-tab-panel.active{display:block}
     .verdict-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;border:2px solid var(--ink);margin-bottom:2rem}
     .verdict-col{padding:1.5rem}
     .verdict-col:first-child{border-right:2px solid var(--ink);background:#fff5f5}
@@ -563,12 +569,13 @@
 
   async function loadData(){
     try{
-      const [books,reports,reviews]=await Promise.all([
+      const [books,reports,reviews,experiences]=await Promise.all([
         supabaseFetch('books?select=*&order=created_at.desc'),
         supabaseFetch('rated_reports?select=*'),
-        supabaseFetch('pro_reviews?select=*')
+        supabaseFetch('pro_reviews?select=*'),
+        supabaseFetch('reader_experiences?select=*')
       ]);
-      BOOKS=books;RATED_REPORTS=reports;PRO_REVIEWS=reviews;
+      BOOKS=books;RATED_REPORTS=reports;PRO_REVIEWS=reviews;READER_EXPERIENCES=experiences||[];
       renderBookListPreview();renderRecentBooks();renderAla();buildMarquee();updateStats();
     }catch(err){
       console.error('Failed to load data:',err);
@@ -594,8 +601,10 @@
   function buildMarqueeFallback(){renderMarquee(getFallbackTitles());}
   function getFallbackTitles(){return['The Kite Runner','And Tango Makes Three','The Bluest Eye','Speak','The Hate U Give','Flamer','The Perks of Being a Wallflower','Beloved','Of Mice and Men','The Absolutely True Diary of a Part-Time Indian'];}
   function renderMarquee(titles){const track=document.getElementById('marqueeTrack');const d=[...titles,...titles,...titles,...titles];track.innerHTML=d.map(t=>`<span class="marquee-item">${t} <span class="marquee-sep">◆</span></span>`).join('');}
+  let READER_EXPERIENCES=[];
   function getReportForBook(id){return RATED_REPORTS.find(r=>r.book_id===id);}
   function getReviewsForBook(id){return PRO_REVIEWS.filter(r=>String(r.book_id)===String(id));}
+  function getExperiencesForBook(id){return READER_EXPERIENCES.filter(e=>String(e.book_id)===String(id));}
 
   function renderBookListPreview(){
     const container=document.getElementById('bookListItems');const label=document.getElementById('bookListLabel');
@@ -641,11 +650,34 @@
     const authorLine=[`by ${book.author||'Unknown Author'}`,book.publication_year,( book.categories||[]).join(' · ')].filter(Boolean).join(' · ');
     modalAuthor.textContent=authorLine;
     modalOverlay.classList.add('open');document.body.style.overflow='hidden';
-    renderModal(book,getReportForBook(book.id),getReviewsForBook(book.id));
+    renderModal(book,getReportForBook(book.id),getReviewsForBook(book.id),getExperiencesForBook(book.id));
   }
 
-  function renderModal(book,report,reviews){
-    modalBody.innerHTML=`${book.cover_url?`<div style="margin-bottom:2rem;"><img src="${book.cover_url}" alt="Cover of ${book.title}" style="max-width:100px;border:2px solid var(--ink);" /></div>`:''}${report?`<div class="verdict-grid"><div class="verdict-col"><div class="verdict-label ban">Their Rating</div><div class="verdict-rating">${report.rating||'?'}</div><div class="verdict-source">${report.report_url?`<a href="${report.report_url}" target="_blank" style="color:var(--red)">View Source Report</a>`:'Source on file'}</div></div><div class="verdict-col"><div class="verdict-label real">Status</div><div class="verdict-rating" style="font-size:2rem;padding-top:0.5rem">Banned<br/>Book</div><div class="verdict-source">The Whole Book — counter-database</div></div></div>${report.flagged_categories?`<div class="section-label">Rated Books Categories</div><div class="context-quote" style="font-style:normal;margin-bottom:2rem">${report.flagged_categories}</div>`:''}${report.excerpts?`<div class="section-label">How They Framed It</div><div class="context-quote">${report.excerpts}<cite>From the ban report — stripped of context</cite></div>`:''}`:`<div style="padding:1rem 0 2rem;font-family:var(--font-mono);font-size:0.7rem;color:var(--gray);letter-spacing:0.1em;text-transform:uppercase;">ℹ No formal ban report on file for this title yet.</div>`}${reviews&&reviews.length>0?`<div class="section-label">Professional Reviews</div>${reviews.map(r=>`<div class="analysis-text" style="margin-bottom:1.5rem">${r.summary?`<p>${r.summary}</p>`:''}${r.award?`<div class="awards-list" style="margin-top:0.8rem"><span class="award-badge">🏆 ${r.award}</span></div>`:''}${r.source?`<p style="font-family:var(--font-mono);font-size:0.65rem;color:var(--gray);margin-top:0.5rem">— ${r.source}${r.url?` · <a href="${r.url}" target="_blank" style="color:var(--ink)">Read full review ↗</a>`:''}</p>`:''}</div>`).join('')}`:`<div style="font-family:var(--font-mono);font-size:0.7rem;color:var(--gray);letter-spacing:0.1em;text-transform:uppercase;">ℹ No professional reviews on file yet.</div>`}`;
+  function switchModalTab(btn,panelId){
+    btn.closest('.modal-tabs').querySelectorAll('.modal-tab').forEach(t=>t.classList.remove('active'));
+    modalBody.querySelectorAll('.modal-tab-panel').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(panelId).classList.add('active');
+  }
+
+  function renderModal(book,report,reviews,experiences){
+    const noItem='<p style="font-family:var(--font-mono);font-size:0.7rem;color:var(--gray);letter-spacing:0.1em;text-transform:uppercase;padding:0.5rem 0">';
+
+    const proHtml=reviews&&reviews.length>0
+      ?reviews.map(r=>`<div class="analysis-text" style="margin-bottom:1.5rem">${r.summary?`<p>${r.summary}</p>`:''}${r.award?`<div class="awards-list" style="margin-top:0.8rem"><span class="award-badge">🏆 ${r.award}</span></div>`:''}${r.source?`<p style="font-family:var(--font-mono);font-size:0.65rem;color:var(--gray);margin-top:0.5rem">— ${r.source}${r.url?` · <a href="${r.url}" target="_blank" style="color:var(--ink)">Read full review ↗</a>`:''}</p>`:''}</div>`).join('')
+      :noItem+'ℹ No professional reviews on file yet.</p>';
+
+    const expHtml=experiences&&experiences.length>0
+      ?experiences.map(e=>`<div style="margin-bottom:1.5rem;border-left:3px solid var(--red);padding-left:1.2rem">${e.story?`<p class="analysis-text" style="font-style:italic">${e.story}</p>`:''}${(e.reader_name||e.source)?`<p style="font-family:var(--font-mono);font-size:0.65rem;color:var(--gray);margin-top:0.5rem">— ${[e.reader_name,e.source].filter(Boolean).join(' · ')}</p>`:''}</div>`).join('')
+      :noItem+'ℹ No reader experiences on file yet.</p>';
+
+    const ratedHtml=report
+      ?`<div class="verdict-grid"><div class="verdict-col"><div class="verdict-label ban">Their Rating</div><div class="verdict-rating">${report.rating||'?'}</div><div class="verdict-source">${report.report_url?`<a href="${report.report_url}" target="_blank" style="color:var(--red)">View Source Report</a>`:'Source on file'}</div></div><div class="verdict-col"><div class="verdict-label real">Status</div><div class="verdict-rating" style="font-size:2rem;padding-top:0.5rem">Banned<br/>Book</div><div class="verdict-source">The Whole Book — counter-database</div></div></div>${report.flagged_categories?`<div class="section-label">RatedBooks Categories</div><div class="context-quote" style="font-style:normal;margin-bottom:2rem">${report.flagged_categories}</div>`:''}${report.excerpts?`<div class="section-label">How They Framed It</div><div class="context-quote">${report.excerpts}<cite>From the ban report — stripped of context</cite></div>`:''}`
+      :noItem+'ℹ No RatedBooks report on file for this title yet.</p>';
+
+    const coverHtml=book.cover_url?`<div style="padding:2rem 2.5rem 0"><img src="${book.cover_url}" alt="Cover of ${book.title}" style="max-width:80px;border:2px solid var(--ink);" /></div>`:'';
+
+    modalBody.innerHTML=`${coverHtml}<div class="modal-tabs"><button class="modal-tab active" onclick="switchModalTab(this,'modal-tab-pro')">Pro Reviews</button><button class="modal-tab" onclick="switchModalTab(this,'modal-tab-exp')">Reader Experiences</button><button class="modal-tab" onclick="switchModalTab(this,'modal-tab-rated')">RatedBooks Ratings</button></div><div class="modal-tab-panel active" id="modal-tab-pro">${proHtml}</div><div class="modal-tab-panel" id="modal-tab-exp">${expHtml}</div><div class="modal-tab-panel" id="modal-tab-rated">${ratedHtml}</div>`;
   }
 
   document.getElementById('modalClose').addEventListener('click',closeModal);
