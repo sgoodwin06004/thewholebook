@@ -115,7 +115,7 @@
     .modal-tab.active{color:var(--paper);border-bottom-color:var(--red)}
     .modal-tab-panel{display:none;padding:2.5rem}
     .modal-tab-panel.active{display:block}
-    .verdict-grid{border:2px solid var(--ink);margin-bottom:2rem;background:#fff5f5}
+    .verdict-grid{border:2px solid var(--ink);margin-bottom:2rem;background:#fff5f5;display:flex;align-items:center}
     .verdict-col{padding:1.5rem}
     .verdict-label{font-family:var(--font-mono);font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;margin-bottom:0.6rem;display:flex;align-items:center;gap:0.5rem}
     .verdict-label.ban{color:var(--red)}
@@ -727,7 +727,7 @@
       :noItem+'ℹ No reader experiences on file yet.</p>';
 
     const ratedHtml=report
-      ?`<div class="verdict-grid"><div class="verdict-col"><div class="verdict-label ban">Their Rating</div><div class="verdict-rating">${report.rating||'?'}</div><div class="verdict-source">${report.report_url?`<a href="${report.report_url}" target="_blank" style="color:var(--red)">View Source Report</a>`:'Source on file'}</div></div>${report.flagged_categories?`<div style="font-family:var(--font-mono);font-size:0.7rem;color:var(--gray);align-self:center;padding-left:1.5rem;letter-spacing:0.03em">These are their objections to the book.</div>`:''}</div>${report.flagged_categories?`<div class="section-label">RatedBooks Categories</div><div class="context-quote" style="font-style:normal;margin-bottom:2rem">${report.flagged_categories}</div>`:''}${report.excerpts?`<div class="section-label">How They Framed It</div><div class="context-quote">${report.excerpts}<cite>From the ban report — stripped of context</cite></div>`:''}`
+      ?`<div class="verdict-grid"><div class="verdict-col"><div class="verdict-label ban">Their Rating</div><div class="verdict-rating">${report.rating||'?'}</div><div class="verdict-source">${report.report_url?`<a href="${report.report_url}" target="_blank" style="color:var(--red)">View Source Report</a>`:'Source on file'}</div></div>${report.flagged_categories?`<div style="font-family:var(--font-mono);font-size:1.4rem;color:var(--ink);flex:1;text-align:right;padding:1.5rem;letter-spacing:0.02em;line-height:1.3">These are their objections to the book.</div>`:''}</div>${report.flagged_categories?`<div class="section-label">RatedBooks Categories</div><div class="context-quote" style="font-style:normal;margin-bottom:2rem">${report.flagged_categories}</div>`:''}${report.excerpts?`<div class="section-label">How They Framed It</div><div class="context-quote">${report.excerpts}<cite>From the ban report — stripped of context</cite></div>`:''}`
       :noItem+'ℹ No RatedBooks report on file for this title yet.</p>';
 
     const coverHtml=book.cover_url?`<div style="padding:2rem 2.5rem 0"><img src="${book.cover_url}" alt="Cover of ${book.title}" style="max-width:80px;border:2px solid var(--ink);" /></div>`:'';
