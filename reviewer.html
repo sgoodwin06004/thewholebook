@@ -537,6 +537,10 @@
           <input type="text" id="b-author" placeholder="Author name" />
         </div>
         <div class="field">
+          <label>Author 2 / Contributor <span class="optional">optional</span></label>
+          <input type="text" id="b-author2" placeholder="Co-author or contributor name" />
+        </div>
+        <div class="field">
           <label>ISBN</label>
           <input type="text" id="b-isbn" placeholder="978-0-000-00000-0" />
         </div>
@@ -683,7 +687,7 @@
         <div class="field-row">
           <div class="field">
             <label>Source</label>
-            <input type="text" id="p-source-${idx}" value="Goodreads Review" placeholder="e.g. Publishers Weekly, Booklist" />
+            <input type="text" id="p-source-${idx}" placeholder="e.g. Publishers Weekly, Booklist" />
           </div>
           <div class="field">
             <label>Award <span class="optional">optional</span></label>
@@ -799,6 +803,7 @@
 
           document.getElementById('b-title').value    = book.title            || '';
           document.getElementById('b-author').value   = book.author           || '';
+          document.getElementById('b-author2').value  = book.author2          || '';
           document.getElementById('b-isbn').value     = book.isbn             || '';
           document.getElementById('b-pub-year').value = book.publication_year || '';
           document.getElementById('b-cover').value    = book.cover_url        || '';
@@ -931,7 +936,8 @@
             .from('books')
             .update({
               title,
-              author:           document.getElementById('b-author').value.trim()  || null,
+              author:           document.getElementById('b-author').value.trim()   || null,
+              author2:          document.getElementById('b-author2').value.trim() || null,
               isbn:             document.getElementById('b-isbn').value.trim()     || null,
               cover_url:        document.getElementById('b-cover').value.trim()   || null,
               goodreads_rating: document.getElementById('g-rating').value         || null,
@@ -949,7 +955,8 @@
             .from('books')
             .insert({
               title,
-              author:           document.getElementById('b-author').value.trim()  || null,
+              author:           document.getElementById('b-author').value.trim()   || null,
+              author2:          document.getElementById('b-author2').value.trim() || null,
               isbn:             document.getElementById('b-isbn').value.trim()     || null,
               cover_url:        document.getElementById('b-cover').value.trim()   || null,
               publication_year: document.getElementById('b-pub-year').value ? parseInt(document.getElementById('b-pub-year').value) : null,
@@ -1095,7 +1102,7 @@
     }
 
     function disableBookFields() {
-      const ids = ['b-title','b-author','b-isbn','b-pub-year','b-cover',
+      const ids = ['b-title','b-author','b-author2','b-isbn','b-pub-year','b-cover',
         'r-rating','r-flagged','r-excerpts','r-report-url',
         'g-rating','g-summary','g-url','cat-audience'];
       ids.forEach(id => {
@@ -1169,7 +1176,7 @@
     }
 
     function clearForm() {
-      ['b-title','b-author','b-isbn','b-pub-year','b-cover',
+      ['b-title','b-author','b-author2','b-isbn','b-pub-year','b-cover',
        'r-rating','r-flagged','r-excerpts','r-report-url',
        'g-rating','g-summary','g-url'
       ].forEach(id => document.getElementById(id).value = '');
