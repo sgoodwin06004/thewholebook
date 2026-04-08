@@ -668,7 +668,7 @@
       :noItem+'ℹ No professional reviews on file yet.</p>';
 
     const expHtml=experiences&&experiences.length>0
-      ?experiences.map(e=>`<div style="margin-bottom:1.5rem;border-left:3px solid var(--red);padding-left:1.2rem">${e.story?`<p class="analysis-text" style="font-style:italic">${e.story}</p>`:''}${(e.reader_name||e.source)?`<p style="font-family:var(--font-mono);font-size:0.65rem;color:var(--gray);margin-top:0.5rem">— ${[e.reader_name,e.source].filter(Boolean).join(' · ')}</p>`:''}</div>`).join('')
+      ?experiences.map(e=>`<div style="margin-bottom:2rem;border-left:3px solid var(--red);padding-left:1.2rem">${e.story?`<div class="analysis-text" style="font-style:italic"><p>${e.story}</p></div>`:''}${(e.reader_name||e.source)?`<p style="font-family:var(--font-mono);font-size:0.65rem;color:var(--gray);margin-top:0.5rem">— ${[e.reader_name,e.source].filter(Boolean).join(' · ')}</p>`:''}</div>`).join('')
       :noItem+'ℹ No reader experiences on file yet.</p>';
 
     const ratedHtml=report
