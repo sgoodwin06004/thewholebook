@@ -118,14 +118,14 @@
     .verdict-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;border:2px solid var(--ink);margin-bottom:2rem}
     .verdict-col{padding:1.5rem}
     .verdict-col:first-child{border-right:2px solid var(--ink);background:#fff5f5}
-    .verdict-col:last-child{background:#f5fff8}
+    .verdict-col:last-child{background:#fff8f2}
     .verdict-label{font-family:var(--font-mono);font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;margin-bottom:0.6rem;display:flex;align-items:center;gap:0.5rem}
     .verdict-label.ban{color:var(--red)}
-    .verdict-label.real{color:#1a7a3c}
+    .verdict-label.real{color:#c45c00}
     .verdict-label::before{content:'';display:block;width:8px;height:8px;border-radius:50%;background:currentColor}
     .verdict-rating{font-family:var(--font-display);font-size:3.5rem;line-height:1;margin-bottom:0.3rem}
     .verdict-col:first-child .verdict-rating{color:var(--red)}
-    .verdict-col:last-child .verdict-rating{color:#1a7a3c}
+    .verdict-col:last-child .verdict-rating{color:#c45c00}
     .verdict-source{font-family:var(--font-mono);font-size:0.65rem;color:var(--gray);letter-spacing:0.05em}
     .section-label{font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--gray);margin-bottom:0.8rem;padding-bottom:0.5rem;border-bottom:1px solid var(--paper-dark);display:flex;align-items:center;gap:0.6rem}
     .section-label::after{content:'';flex:1;height:1px;background:var(--paper-dark)}
@@ -732,7 +732,7 @@
       :noItem+'ℹ No reader experiences on file yet.</p>';
 
     const ratedHtml=report
-      ?`<div class="verdict-grid"><div class="verdict-col"><div class="verdict-label ban">Their Rating</div><div class="verdict-rating">${report.rating||'?'}</div><div class="verdict-source">${report.report_url?`<a href="${report.report_url}" target="_blank" style="color:var(--red)">View Source Report</a>`:'Source on file'}</div></div><div class="verdict-col"><div class="verdict-label real">Status</div><div class="verdict-rating" style="font-size:2rem;padding-top:0.5rem">Banned<br/>Book</div><div class="verdict-source">The Whole Book — counter-database</div></div></div>${report.flagged_categories?`<div class="section-label">RatedBooks Categories</div><div class="context-quote" style="font-style:normal;margin-bottom:2rem">${report.flagged_categories}</div>`:''}${report.excerpts?`<div class="section-label">How They Framed It</div><div class="context-quote">${report.excerpts}<cite>From the ban report — stripped of context</cite></div>`:''}`
+      ?`<div class="verdict-grid"><div class="verdict-col"><div class="verdict-label ban">Their Rating</div><div class="verdict-rating">${report.rating||'?'}</div><div class="verdict-source">${report.report_url?`<a href="${report.report_url}" target="_blank" style="color:var(--red)">View Source Report</a>`:'Source on file'}</div></div><div class="verdict-col"><div class="verdict-label real">Status</div><div class="verdict-rating" style="font-size:1.4rem;padding-top:0.5rem;line-height:1.2">This is why they want it banned?</div><div class="verdict-source">The Whole Book — counter-database</div></div></div>${report.flagged_categories?`<div class="section-label">RatedBooks Categories</div><div class="context-quote" style="font-style:normal;margin-bottom:2rem">${report.flagged_categories}</div>`:''}${report.excerpts?`<div class="section-label">How They Framed It</div><div class="context-quote">${report.excerpts}<cite>From the ban report — stripped of context</cite></div>`:''}`
       :noItem+'ℹ No RatedBooks report on file for this title yet.</p>';
 
     const coverHtml=book.cover_url?`<div style="padding:2rem 2.5rem 0"><img src="${book.cover_url}" alt="Cover of ${book.title}" style="max-width:80px;border:2px solid var(--ink);" /></div>`:'';
