@@ -107,6 +107,27 @@
     .search-bar input:focus { border-color: var(--accent); }
     .search-bar input::placeholder { color: var(--muted); }
 
+    /* ── Browse controls ── */
+    .browse-bar { padding: 10px 20px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 8px; }
+    .sort-row { display: flex; gap: 6px; flex-wrap: wrap; }
+    .sort-btn {
+      background: none; border: 1px solid var(--border); color: var(--muted);
+      font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.08em;
+      text-transform: uppercase; padding: 4px 10px; border-radius: 3px;
+      cursor: pointer; transition: border-color 0.2s, color 0.2s, background 0.2s;
+    }
+    .sort-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .sort-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .alpha-row { display: flex; flex-wrap: wrap; gap: 3px; }
+    .alpha-btn {
+      background: none; border: 1px solid var(--border); color: var(--muted);
+      font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.04em;
+      width: 26px; height: 26px; display: flex; align-items: center; justify-content: center;
+      border-radius: 2px; cursor: pointer; transition: border-color 0.2s, color 0.2s, background 0.2s;
+    }
+    .alpha-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .alpha-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
     /* ── Book list ── */
     .book-row {
       display: grid;
@@ -241,6 +262,15 @@
         <div class="search-bar">
           <input type="text" id="bookSearch" placeholder="Filter by title or author…" oninput="filterBooks(this.value)" />
         </div>
+        <div class="browse-bar">
+          <div class="sort-row">
+            <button class="sort-btn active" onclick="setAdminSort('title-asc',this)">Title A→Z</button>
+            <button class="sort-btn" onclick="setAdminSort('title-desc',this)">Title Z→A</button>
+            <button class="sort-btn" onclick="setAdminSort('author-asc',this)">Author A→Z</button>
+            <button class="sort-btn" onclick="setAdminSort('author-desc',this)">Author Z→A</button>
+          </div>
+          <div class="alpha-row" id="adminAlphaStrip"></div>
+        </div>
         <div id="bookList"><div class="loading-row">Loading books…</div></div>
       </div>
     </div>
@@ -280,6 +310,9 @@
     let allBooks = [];
     let userMap  = {};
     let authToken = '';
+    let adminSort = 'title-asc';
+    let adminLetter = '';
+    let adminSearch = '';
 
     // ── AUTH ──────────────────────────────────────────────────────────────
     async function init() {
@@ -325,9 +358,62 @@
         return;
       }
       allBooks = (data || []).map(b => ({ ...b, submitter_id: b.user_id || null }));
-      allBooks.sort((a,b) => sortKey(a.title).localeCompare(sortKey(b.title)));
       document.getElementById('book-count').textContent = `(${allBooks.length})`;
-      renderBooks(allBooks);
+      buildAdminAlphaStrip();
+      applyAndRender();
+    }
+
+    function buildAdminAlphaStrip() {
+      const strip = document.getElementById('adminAlphaStrip');
+      const letters = ['All','#','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
+      strip.innerHTML = letters.map(l =>
+        `<button class="alpha-btn${adminLetter===l?' active':''}" onclick="setAdminLetter('${l}')">${l}</button>`
+      ).join('');
+    }
+
+    function setAdminSort(sort, btn) {
+      adminSort = sort;
+      document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      applyAndRender();
+    }
+
+    function setAdminLetter(l) {
+      adminLetter = (adminLetter === l && l !== 'All') ? '' : l;
+      buildAdminAlphaStrip();
+      applyAndRender();
+    }
+
+    function filterBooks(q) {
+      adminSearch = q;
+      applyAndRender();
+    }
+
+    function applyAndRender() {
+      let list = [...allBooks];
+      if (adminSearch) {
+        const lq = adminSearch.toLowerCase();
+        list = list.filter(b =>
+          (b.title||'').toLowerCase().includes(lq) ||
+          (b.author||'').toLowerCase().includes(lq)
+        );
+      }
+      if (adminLetter && adminLetter !== 'All') {
+        list = list.filter(b => {
+          const field = adminSort.startsWith('author') ? b.author : b.title;
+          const key = (field||'').replace(/^(the|a|an)\s+/i,'').trim();
+          if (adminLetter === '#') return /^[^a-z]/i.test(key);
+          return key.toUpperCase().startsWith(adminLetter);
+        });
+      }
+      list.sort((a, b) => {
+        if (adminSort === 'title-asc')   return sortKey(a.title).localeCompare(sortKey(b.title));
+        if (adminSort === 'title-desc')  return sortKey(b.title).localeCompare(sortKey(a.title));
+        if (adminSort === 'author-asc')  return (a.author||'').toLowerCase().localeCompare((b.author||'').toLowerCase());
+        if (adminSort === 'author-desc') return (b.author||'').toLowerCase().localeCompare((a.author||'').toLowerCase());
+        return 0;
+      });
+      renderBooks(list);
     }
 
     function renderBooks(books) {
@@ -347,14 +433,6 @@
             <a class="btn-edit" href="/reviewer.html?id=${b.id}">Edit</a>
           </div>`;
         }).join('');
-    }
-
-    function filterBooks(q) {
-      const lq = q.toLowerCase();
-      renderBooks(allBooks.filter(b =>
-        (b.title||'').toLowerCase().includes(lq) ||
-        (b.author||'').toLowerCase().includes(lq)
-      ));
     }
 
     function exportCSV() {

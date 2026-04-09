@@ -208,6 +208,16 @@
     .grid-loading{grid-column:1/-1;display:flex;align-items:center;justify-content:center;padding:4rem;gap:1rem;flex-direction:column}
     .grid-loading p{font-family:var(--font-mono);font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gray)}
     .grid-error{grid-column:1/-1;padding:3rem;text-align:center;font-family:var(--font-mono);font-size:0.75rem;color:var(--red);letter-spacing:0.1em}
+    .browse-controls{display:flex;flex-direction:column;gap:1rem;margin-bottom:2rem}
+    .browse-sort{display:flex;gap:0.5rem;flex-wrap:wrap}
+    .sort-btn{font-family:var(--font-mono);font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;background:none;border:1.5px solid var(--paper-dark);color:var(--gray);padding:0.35rem 0.8rem;cursor:pointer;transition:border-color 0.2s,color 0.2s,background 0.2s}
+    .sort-btn:hover{border-color:var(--ink);color:var(--ink)}
+    .sort-btn.active{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+    .alpha-strip{display:flex;flex-wrap:wrap;gap:0.25rem}
+    .alpha-btn{font-family:var(--font-mono);font-size:0.62rem;letter-spacing:0.08em;background:none;border:1.5px solid var(--paper-dark);color:var(--gray);width:2rem;height:2rem;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:border-color 0.2s,color 0.2s,background 0.2s}
+    .alpha-btn:hover{border-color:var(--ink);color:var(--ink)}
+    .alpha-btn.active{background:var(--red);border-color:var(--red);color:var(--white)}
+    .grid-empty{grid-column:1/-1;padding:3rem;text-align:center;font-family:var(--font-mono);font-size:0.75rem;color:var(--gray);letter-spacing:0.1em;text-transform:uppercase}
     footer{background:var(--ink);color:var(--paper);padding:3rem 4rem;display:grid;grid-template-columns:2fr 1fr 1fr;gap:3rem;border-top:3px solid var(--border)}
     .footer-brand{font-family:var(--font-display);font-size:2.5rem;letter-spacing:0.05em;margin-bottom:0.8rem}
     .footer-tagline{font-family:var(--font-serif);font-style:italic;font-size:0.95rem;color:rgba(245,240,232,0.6);line-height:1.6;max-width:340px}
@@ -370,8 +380,17 @@
 
 <section class="recent-section" id="recently-added">
   <div class="section-header">
-    <h2 class="section-title">Recently Documented</h2>
+    <h2 class="section-title">Browse Books</h2>
     <span class="section-meta" id="recentMeta">Loading…</span>
+  </div>
+  <div class="browse-controls">
+    <div class="browse-sort">
+      <button class="sort-btn active" onclick="setBrowseSort('title-asc')">Title A→Z</button>
+      <button class="sort-btn" onclick="setBrowseSort('title-desc')">Title Z→A</button>
+      <button class="sort-btn" onclick="setBrowseSort('author-asc')">Author A→Z</button>
+      <button class="sort-btn" onclick="setBrowseSort('author-desc')">Author Z→A</button>
+    </div>
+    <div class="alpha-strip" id="alphaStrip"></div>
   </div>
   <div class="books-grid" id="recentBooks">
     <div class="grid-loading"><div class="spinner-ring"></div><p>Loading books…</p></div>
@@ -549,6 +568,46 @@
   function sortKey(title){return(title||'').replace(/^(the|a|an)\s+/i,'').toLowerCase();}
   let BOOKS=[], RATED_REPORTS=[], PRO_REVIEWS=[];
   let alaFilter='';
+  let browseSort='title-asc', browseLetter='';
+
+  function buildAlphaStrip(){
+    const strip=document.getElementById('alphaStrip');
+    const letters=['All','#','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
+    strip.innerHTML=letters.map(l=>`<button class="alpha-btn${browseLetter===l?' active':''}" onclick="setBrowseLetter('${l}')">${l}</button>`).join('');
+  }
+
+  function setBrowseSort(sort){
+    browseSort=sort;
+    document.querySelectorAll('.sort-btn').forEach(b=>b.classList.remove('active'));
+    event.target.classList.add('active');
+    renderRecentBooks();
+  }
+
+  function setBrowseLetter(l){
+    browseLetter=(browseLetter===l&&l!=='All')?'':l;
+    buildAlphaStrip();
+    renderRecentBooks();
+  }
+
+  function applyBrowseFilters(books){
+    let list=[...books];
+    if(browseLetter&&browseLetter!=='All'){
+      list=list.filter(b=>{
+        const field=browseSort.startsWith('author')?b.author:b.title;
+        const key=(field||'').replace(/^(the|a|an)\s+/i,'').trim();
+        if(browseLetter==='#') return /^[^a-z]/i.test(key);
+        return key.toUpperCase().startsWith(browseLetter);
+      });
+    }
+    list.sort((a,b)=>{
+      if(browseSort==='title-asc')  return sortKey(a.title).localeCompare(sortKey(b.title));
+      if(browseSort==='title-desc') return sortKey(b.title).localeCompare(sortKey(a.title));
+      if(browseSort==='author-asc') return (a.author||'').toLowerCase().localeCompare((b.author||'').toLowerCase());
+      if(browseSort==='author-desc')return (b.author||'').toLowerCase().localeCompare((a.author||'').toLowerCase());
+      return 0;
+    });
+    return list;
+  }
 
   function renderAla(){
     const grid=document.getElementById('alaGrid');
@@ -576,7 +635,7 @@
         supabaseFetch('reader_experiences?select=*')
       ]);
       BOOKS=books;RATED_REPORTS=reports;PRO_REVIEWS=reviews;READER_EXPERIENCES=experiences||[];
-      renderBookListPreview();renderRecentBooks();renderAla();buildMarquee();updateStats();
+      buildAlphaStrip();renderBookListPreview();renderRecentBooks();renderAla();buildMarquee();updateStats();
     }catch(err){
       console.error('Failed to load data:',err);
       document.getElementById('bookListItems').innerHTML=`<div class="book-list-loading" style="color:var(--red)">⚠ Could not load — check Supabase key.</div>`;
@@ -616,8 +675,11 @@
   function renderRecentBooks(){
     const container=document.getElementById('recentBooks');const meta=document.getElementById('recentMeta');
     if(!BOOKS.length){container.innerHTML=`<div class="grid-error">No books found.</div>`;meta.textContent='0 books';return;}
-    meta.textContent=`${BOOKS.length} book${BOOKS.length!==1?'s':''} in database`;
-    container.innerHTML=BOOKS.map((book,i)=>{const report=getReportForBook(book.id);const reviews=getReviewsForBook(book.id);const cats=(book.categories||[]).join(' · ');return`<div class="book-tile" onclick="openModal('${book.id}')">${book.cover_url?`<img class="book-tile-cover" src="${book.cover_url}" alt="Cover of ${book.title}" onerror="this.style.display='none'" />`:`<div class="book-tile-number">${String(i+1).padStart(2,'0')}</div>`}<div class="book-tile-title">${book.title}</div><div class="book-tile-author">— ${book.author||'Unknown Author'}</div><div class="book-tile-meta">${book.publication_year?`${book.publication_year} · `:''}${cats?`${cats} · `:''}${report?'⚠ Report on file':'No report yet'}${reviews.length>0?` · ${reviews.length} review${reviews.length>1?'s':''}`:''}</div><div class="tile-tags">${report?`<span class="tile-tag" style="border-color:var(--red);color:var(--red)">Flagged</span>`:''}${book.award?`<span class="tile-tag" style="border-color:var(--gold);color:var(--gold)">Award</span>`:''}${reviews.length>0?'<span class="tile-tag">Reviewed</span>':''}${(book.categories||[]).map(c=>`<span class="tile-tag">${c}</span>`).join('')}</div></div>`;}).join('');
+    const filtered=applyBrowseFilters(BOOKS);
+    const total=BOOKS.length;
+    meta.textContent=filtered.length===total?`${total} book${total!==1?'s':''} in database`:`${filtered.length} of ${total} books`;
+    if(!filtered.length){container.innerHTML=`<div class="grid-empty">No books starting with "${browseLetter}"</div>`;return;}
+    container.innerHTML=filtered.map((book,i)=>{const report=getReportForBook(book.id);const reviews=getReviewsForBook(book.id);const cats=(book.categories||[]).join(' · ');return`<div class="book-tile" onclick="openModal('${book.id}')">${book.cover_url?`<img class="book-tile-cover" src="${book.cover_url}" alt="Cover of ${book.title}" onerror="this.style.display='none'" />`:`<div class="book-tile-number">${String(i+1).padStart(2,'0')}</div>`}<div class="book-tile-title">${book.title}</div><div class="book-tile-author">— ${book.author||'Unknown Author'}</div><div class="book-tile-meta">${book.publication_year?`${book.publication_year} · `:''}${cats?`${cats} · `:''}${report?'⚠ Report on file':'No report yet'}${reviews.length>0?` · ${reviews.length} review${reviews.length>1?'s':''}`:''}</div><div class="tile-tags">${report?`<span class="tile-tag" style="border-color:var(--red);color:var(--red)">Flagged</span>`:''}${book.award?`<span class="tile-tag" style="border-color:var(--gold);color:var(--gold)">Award</span>`:''}${reviews.length>0?'<span class="tile-tag">Reviewed</span>':''}${(book.categories||[]).map(c=>`<span class="tile-tag">${c}</span>`).join('')}</div></div>`;}).join('');
   }
 
   const searchInput=document.getElementById('searchInput');
