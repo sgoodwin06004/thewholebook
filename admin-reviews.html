@@ -554,6 +554,20 @@
       padding: 0 0.75rem;
     }
     .list-header span:first-child { padding-left: 0.75rem; }
+
+    .filter-sep {
+      color: var(--border);
+      font-size: 1rem;
+      padding: 0 0.1rem;
+      user-select: none;
+    }
+    .book-date-text {
+      font-size: 0.72rem;
+      color: var(--muted);
+      font-family: var(--mono);
+      margin-top: 0.2rem;
+      opacity: 0.8;
+    }
   </style>
 </head>
 <body>
@@ -590,6 +604,10 @@
     <div class="filters">
       <button class="filter-btn active" data-filter="all">All Books</button>
       <button class="filter-btn" data-filter="has">Has Reviews</button>
+      <span class="filter-sep">|</span>
+      <button class="filter-btn sort-btn active" data-sort="alpha">A–Z</button>
+      <button class="filter-btn sort-btn" data-sort="added">Recently Added</button>
+      <button class="filter-btn sort-btn" data-sort="updated">Recently Updated</button>
       <input type="text" class="search-box" id="searchBox" placeholder="Search title or author…" />
     </div>
 
@@ -673,6 +691,7 @@
     let allReviews = [];
     let userMap = {};
     let activeFilter = 'all';
+    let sortMode = 'alpha';
     let searchQuery = '';
     let currentBookId = null;
     let editingReviewId = null;
@@ -707,6 +726,16 @@
       document.getElementById('statTotalReviews').textContent = allReviews.length;
     }
 
+    function latestReviewDate(bookId, mode) {
+      const revs = reviewsForBook(bookId);
+      if (!revs.length) return null;
+      const dates = mode === 'updated'
+        ? revs.map(r => r.updated_at && r.updated_at !== r.created_at ? r.updated_at : null).filter(Boolean)
+        : revs.map(r => r.created_at).filter(Boolean);
+      if (!dates.length) return null;
+      return dates.reduce((max, d) => d > max ? d : max);
+    }
+
     // ── RENDER LIST ──
     function renderList() {
       const q = searchQuery.toLowerCase();
@@ -717,6 +746,17 @@
           (activeFilter === 'has' && revCount > 0);
         return matchSearch && matchFilter;
       });
+
+      if (sortMode === 'added' || sortMode === 'updated') {
+        filtered.sort((a, b) => {
+          const da = latestReviewDate(a.id, sortMode);
+          const db = latestReviewDate(b.id, sortMode);
+          if (!da && !db) return sortKey(a.title).localeCompare(sortKey(b.title));
+          if (!da) return 1;
+          if (!db) return -1;
+          return db.localeCompare(da); // desc
+        });
+      }
 
       const list = document.getElementById('bookList');
 
@@ -738,11 +778,17 @@
           ? `<img class="book-cover-thumb" src="${escHtml(book.cover_url)}" alt="" loading="lazy" />`
           : `<div class="cover-placeholder">📖</div>`;
 
+        const latestDate = (sortMode !== 'alpha') ? latestReviewDate(book.id, sortMode) : null;
+        const dateLabel = latestDate
+          ? `<div class="book-date-text">${sortMode === 'added' ? 'Added' : 'Updated'} ${new Date(latestDate).toLocaleDateString('en-US', { year:'numeric', month:'short', day:'numeric' })}</div>`
+          : '';
+
         return `<div class="book-row" data-id="${escHtml(book.id)}">
           <div class="book-cover-cell">${cover}</div>
           <div class="book-info-cell">
             <div class="book-title-text">${escHtml(book.title)}</div>
             <div class="book-author-text">${escHtml(book.author || '')}</div>
+            ${dateLabel}
           </div>
           <div class="review-badge-cell">
             <span class="review-badge ${badgeClass}">
@@ -914,11 +960,20 @@
     document.getElementById('btnSaveReview').addEventListener('click', saveReview);
     document.getElementById('btnClearForm').addEventListener('click', clearForm);
 
-    document.querySelectorAll('.filter-btn').forEach(btn => {
+    document.querySelectorAll('.filter-btn:not(.sort-btn)').forEach(btn => {
       btn.addEventListener('click', () => {
-        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.filter-btn:not(.sort-btn)').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         activeFilter = btn.dataset.filter;
+        renderList();
+      });
+    });
+
+    document.querySelectorAll('.sort-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        sortMode = btn.dataset.sort;
         renderList();
       });
     });
