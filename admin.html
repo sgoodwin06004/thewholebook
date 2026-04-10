@@ -131,7 +131,7 @@
     /* ── Book list ── */
     .book-row {
       display: grid;
-      grid-template-columns: 2fr 1.2fr 1fr 1.2fr 70px;
+      grid-template-columns: 2fr 1fr 0.8fr 1fr 110px 70px;
       align-items: center; padding: 11px 20px;
       border-bottom: 1px solid var(--border); font-size: 12px;
       gap: 12px; transition: background 0.15s;
@@ -146,6 +146,8 @@
     .book-author    { color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .book-isbn      { color: var(--muted); }
     .book-submitter { color: var(--muted); font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .book-date { color: var(--muted); font-size: 11px; white-space: nowrap; }
+    .book-date-updated { color: var(--accent); font-size: 10px; margin-top: 2px; }
     .btn-edit {
       background: none; border: 1px solid var(--border); color: var(--text);
       font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.06em;
@@ -268,6 +270,8 @@
             <button class="sort-btn" onclick="setAdminSort('title-desc',this)">Title Z→A</button>
             <button class="sort-btn" onclick="setAdminSort('author-asc',this)">Author A→Z</button>
             <button class="sort-btn" onclick="setAdminSort('author-desc',this)">Author Z→A</button>
+            <button class="sort-btn" onclick="setAdminSort('date-added-desc',this)">Recently Added</button>
+            <button class="sort-btn" onclick="setAdminSort('date-updated-desc',this)">Recently Updated</button>
           </div>
           <div class="alpha-row" id="adminAlphaStrip"></div>
         </div>
@@ -351,7 +355,7 @@
     async function loadBooks() {
       const { data, error } = await sb
         .from('books')
-        .select('id, title, author, isbn, user_id')
+        .select('id, title, author, isbn, user_id, created_at, updated_at')
         .order('title');
       if (error) {
         document.getElementById('bookList').innerHTML = `<div class="empty-state">${error.message}</div>`;
@@ -407,10 +411,12 @@
         });
       }
       list.sort((a, b) => {
-        if (adminSort === 'title-asc')   return sortKey(a.title).localeCompare(sortKey(b.title));
-        if (adminSort === 'title-desc')  return sortKey(b.title).localeCompare(sortKey(a.title));
-        if (adminSort === 'author-asc')  return (a.author||'').toLowerCase().localeCompare((b.author||'').toLowerCase());
-        if (adminSort === 'author-desc') return (b.author||'').toLowerCase().localeCompare((a.author||'').toLowerCase());
+        if (adminSort === 'title-asc')        return sortKey(a.title).localeCompare(sortKey(b.title));
+        if (adminSort === 'title-desc')        return sortKey(b.title).localeCompare(sortKey(a.title));
+        if (adminSort === 'author-asc')        return (a.author||'').toLowerCase().localeCompare((b.author||'').toLowerCase());
+        if (adminSort === 'author-desc')       return (b.author||'').toLowerCase().localeCompare((a.author||'').toLowerCase());
+        if (adminSort === 'date-added-desc')   return (b.created_at||'').localeCompare(a.created_at||'');
+        if (adminSort === 'date-updated-desc') return ((b.updated_at||b.created_at)||'').localeCompare((a.updated_at||a.created_at)||'');
         return 0;
       });
       renderBooks(list);
@@ -419,17 +425,24 @@
     function renderBooks(books) {
       const el = document.getElementById('bookList');
       if (!books.length) { el.innerHTML = '<div class="empty-state">No books found.</div>'; return; }
+      const fmtDate = d => new Date(d).toLocaleDateString('en-US', { year:'numeric', month:'short', day:'numeric' });
       el.innerHTML =
         `<div class="book-row header">
-          <div>Title</div><div>Author</div><div>ISBN</div><div>Submitted By</div><div></div>
+          <div>Title</div><div>Author</div><div>ISBN</div><div>Submitted By</div><div>Date</div><div></div>
         </div>` +
         books.map(b => {
           const email = b.submitter_id ? (userMap[b.submitter_id] || '—') : '—';
+          const added   = b.created_at ? fmtDate(b.created_at) : '—';
+          const updated = b.updated_at && b.updated_at !== b.created_at ? fmtDate(b.updated_at) : null;
           return `<div class="book-row">
             <div class="book-title">${esc(b.title || '')}</div>
             <div class="book-author">${esc(b.author || '—')}</div>
             <div class="book-isbn">${esc(b.isbn || '—')}</div>
             <div class="book-submitter">${esc(email)}</div>
+            <div class="book-date">
+              ${added}
+              ${updated ? `<div class="book-date-updated">↑ ${updated}</div>` : ''}
+            </div>
             <a class="btn-edit" href="/reviewer.html?id=${b.id}">Edit</a>
           </div>`;
         }).join('');
