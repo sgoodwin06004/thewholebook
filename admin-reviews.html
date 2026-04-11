@@ -568,6 +568,150 @@
       margin-top: 0.2rem;
       opacity: 0.8;
     }
+
+    /* ── DATE RANGE FILTER ── */
+    .date-range-row {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-bottom: 1.25rem;
+      flex-wrap: wrap;
+    }
+    .dr-label {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      font-family: var(--mono);
+    }
+    .date-input {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.4rem 0.7rem;
+      border-radius: var(--radius);
+      font-size: 0.82rem;
+      font-family: var(--mono);
+      outline: none;
+      transition: border-color 0.15s;
+      color-scheme: dark;
+    }
+    .date-input:focus { border-color: #555; }
+    .dr-sep {
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-family: var(--mono);
+    }
+
+    /* ── DATE RANGE RESULTS PANEL ── */
+    .dr-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin-bottom: 1.5rem;
+    }
+    .dr-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface2);
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .dr-count {
+      font-size: 0.82rem;
+      color: var(--text);
+      font-family: var(--mono);
+    }
+    .dr-selected-count { color: var(--accent); }
+    .dr-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+    }
+    .dr-select-all-label {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      font-family: var(--mono);
+      cursor: pointer;
+      user-select: none;
+    }
+    .dr-select-all-label input { cursor: pointer; accent-color: var(--accent); }
+    .btn-bulk-pub, .btn-bulk-unpub {
+      background: none;
+      border: 1px solid;
+      padding: 0.3rem 0.7rem;
+      border-radius: var(--radius);
+      font-size: 0.72rem;
+      font-family: var(--mono);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-bulk-pub { color: var(--green); border-color: rgba(39,174,96,0.3); }
+    .btn-bulk-pub:hover { background: var(--green-soft); }
+    .btn-bulk-unpub { color: var(--muted); border-color: var(--border); }
+    .btn-bulk-unpub:hover { color: var(--text); border-color: #555; }
+
+    .dr-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      background: var(--border);
+    }
+    .dr-review-item {
+      background: var(--surface);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.7rem 1rem;
+      cursor: pointer;
+      transition: background 0.1s;
+    }
+    .dr-review-item:hover { background: var(--surface2); }
+    .dr-review-item.dr-selected { background: rgba(192,57,43,0.06); }
+    .dr-check { cursor: pointer; accent-color: var(--accent); flex-shrink: 0; }
+    .dr-review-info { flex: 1; min-width: 0; }
+    .dr-review-book {
+      font-size: 0.88rem;
+      color: var(--text);
+      margin-bottom: 0.1rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .dr-review-source {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-bottom: 0.15rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+    .dr-review-meta {
+      font-size: 0.7rem;
+      color: var(--muted);
+      font-family: var(--mono);
+    }
+    .dr-pub { color: var(--green); }
+    .dr-unpub { color: var(--muted); opacity: 0.7; }
+    .dr-empty {
+      padding: 2.5rem 2rem;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
   </style>
 </head>
 <body>
@@ -610,6 +754,16 @@
       <button class="filter-btn sort-btn" data-sort="updated">Recently Updated</button>
       <input type="text" class="search-box" id="searchBox" placeholder="Search title or author…" />
     </div>
+
+    <div class="date-range-row">
+      <span class="dr-label">Date Range</span>
+      <input type="date" class="date-input" id="dateFrom" title="From date" />
+      <span class="dr-sep">to</span>
+      <input type="date" class="date-input" id="dateTo" title="To date" />
+      <button class="filter-btn" id="btnClearDates">Clear</button>
+    </div>
+
+    <div id="dateRangeResults"></div>
 
     <div class="book-list" id="bookList">
       <div class="loading-state">
@@ -695,6 +849,9 @@
     let searchQuery = '';
     let currentBookId = null;
     let editingReviewId = null;
+    let dateFrom = '';
+    let dateTo = '';
+    let selectedReviewIds = new Set();
 
     // ── LOAD ──
     async function loadAll() {
@@ -952,6 +1109,125 @@
       return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
     }
 
+    // ── DATE RANGE ──
+    function reviewsInRange() {
+      if (!dateFrom && !dateTo) return [];
+      return allReviews.filter(r => {
+        const d = (r.created_at || '').slice(0, 10);
+        if (dateFrom && d < dateFrom) return false;
+        if (dateTo && d > dateTo) return false;
+        return true;
+      });
+    }
+
+    function applyDateRange() {
+      dateFrom = document.getElementById('dateFrom').value;
+      dateTo = document.getElementById('dateTo').value;
+      selectedReviewIds.clear();
+      renderDateRangeResults();
+    }
+
+    function clearDateRange() {
+      dateFrom = '';
+      dateTo = '';
+      document.getElementById('dateFrom').value = '';
+      document.getElementById('dateTo').value = '';
+      selectedReviewIds.clear();
+      document.getElementById('dateRangeResults').innerHTML = '';
+    }
+
+    function renderDateRangeResults() {
+      const panel = document.getElementById('dateRangeResults');
+      if (!dateFrom && !dateTo) {
+        panel.innerHTML = '';
+        return;
+      }
+
+      const matched = reviewsInRange();
+      const allSelected = matched.length > 0 && matched.every(r => selectedReviewIds.has(r.id));
+      const anySelected = selectedReviewIds.size > 0;
+
+      const fromLabel = dateFrom ? new Date(dateFrom + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
+      const toLabel   = dateTo   ? new Date(dateTo   + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
+      const rangeText = fromLabel && toLabel ? `${fromLabel} – ${toLabel}` : fromLabel || toLabel;
+
+      panel.innerHTML = `<div class="dr-panel">
+        <div class="dr-header">
+          <div class="dr-count">
+            ${matched.length} review${matched.length !== 1 ? 's' : ''} · ${rangeText}
+            ${anySelected ? `<span class="dr-selected-count"> · ${selectedReviewIds.size} selected</span>` : ''}
+          </div>
+          <div class="dr-controls">
+            <label class="dr-select-all-label">
+              <input type="checkbox" id="chkSelectAll" ${allSelected ? 'checked' : ''} onchange="toggleSelectAll(this.checked)" />
+              <span>Select All</span>
+            </label>
+            ${anySelected ? `
+              <button class="btn-bulk-pub" onclick="bulkPublish(true)">Publish (${selectedReviewIds.size})</button>
+              <button class="btn-bulk-unpub" onclick="bulkPublish(false)">Unpublish (${selectedReviewIds.size})</button>
+            ` : ''}
+          </div>
+        </div>
+        ${matched.length === 0
+          ? `<div class="dr-empty">No reviews found in this date range.</div>`
+          : `<div class="dr-list">${matched.map(r => {
+              const book = allBooks.find(b => b.id === r.book_id);
+              const bookTitle = book ? book.title : 'Unknown Book';
+              const dateStr = r.created_at
+                ? new Date(r.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
+                : '—';
+              const checked = selectedReviewIds.has(r.id);
+              return `<label class="dr-review-item${checked ? ' dr-selected' : ''}">
+                <input type="checkbox" class="dr-check" ${checked ? 'checked' : ''} onchange="toggleReviewCheck('${escHtml(r.id)}', this.checked)" />
+                <div class="dr-review-info">
+                  <div class="dr-review-book">${escHtml(bookTitle)}</div>
+                  <div class="dr-review-source">${escHtml(r.source || 'Unknown source')}${r.award ? ` <span class="review-award">★ ${escHtml(r.award)}</span>` : ''}</div>
+                  <div class="dr-review-meta">${dateStr} · ${r.published ? '<span class="dr-pub">Published</span>' : '<span class="dr-unpub">Hidden</span>'}</div>
+                </div>
+                <button class="btn-sm" onclick="event.preventDefault(); openModal('${escHtml(r.book_id)}')">View</button>
+              </label>`;
+            }).join('')}</div>`
+        }
+      </div>`;
+    }
+
+    function toggleReviewCheck(reviewId, checked) {
+      if (checked) selectedReviewIds.add(reviewId);
+      else selectedReviewIds.delete(reviewId);
+      renderDateRangeResults();
+    }
+
+    function toggleSelectAll(checked) {
+      const matched = reviewsInRange();
+      if (checked) matched.forEach(r => selectedReviewIds.add(r.id));
+      else selectedReviewIds.clear();
+      renderDateRangeResults();
+    }
+
+    async function bulkPublish(publishedVal) {
+      if (selectedReviewIds.size === 0) return;
+      const ids = [...selectedReviewIds];
+      const label = publishedVal ? 'Publish' : 'Unpublish';
+      if (!confirm(`${label} ${ids.length} review${ids.length !== 1 ? 's' : ''}?`)) return;
+
+      try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/pro_reviews?id=in.(${ids.join(',')})`, {
+          method: 'PATCH',
+          headers,
+          body: JSON.stringify({ published: publishedVal })
+        });
+        if (!res.ok) {
+          const err = await res.text();
+          throw new Error(err);
+        }
+        allReviews = allReviews.map(r => selectedReviewIds.has(r.id) ? { ...r, published: publishedVal } : r);
+        selectedReviewIds.clear();
+        renderDateRangeResults();
+      } catch (e) {
+        alert('Bulk update failed: ' + e.message);
+      }
+    }
+
     // ── EVENTS ──
     document.getElementById('modalClose').addEventListener('click', closeModal);
     document.getElementById('modalOverlay').addEventListener('click', e => {
@@ -982,6 +1258,10 @@
       searchQuery = e.target.value;
       renderList();
     });
+
+    document.getElementById('dateFrom').addEventListener('change', applyDateRange);
+    document.getElementById('dateTo').addEventListener('change', applyDateRange);
+    document.getElementById('btnClearDates').addEventListener('click', clearDateRange);
 
     // ── INIT: load data, then auto-open modal if ?book= param is present ──
     async function init() {
