@@ -93,6 +93,23 @@
     }
     .btn-danger:hover { border-color: var(--error); color: var(--error); }
 
+    .btn-publish-sel {
+      background: var(--success); color: #0f0f0f; border: none;
+      font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 500;
+      letter-spacing: 0.08em; text-transform: uppercase; padding: 5px 14px;
+      border-radius: 3px; cursor: pointer; transition: opacity 0.2s;
+    }
+    .btn-publish-sel:hover { opacity: 0.85; }
+    .btn-publish-sel:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .status-badge {
+      display: inline-block; font-size: 9px; font-weight: 600;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      padding: 2px 6px; border-radius: 2px; vertical-align: middle; margin-left: 6px;
+    }
+    .status-badge-hidden  { background: rgba(255,107,107,0.15); color: var(--error); border: 1px solid rgba(255,107,107,0.3); }
+    .status-badge-partial { background: rgba(255,200,100,0.12); color: #ffc864;      border: 1px solid rgba(255,200,100,0.3); }
+
     /* ── Unpublish selection ── */
     .btn-select-all {
       background: none; border: 1px solid var(--border); color: var(--muted);
@@ -276,6 +293,7 @@
         <div style="display:flex;gap:8px;align-items:center">
           <button class="btn-select-all" onclick="toggleSelectAll()">Select All</button>
           <button class="btn-unpublish-sel" id="btnUnpublishSel" onclick="unpublishSelected()" disabled>Unpublish Selected</button>
+          <button class="btn-publish-sel" id="btnPublishSel" onclick="publishSelected()" disabled>Publish Selected</button>
           <button class="btn-outline" onclick="exportCSV()">Export CSV</button>
           <a class="btn-primary" href="/reviewer.html?from=admin">+ Add Book</a>
         </div>
@@ -373,15 +391,24 @@
     });
 
     // ── BOOKS ─────────────────────────────────────────────────────────────
+    let publishMap = {}; // bookId -> { total, unpublished }
+
     async function loadBooks() {
-      const { data, error } = await sb
-        .from('books')
-        .select('id, title, author, isbn, user_id, created_at, updated_at')
-        .order('title');
+      const [{ data, error }, { data: reviews }] = await Promise.all([
+        sb.from('books').select('id, title, author, isbn, user_id, created_at, updated_at').order('title'),
+        sb.from('pro_reviews').select('book_id, published')
+      ]);
       if (error) {
         document.getElementById('bookList').innerHTML = `<div class="empty-state">${error.message}</div>`;
         return;
       }
+      // Build per-book publish status map
+      publishMap = {};
+      (reviews || []).forEach(r => {
+        if (!publishMap[r.book_id]) publishMap[r.book_id] = { total: 0, unpublished: 0 };
+        publishMap[r.book_id].total++;
+        if (r.published === false) publishMap[r.book_id].unpublished++;
+      });
       allBooks = (data || []).map(b => ({ ...b, submitter_id: b.user_id || null }));
       document.getElementById('book-count').textContent = `(${allBooks.length})`;
       buildAdminAlphaStrip();
@@ -455,9 +482,18 @@
           const email = b.submitter_id ? (userMap[b.submitter_id] || '—') : '—';
           const added   = b.created_at ? fmtDate(b.created_at) : '—';
           const updated = b.updated_at && b.updated_at !== b.created_at ? fmtDate(b.updated_at) : null;
+          const ps = publishMap[b.id];
+          let badge = '';
+          if (ps && ps.unpublished > 0) {
+            if (ps.unpublished === ps.total) {
+              badge = `<span class="status-badge status-badge-hidden">Hidden</span>`;
+            } else {
+              badge = `<span class="status-badge status-badge-partial">Partial</span>`;
+            }
+          }
           return `<div class="book-row">
             <div><input type="checkbox" class="book-check" id="bchk-${b.id}" onchange="updateUnpublishBtn()" /></div>
-            <div class="book-title">${esc(b.title || '')}</div>
+            <div class="book-title">${esc(b.title || '')}${badge}</div>
             <div class="book-author">${esc(b.author || '—')}</div>
             <div class="book-isbn">${esc(b.isbn || '—')}</div>
             <div class="book-submitter">${esc(email)}</div>
@@ -484,7 +520,7 @@
       a.click(); URL.revokeObjectURL(a.href);
     }
 
-    // ── UNPUBLISH SELECTION ───────────────────────────────────────────────
+    // ── SELECTION ─────────────────────────────────────────────────────────
     function getCheckedBookIds() {
       return allBooks
         .filter(b => document.getElementById('bchk-' + b.id)?.checked)
@@ -492,10 +528,13 @@
     }
 
     function updateUnpublishBtn() {
-      const btn = document.getElementById('btnUnpublishSel');
       const checked = getCheckedBookIds().length;
-      btn.disabled = checked === 0;
-      btn.textContent = checked > 0 ? `Unpublish Selected (${checked})` : 'Unpublish Selected';
+      const unpBtn = document.getElementById('btnUnpublishSel');
+      const pubBtn = document.getElementById('btnPublishSel');
+      unpBtn.disabled = checked === 0;
+      pubBtn.disabled = checked === 0;
+      unpBtn.textContent = checked > 0 ? `Unpublish Selected (${checked})` : 'Unpublish Selected';
+      pubBtn.textContent = checked > 0 ? `Publish Selected (${checked})` : 'Publish Selected';
     }
 
     function toggleSelectAll() {
@@ -533,12 +572,42 @@
         });
         if (!res.ok) throw new Error(await res.text());
         showToast(`Reviews unpublished for ${bookIds.length} book${bookIds.length !== 1 ? 's' : ''}.`, 'success');
-        // Uncheck all boxes
-        bookIds.forEach(id => {
-          const chk = document.getElementById('bchk-' + id);
-          if (chk) chk.checked = false;
-        });
+        bookIds.forEach(id => { const chk = document.getElementById('bchk-' + id); if (chk) chk.checked = false; });
+        await loadBooks();
+      } catch (e) {
+        showToast('Error: ' + e.message, 'error');
+        btn.disabled = false;
         updateUnpublishBtn();
+      }
+    }
+
+    async function publishSelected() {
+      const bookIds = getCheckedBookIds();
+      if (!bookIds.length) return;
+      if (!confirm(`Publish all reviews for ${bookIds.length} book${bookIds.length !== 1 ? 's' : ''}? They will be visible on the public site.`)) return;
+
+      const btn = document.getElementById('btnPublishSel');
+      btn.disabled = true;
+      btn.textContent = 'Publishing…';
+
+      try {
+        const SUPABASE_URL      = 'https://cqslqfztgtuuidgdkyyz.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_TBJdijzfEaYzBDBeqAy2CA_edJMKfgz';
+        const filter = bookIds.map(id => `book_id.eq.${id}`).join(',');
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/pro_reviews?or=(${filter})`, {
+          method: 'PATCH',
+          headers: {
+            apikey: SUPABASE_ANON_KEY,
+            Authorization: `Bearer ${authToken}`,
+            'Content-Type': 'application/json',
+            Prefer: 'return=minimal'
+          },
+          body: JSON.stringify({ published: true })
+        });
+        if (!res.ok) throw new Error(await res.text());
+        showToast(`Reviews published for ${bookIds.length} book${bookIds.length !== 1 ? 's' : ''}.`, 'success');
+        bookIds.forEach(id => { const chk = document.getElementById('bchk-' + id); if (chk) chk.checked = false; });
+        await loadBooks();
       } catch (e) {
         showToast('Error: ' + e.message, 'error');
         btn.disabled = false;
