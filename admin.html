@@ -93,6 +93,52 @@
     }
     .btn-danger:hover { border-color: var(--error); color: var(--error); }
 
+    /* ── Bulk Unpublish ── */
+    .bulk-panel {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 4px;
+      overflow: hidden; margin-bottom: 24px; display: none;
+    }
+    .bulk-panel.open { display: block; }
+    .bulk-panel-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 20px; border-bottom: 1px solid var(--border);
+      background: rgba(255,107,107,0.04);
+    }
+    .bulk-panel-title { font-size: 12px; color: var(--error); letter-spacing: 0.06em; text-transform: uppercase; }
+    .bulk-panel-actions { display: flex; align-items: center; gap: 8px; }
+    .btn-select-all {
+      background: none; border: 1px solid var(--border); color: var(--muted);
+      font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.06em;
+      text-transform: uppercase; padding: 4px 10px; border-radius: 3px;
+      cursor: pointer; transition: border-color 0.2s, color 0.2s;
+    }
+    .btn-select-all:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-unpublish-sel {
+      background: var(--error); color: #fff; border: none;
+      font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 500;
+      letter-spacing: 0.08em; text-transform: uppercase; padding: 5px 14px;
+      border-radius: 3px; cursor: pointer; transition: opacity 0.2s;
+    }
+    .btn-unpublish-sel:hover { opacity: 0.85; }
+    .btn-unpublish-sel:disabled { opacity: 0.4; cursor: not-allowed; }
+    .bulk-row {
+      display: grid; grid-template-columns: 36px 2fr 1.4fr 1.4fr 100px;
+      align-items: center; padding: 9px 20px;
+      border-bottom: 1px solid var(--border); font-size: 11px; gap: 10px;
+      transition: background 0.15s;
+    }
+    .bulk-row:last-child { border-bottom: none; }
+    .bulk-row:hover { background: rgba(255,255,255,0.02); }
+    .bulk-row.header {
+      font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--muted); background: rgba(255,255,255,0.02); padding: 7px 20px;
+    }
+    .bulk-check { width: 14px; height: 14px; accent-color: var(--error); cursor: pointer; }
+    .bulk-missing { color: var(--error); font-size: 10px; letter-spacing: 0.05em; }
+    .bulk-ok { color: var(--muted); font-size: 10px; }
+    .bulk-count { font-size: 11px; color: var(--muted); }
+    .bulk-empty { padding: 24px 20px; text-align: center; color: var(--muted); font-size: 12px; }
+
     /* ── Panel ── */
     .panel { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; }
 
@@ -257,9 +303,23 @@
         <span class="pane-title">Books <span id="book-count" style="font-size:14px;color:var(--muted);font-weight:400"></span></span>
         <div style="display:flex;gap:8px">
           <button class="btn-outline" onclick="exportCSV()">Export CSV</button>
+          <button class="btn-danger" id="btnBulkToggle" onclick="toggleBulkPanel()" style="font-size:11px;padding:7px 14px">Bulk Unpublish…</button>
           <a class="btn-primary" href="/reviewer.html?from=admin">+ Add Book</a>
         </div>
       </div>
+      <!-- ── BULK UNPUBLISH PANEL ── -->
+      <div class="bulk-panel" id="bulkPanel">
+        <div class="bulk-panel-header">
+          <span class="bulk-panel-title">Unpublish Incomplete Reviews <span class="bulk-count" id="bulkCount"></span></span>
+          <div class="bulk-panel-actions">
+            <button class="btn-select-all" onclick="toggleSelectAll()">Select All</button>
+            <button class="btn-unpublish-sel" id="btnUnpublishSel" onclick="bulkUnpublish()" disabled>Unpublish Selected</button>
+            <button class="btn-ghost" onclick="toggleBulkPanel()">✕</button>
+          </div>
+        </div>
+        <div id="bulkList"><div class="bulk-empty">Loading…</div></div>
+      </div>
+
       <div class="panel">
         <div class="search-bar">
           <input type="text" id="bookSearch" placeholder="Filter by title or author…" oninput="filterBooks(this.value)" />
@@ -460,6 +520,123 @@
       const blob = new Blob([rows.map(r => r.join(',')).join('\n')], { type: 'text/csv' });
       const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: 'books.csv' });
       a.click(); URL.revokeObjectURL(a.href);
+    }
+
+    // ── BULK UNPUBLISH ────────────────────────────────────────────────────
+    let incompleteReviews = [];
+    let bulkPanelOpen = false;
+
+    async function toggleBulkPanel() {
+      const panel = document.getElementById('bulkPanel');
+      bulkPanelOpen = !bulkPanelOpen;
+      panel.classList.toggle('open', bulkPanelOpen);
+      const btn = document.getElementById('btnBulkToggle');
+      btn.textContent = bulkPanelOpen ? 'Hide Panel' : 'Bulk Unpublish…';
+      if (bulkPanelOpen) await loadIncompleteReviews();
+    }
+
+    async function loadIncompleteReviews() {
+      document.getElementById('bulkList').innerHTML = '<div class="bulk-empty">Loading…</div>';
+      document.getElementById('bulkCount').textContent = '';
+      try {
+        const SUPABASE_URL      = 'https://cqslqfztgtuuidgdkyyz.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_TBJdijzfEaYzBDBeqAy2CA_edJMKfgz';
+        const url = `${SUPABASE_URL}/rest/v1/pro_reviews?select=id,source,summary,created_at,book_id,books(title,author)&published=eq.true&or=(source.is.null,summary.is.null)&order=created_at.asc`;
+        const res = await fetch(url, {
+          headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${authToken}` }
+        });
+        if (!res.ok) throw new Error(await res.text());
+        incompleteReviews = await res.json();
+        renderBulkList();
+      } catch (e) {
+        document.getElementById('bulkList').innerHTML = `<div class="bulk-empty">Error: ${esc(e.message)}</div>`;
+      }
+    }
+
+    function renderBulkList() {
+      const el = document.getElementById('bulkList');
+      const count = incompleteReviews.length;
+      document.getElementById('bulkCount').textContent = `(${count} found)`;
+      updateUnpublishBtn();
+      if (!count) {
+        el.innerHTML = '<div class="bulk-empty">No incomplete published reviews found.</div>';
+        return;
+      }
+      const fmtDate = d => new Date(d).toLocaleDateString('en-US', { year:'numeric', month:'short', day:'numeric' });
+      el.innerHTML =
+        `<div class="bulk-row header">
+          <div></div><div>Book / Source</div><div>Source</div><div>Summary</div><div>Added</div>
+        </div>` +
+        incompleteReviews.map(r => {
+          const book = r.books || {};
+          const missingSource  = !r.source;
+          const missingSummary = !r.summary;
+          return `<div class="bulk-row" id="brow-${r.id}">
+            <div><input type="checkbox" class="bulk-check" id="bchk-${r.id}" onchange="updateUnpublishBtn()" /></div>
+            <div>
+              <div style="color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(book.title || '—')}</div>
+              <div style="color:var(--muted);font-size:10px">${esc(book.author || '')}</div>
+            </div>
+            <div>${missingSource ? '<span class="bulk-missing">Missing</span>' : `<span class="bulk-ok">${esc(r.source)}</span>`}</div>
+            <div>${missingSummary ? '<span class="bulk-missing">Missing</span>' : '<span class="bulk-ok">✓</span>'}</div>
+            <div style="color:var(--muted);font-size:10px">${r.created_at ? fmtDate(r.created_at) : '—'}</div>
+          </div>`;
+        }).join('');
+    }
+
+    function getCheckedIds() {
+      return incompleteReviews
+        .filter(r => document.getElementById('bchk-' + r.id)?.checked)
+        .map(r => r.id);
+    }
+
+    function updateUnpublishBtn() {
+      const btn = document.getElementById('btnUnpublishSel');
+      const checked = getCheckedIds().length;
+      btn.disabled = checked === 0;
+      btn.textContent = checked > 0 ? `Unpublish ${checked} Selected` : 'Unpublish Selected';
+    }
+
+    function toggleSelectAll() {
+      const allChecked = getCheckedIds().length === incompleteReviews.length;
+      incompleteReviews.forEach(r => {
+        const chk = document.getElementById('bchk-' + r.id);
+        if (chk) chk.checked = !allChecked;
+      });
+      updateUnpublishBtn();
+    }
+
+    async function bulkUnpublish() {
+      const ids = getCheckedIds();
+      if (!ids.length) return;
+      if (!confirm(`Unpublish ${ids.length} review${ids.length !== 1 ? 's' : ''}? They will be hidden from the public site.`)) return;
+
+      const btn = document.getElementById('btnUnpublishSel');
+      btn.disabled = true;
+      btn.textContent = 'Unpublishing…';
+
+      try {
+        const SUPABASE_URL      = 'https://cqslqfztgtuuidgdkyyz.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_TBJdijzfEaYzBDBeqAy2CA_edJMKfgz';
+        const filter = ids.map(id => `id.eq.${id}`).join(',');
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/pro_reviews?or=(${filter})`, {
+          method: 'PATCH',
+          headers: {
+            apikey: SUPABASE_ANON_KEY,
+            Authorization: `Bearer ${authToken}`,
+            'Content-Type': 'application/json',
+            Prefer: 'return=minimal'
+          },
+          body: JSON.stringify({ published: false })
+        });
+        if (!res.ok) throw new Error(await res.text());
+        showToast(`${ids.length} review${ids.length !== 1 ? 's' : ''} unpublished.`, 'success');
+        await loadIncompleteReviews();
+      } catch (e) {
+        showToast('Error: ' + e.message, 'error');
+        btn.disabled = false;
+        updateUnpublishBtn();
+      }
     }
 
     // ── USERS ─────────────────────────────────────────────────────────────
