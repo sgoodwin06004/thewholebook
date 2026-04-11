@@ -631,7 +631,7 @@
       const [books,reports,reviews,experiences]=await Promise.all([
         supabaseFetch('books?select=*&order=created_at.desc'),
         supabaseFetch('rated_reports?select=*'),
-        supabaseFetch('pro_reviews?select=*'),
+        supabaseFetch('pro_reviews?select=*&published=eq.true'),
         supabaseFetch('reader_experiences?select=*')
       ]);
       BOOKS=books;RATED_REPORTS=reports;PRO_REVIEWS=reviews;READER_EXPERIENCES=experiences||[];

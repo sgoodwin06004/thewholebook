@@ -93,6 +93,22 @@
       border-radius: 2px; cursor: pointer; transition: border-color 0.2s, color 0.2s;
     }
     .btn-delete-review:hover { border-color: var(--error); color: var(--error); }
+    .btn-toggle-published {
+      background: none; border: 1px solid var(--border); color: var(--muted);
+      font-family: 'DM Sans', sans-serif; font-size: 12px; padding: 5px 14px;
+      border-radius: 2px; cursor: pointer; transition: border-color 0.2s, color 0.2s;
+    }
+    .btn-toggle-published:hover { border-color: var(--accent); color: var(--accent); }
+
+    .review-card--unpublished { opacity: 0.55; }
+    .review-card--unpublished .review-card-body { position: relative; }
+    .hidden-badge {
+      display: inline-block; font-size: 10px; font-weight: 500;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      background: rgba(232,184,109,0.1); color: var(--accent);
+      border: 1px solid rgba(232,184,109,0.3); padding: 2px 8px;
+      border-radius: 99px;
+    }
 
     /* ── Inline edit form ── */
     .edit-form {
@@ -282,12 +298,14 @@
         ? new Date(r.updated_at).toLocaleDateString('en-US', { year:'numeric', month:'short', day:'numeric' })
         : null;
 
+      const isUnpublished = r.published === false;
       return `
-        <div class="review-card" id="card-${r.id}">
+        <div class="review-card${isUnpublished ? ' review-card--unpublished' : ''}" id="card-${r.id}">
           <div class="review-card-body">
             <div class="review-meta">
               <span class="review-source">${esc(r.source || 'Unknown source')}</span>
               ${r.award ? `<span class="review-award">★ ${esc(r.award)}</span>` : ''}
+              ${isUnpublished ? `<span class="hidden-badge">Hidden from public</span>` : ''}
             </div>
             ${r.summary ? `<div class="review-summary">${esc(r.summary)}</div>` : ''}
             ${r.url ? `<a class="review-url" href="${esc(r.url)}" target="_blank" rel="noopener">${esc(r.url)}</a>` : ''}
@@ -297,6 +315,7 @@
           </div>
           <div class="review-card-actions">
             <button class="btn-edit-review" onclick="toggleEdit('${r.id}')">Edit</button>
+            <button class="btn-toggle-published" onclick="togglePublished('${r.id}', ${!isUnpublished})">${isUnpublished ? 'Publish' : 'Unpublish'}</button>
             <button class="btn-delete-review" onclick="deleteReview('${r.id}')">Delete</button>
           </div>
           <div class="edit-form" id="edit-${r.id}">
@@ -356,6 +375,15 @@
       if (error) { showToast('Save failed: ' + error.message, 'error'); return; }
 
       showToast('Review updated.', 'success');
+      await loadReviews();
+    }
+
+    async function togglePublished(reviewId, currentlyPublished) {
+      const { error } = await sb.from('pro_reviews')
+        .update({ published: !currentlyPublished })
+        .eq('id', reviewId);
+      if (error) { showToast('Failed: ' + error.message, 'error'); return; }
+      showToast(currentlyPublished ? 'Review hidden from public.' : 'Review published.', 'success');
       await loadReviews();
     }
 

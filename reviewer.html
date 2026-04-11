@@ -959,6 +959,7 @@
               author2:          document.getElementById('b-author2').value.trim() || null,
               isbn:             document.getElementById('b-isbn').value.trim()     || null,
               cover_url:        document.getElementById('b-cover').value.trim()   || null,
+              goodreads_rating: document.getElementById('g-rating').value         || null,
               publication_year: document.getElementById('b-pub-year').value ? parseInt(document.getElementById('b-pub-year').value) : null,
               categories:       newCat ? [newCat] : null,
               user_id:          currentUser.id,
@@ -999,21 +1000,22 @@
           }
         }
 
+        const gRating  = document.getElementById('g-rating').value;
         const gSummary = document.getElementById('g-summary').value.trim();
         const gUrl     = document.getElementById('g-url').value.trim();
 
-        if (canEditBookFields && (gSummary || gUrl)) {
+        if (canEditBookFields && (gRating || gSummary || gUrl)) {
           if (editingBookId) {
             const { error: gErr } = await sb.from('goodreads')
               .upsert({
-                book_id: bookId,
-                user_id: currentUser.id,
-                summary: gSummary || null,
-                url:     gUrl     || null,
+                book_id:        bookId,
+                user_id:        currentUser.id,
+                average_rating: gRating  ? parseFloat(gRating) : null,
+                summary:        gSummary || null,
+                url:            gUrl     || null,
               }, { onConflict: 'book_id' });
             if (gErr) throw new Error('Goodreads: ' + gErr.message);
           } else {
-            const gRating = document.getElementById('g-rating').value;
             const { error: gErr } = await sb.from('goodreads').insert({
               book_id:        bookId,
               user_id:        currentUser.id,
