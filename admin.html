@@ -156,6 +156,25 @@
     .alpha-btn:hover { border-color: var(--accent); color: var(--accent); }
     .alpha-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
 
+    /* ── Date range row ── */
+    .date-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .date-row label { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+    .date-row input[type="date"] {
+      background: var(--bg); border: 1px solid var(--border); border-radius: 3px;
+      color: var(--text); font-family: 'DM Mono', monospace; font-size: 11px;
+      padding: 4px 8px; outline: none; transition: border-color 0.2s;
+      color-scheme: dark;
+    }
+    .date-row input[type="date"]:focus { border-color: var(--accent); }
+    .date-row .date-field-label { color: var(--muted); font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; }
+    .btn-clear-dates {
+      background: none; border: 1px solid var(--border); color: var(--muted);
+      font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.06em;
+      text-transform: uppercase; padding: 4px 10px; border-radius: 3px;
+      cursor: pointer; transition: border-color 0.2s, color 0.2s;
+    }
+    .btn-clear-dates:hover { border-color: var(--error); color: var(--error); }
+
     /* ── Book list ── */
     .book-row {
       display: grid;
@@ -306,6 +325,13 @@
             <button class="sort-btn" onclick="setAdminSort('date-updated-desc',this)">Recently Updated</button>
           </div>
           <div class="alpha-row" id="adminAlphaStrip"></div>
+          <div class="date-row">
+            <span class="date-field-label">Date Added:</span>
+            <input type="date" id="dateFrom" onchange="applyAndRender()" title="From date" />
+            <span class="date-field-label">—</span>
+            <input type="date" id="dateTo" onchange="applyAndRender()" title="To date" />
+            <button class="btn-clear-dates" onclick="clearDateRange()">Clear</button>
+          </div>
         </div>
         <div id="bookList"><div class="loading-row">Loading books…</div></div>
       </div>
@@ -425,6 +451,12 @@
       applyAndRender();
     }
 
+    function clearDateRange() {
+      document.getElementById('dateFrom').value = '';
+      document.getElementById('dateTo').value = '';
+      applyAndRender();
+    }
+
     function applyAndRender() {
       let list = [...allBooks];
       if (adminSearch) {
@@ -433,6 +465,16 @@
           (b.title||'').toLowerCase().includes(lq) ||
           (b.author||'').toLowerCase().includes(lq)
         );
+      }
+      const dateFrom = document.getElementById('dateFrom')?.value;
+      const dateTo   = document.getElementById('dateTo')?.value;
+      if (dateFrom || dateTo) {
+        list = list.filter(b => {
+          const d = (b.created_at || '').slice(0, 10);
+          if (dateFrom && d < dateFrom) return false;
+          if (dateTo   && d > dateTo)   return false;
+          return true;
+        });
       }
       if (adminLetter && adminLetter !== 'All') {
         list = list.filter(b => {
