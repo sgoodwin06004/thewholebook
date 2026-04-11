@@ -384,24 +384,15 @@
     });
 
     // ── BOOKS ─────────────────────────────────────────────────────────────
-    let publishMap = {}; // bookId -> { total, unpublished }
-
     async function loadBooks() {
-      const [{ data, error }, { data: reviews }] = await Promise.all([
-        sb.from('books').select('id, title, author, isbn, user_id, created_at, updated_at').order('title'),
-        sb.from('pro_reviews').select('book_id, published')
-      ]);
+      const { data, error } = await sb
+        .from('books')
+        .select('id, title, author, isbn, user_id, created_at, updated_at, published')
+        .order('title');
       if (error) {
         document.getElementById('bookList').innerHTML = `<div class="empty-state">${error.message}</div>`;
         return;
       }
-      // Build per-book publish status map
-      publishMap = {};
-      (reviews || []).forEach(r => {
-        if (!publishMap[r.book_id]) publishMap[r.book_id] = { total: 0, unpublished: 0 };
-        publishMap[r.book_id].total++;
-        if (r.published === false) publishMap[r.book_id].unpublished++;
-      });
       allBooks = (data || []).map(b => ({ ...b, submitter_id: b.user_id || null }));
       document.getElementById('book-count').textContent = `(${allBooks.length})`;
       buildAdminAlphaStrip();
@@ -475,13 +466,7 @@
           const email = b.submitter_id ? (userMap[b.submitter_id] || '—') : '—';
           const added   = b.created_at ? fmtDate(b.created_at) : '—';
           const updated = b.updated_at && b.updated_at !== b.created_at ? fmtDate(b.updated_at) : null;
-          const ps = publishMap[b.id];
-          let titleColor = '';
-          if (ps) {
-            if (ps.unpublished === ps.total) titleColor = 'color:var(--error)';
-            else if (ps.unpublished > 0)     titleColor = 'color:#ffc864';
-            else                             titleColor = 'color:var(--success)';
-          }
+          const titleColor = b.published === false ? 'color:var(--error)' : 'color:var(--success)';
           return `<div class="book-row">
             <div><input type="checkbox" class="book-check" id="bchk-${b.id}" onchange="updateUnpublishBtn()" /></div>
             <div class="book-title" style="${titleColor}">${esc(b.title || '')}</div>
@@ -548,21 +533,9 @@
       btn.textContent = 'Unpublishing…';
 
       try {
-        const SUPABASE_URL      = 'https://cqslqfztgtuuidgdkyyz.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_TBJdijzfEaYzBDBeqAy2CA_edJMKfgz';
-        const filter = bookIds.map(id => `book_id.eq.${id}`).join(',');
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/pro_reviews?or=(${filter})`, {
-          method: 'PATCH',
-          headers: {
-            apikey: SUPABASE_ANON_KEY,
-            Authorization: `Bearer ${authToken}`,
-            'Content-Type': 'application/json',
-            Prefer: 'return=minimal'
-          },
-          body: JSON.stringify({ published: false })
-        });
-        if (!res.ok) throw new Error(await res.text());
-        showToast(`Reviews unpublished for ${bookIds.length} book${bookIds.length !== 1 ? 's' : ''}.`, 'success');
+        const { error } = await sb.from('books').update({ published: false }).in('id', bookIds);
+        if (error) throw error;
+        showToast(`${bookIds.length} book${bookIds.length !== 1 ? 's' : ''} unpublished.`, 'success');
         bookIds.forEach(id => { const chk = document.getElementById('bchk-' + id); if (chk) chk.checked = false; });
         await loadBooks();
       } catch (e) {
@@ -575,28 +548,16 @@
     async function publishSelected() {
       const bookIds = getCheckedBookIds();
       if (!bookIds.length) return;
-      if (!confirm(`Publish all reviews for ${bookIds.length} book${bookIds.length !== 1 ? 's' : ''}? They will be visible on the public site.`)) return;
+      if (!confirm(`Publish ${bookIds.length} book${bookIds.length !== 1 ? 's' : ''}? They will be visible on the public site.`)) return;
 
       const btn = document.getElementById('btnPublishSel');
       btn.disabled = true;
       btn.textContent = 'Publishing…';
 
       try {
-        const SUPABASE_URL      = 'https://cqslqfztgtuuidgdkyyz.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_TBJdijzfEaYzBDBeqAy2CA_edJMKfgz';
-        const filter = bookIds.map(id => `book_id.eq.${id}`).join(',');
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/pro_reviews?or=(${filter})`, {
-          method: 'PATCH',
-          headers: {
-            apikey: SUPABASE_ANON_KEY,
-            Authorization: `Bearer ${authToken}`,
-            'Content-Type': 'application/json',
-            Prefer: 'return=minimal'
-          },
-          body: JSON.stringify({ published: true })
-        });
-        if (!res.ok) throw new Error(await res.text());
-        showToast(`Reviews published for ${bookIds.length} book${bookIds.length !== 1 ? 's' : ''}.`, 'success');
+        const { error } = await sb.from('books').update({ published: true }).in('id', bookIds);
+        if (error) throw error;
+        showToast(`${bookIds.length} book${bookIds.length !== 1 ? 's' : ''} published.`, 'success');
         bookIds.forEach(id => { const chk = document.getElementById('bchk-' + id); if (chk) chk.checked = false; });
         await loadBooks();
       } catch (e) {
