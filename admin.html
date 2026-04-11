@@ -107,8 +107,9 @@
       letter-spacing: 0.08em; text-transform: uppercase;
       padding: 2px 6px; border-radius: 2px; vertical-align: middle; margin-left: 6px;
     }
-    .status-badge-hidden  { background: rgba(255,107,107,0.15); color: var(--error); border: 1px solid rgba(255,107,107,0.3); }
-    .status-badge-partial { background: rgba(255,200,100,0.12); color: #ffc864;      border: 1px solid rgba(255,200,100,0.3); }
+    .status-badge-published { background: rgba(107,255,184,0.1); color: var(--success); border: 1px solid rgba(107,255,184,0.3); }
+    .status-badge-hidden    { background: rgba(255,107,107,0.15); color: var(--error); border: 1px solid rgba(255,107,107,0.3); }
+    .status-badge-partial   { background: rgba(255,200,100,0.12); color: #ffc864;      border: 1px solid rgba(255,200,100,0.3); }
 
     /* ── Unpublish selection ── */
     .btn-select-all {
@@ -484,11 +485,13 @@
           const updated = b.updated_at && b.updated_at !== b.created_at ? fmtDate(b.updated_at) : null;
           const ps = publishMap[b.id];
           let badge = '';
-          if (ps && ps.unpublished > 0) {
+          if (ps) {
             if (ps.unpublished === ps.total) {
-              badge = `<span class="status-badge status-badge-hidden">Hidden</span>`;
-            } else {
+              badge = `<span class="status-badge status-badge-hidden">Unpublished</span>`;
+            } else if (ps.unpublished > 0) {
               badge = `<span class="status-badge status-badge-partial">Partial</span>`;
+            } else {
+              badge = `<span class="status-badge status-badge-published">Published</span>`;
             }
           }
           return `<div class="book-row">
