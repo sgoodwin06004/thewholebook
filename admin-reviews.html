@@ -706,6 +706,20 @@
     }
     .dr-pub { color: var(--green); }
     .dr-unpub { color: var(--muted); opacity: 0.7; }
+    .btn-dr-clear {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 0.4rem 0.9rem;
+      border-radius: 99px;
+      font-size: 0.78rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      cursor: pointer;
+      font-family: var(--mono);
+      transition: all 0.15s;
+    }
+    .btn-dr-clear:hover { color: var(--text); border-color: #444; }
     .btn-dr-view {
       flex-shrink: 0;
       background: var(--surface2);
@@ -775,7 +789,7 @@
       <input type="date" class="date-input" id="dateFrom" title="From date" />
       <span class="dr-sep">to</span>
       <input type="date" class="date-input" id="dateTo" title="To date" />
-      <button class="filter-btn" id="btnClearDates">Clear</button>
+      <button class="btn-dr-clear" id="btnClearDates">Clear</button>
     </div>
 
     <div id="dateRangeResults"></div>
@@ -1159,51 +1173,71 @@
       }
 
       const matched = reviewsInRange();
-      const allSelected = matched.length > 0 && matched.every(r => selectedReviewIds.has(r.id));
+      const allSelected = matched.length > 0 && matched.every(function(r) { return selectedReviewIds.has(r.id); });
       const anySelected = selectedReviewIds.size > 0;
 
-      const fromLabel = dateFrom ? new Date(dateFrom + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
-      const toLabel   = dateTo   ? new Date(dateTo   + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
-      const rangeText = fromLabel && toLabel ? `${fromLabel} – ${toLabel}` : fromLabel || toLabel;
+      const fmt = { month: 'short', day: 'numeric', year: 'numeric' };
+      const fromLabel = dateFrom ? new Date(dateFrom + 'T00:00:00').toLocaleDateString('en-US', fmt) : '';
+      const toLabel   = dateTo   ? new Date(dateTo   + 'T00:00:00').toLocaleDateString('en-US', fmt) : '';
+      const rangeText = (fromLabel && toLabel) ? fromLabel + ' – ' + toLabel : (fromLabel || toLabel);
 
-      panel.innerHTML = `<div class="dr-panel">
-        <div class="dr-header">
-          <div class="dr-count">
-            ${matched.length} review${matched.length !== 1 ? 's' : ''} · ${rangeText}
-            ${anySelected ? `<span class="dr-selected-count"> · ${selectedReviewIds.size} selected</span>` : ''}
-          </div>
-          <div class="dr-controls">
-            <label class="dr-select-all-label">
-              <input type="checkbox" id="chkSelectAll" ${allSelected ? 'checked' : ''} onchange="toggleSelectAll(this.checked)" />
-              <span>Select All</span>
-            </label>
-            ${anySelected ? `
-              <button class="btn-bulk-pub" onclick="bulkPublish(true)">Publish (${selectedReviewIds.size})</button>
-              <button class="btn-bulk-unpub" onclick="bulkPublish(false)">Unpublish (${selectedReviewIds.size})</button>
-            ` : ''}
-          </div>
-        </div>
-        ${matched.length === 0
-          ? `<div class="dr-empty">No reviews found in this date range.</div>`
-          : `<div class="dr-list">${matched.map(r => {
-              const book = allBooks.find(b => b.id === r.book_id);
-              const bookTitle = book ? book.title : 'Unknown Book';
-              const dateStr = r.created_at
-                ? new Date(r.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
-                : '—';
-              const checked = selectedReviewIds.has(r.id);
-              return `<div class="dr-review-item${checked ? ' dr-selected' : ''}" onclick="toggleReviewCheck('${escHtml(r.id)}', !document.getElementById('chk-${escHtml(r.id)}').checked)">
-                <input type="checkbox" class="dr-check" id="chk-${escHtml(r.id)}" ${checked ? 'checked' : ''} onchange="toggleReviewCheck('${escHtml(r.id)}', this.checked)" onclick="event.stopPropagation()" />
-                <div class="dr-review-info">
-                  <div class="dr-review-book">${escHtml(bookTitle)}</div>
-                  <div class="dr-review-source">${escHtml(r.source || 'Unknown source')}${r.award ? ` <span class="review-award">★ ${escHtml(r.award)}</span>` : ''}</div>
-                  <div class="dr-review-meta">${dateStr} · ${r.published ? '<span class="dr-pub">Published</span>' : '<span class="dr-unpub">Hidden</span>'}</div>
-                </div>
-                <button class="btn-dr-view" onclick="event.stopPropagation(); openModal('${escHtml(r.book_id)}')">View</button>
-              </div>`;
-            }).join('')}</div>`
-        }
-      </div>`;
+      const countText = matched.length + ' review' + (matched.length !== 1 ? 's' : '') + ' · ' + rangeText;
+      const selectedText = anySelected ? ' · <span class="dr-selected-count">' + selectedReviewIds.size + ' selected</span>' : '';
+
+      const bulkBtns = anySelected
+        ? '<button class="btn-bulk-pub" onclick="bulkPublish(true)">Publish (' + selectedReviewIds.size + ')</button>'
+          + '<button class="btn-bulk-unpub" onclick="bulkPublish(false)">Unpublish (' + selectedReviewIds.size + ')</button>'
+        : '';
+
+      let rowsHtml = '';
+      if (matched.length === 0) {
+        rowsHtml = '<div class="dr-empty">No reviews found in this date range.</div>';
+      } else {
+        const rows = matched.map(function(r) {
+          const book = allBooks.find(function(b) { return b.id === r.book_id; });
+          const bookTitle = book ? book.title : 'Unknown Book';
+          const dateStr = r.created_at
+            ? new Date(r.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
+            : '—';
+          const checked = selectedReviewIds.has(r.id);
+          const selClass = checked ? ' dr-selected' : '';
+          const pubStr = r.published
+            ? '<span class="dr-pub">Published</span>'
+            : '<span class="dr-unpub">Hidden</span>';
+          const awardStr = r.award
+            ? ' <span class="review-award">★ ' + escHtml(r.award) + '</span>'
+            : '';
+          return '<div class="dr-review-item' + selClass + '" onclick="drRowClick(\'' + escHtml(r.id) + '\')">'
+            + '<input type="checkbox" class="dr-check" id="chk-' + escHtml(r.id) + '" ' + (checked ? 'checked ' : '') + 'onchange="toggleReviewCheck(\'' + escHtml(r.id) + '\', this.checked)" onclick="event.stopPropagation()" />'
+            + '<div class="dr-review-info">'
+            + '<div class="dr-review-book">' + escHtml(bookTitle) + '</div>'
+            + '<div class="dr-review-source">' + escHtml(r.source || 'Unknown source') + awardStr + '</div>'
+            + '<div class="dr-review-meta">' + dateStr + ' · ' + pubStr + '</div>'
+            + '</div>'
+            + '<button class="btn-dr-view" onclick="event.stopPropagation(); openModal(\'' + escHtml(r.book_id) + '\')">View</button>'
+            + '</div>';
+        });
+        rowsHtml = '<div class="dr-list">' + rows.join('') + '</div>';
+      }
+
+      panel.innerHTML = '<div class="dr-panel">'
+        + '<div class="dr-header">'
+        + '<div class="dr-count">' + countText + selectedText + '</div>'
+        + '<div class="dr-controls">'
+        + '<label class="dr-select-all-label">'
+        + '<input type="checkbox" id="chkSelectAll" ' + (allSelected ? 'checked ' : '') + 'onchange="toggleSelectAll(this.checked)" />'
+        + '<span>Select All</span>'
+        + '</label>'
+        + bulkBtns
+        + '</div>'
+        + '</div>'
+        + rowsHtml
+        + '</div>';
+    }
+
+    function drRowClick(reviewId) {
+      var chk = document.getElementById('chk-' + reviewId);
+      if (chk) toggleReviewCheck(reviewId, !chk.checked);
     }
 
     function toggleReviewCheck(reviewId, checked) {
