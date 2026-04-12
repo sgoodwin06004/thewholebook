@@ -389,6 +389,31 @@
       transition: color 0.15s;
     }
     .btn-remove-review:hover { color: var(--error); }
+    .review-item-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-publish-toggle {
+      background: none;
+      border: 1px solid var(--success);
+      color: var(--success);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 2px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-publish-toggle:hover { background: rgba(111,207,151,0.1); }
+    .btn-publish-toggle.unpublished {
+      border-color: var(--muted);
+      color: var(--muted);
+    }
+    .btn-publish-toggle.unpublished:hover { border-color: var(--accent); color: var(--accent); }
     .btn-add-review {
       background: none;
       border: 1px dashed var(--border);
@@ -689,10 +714,14 @@
       const div = document.createElement('div');
       div.className = 'pro-review-item';
       div.id = 'pro-review-' + idx;
+      div.dataset.published = 'true';
       div.innerHTML = `
         <div class="review-item-header">
           <span class="review-item-num">Review ${idx}</span>
-          ${idx > 1 ? '<button type="button" class="btn-remove-review" onclick="removeProReview(' + idx + ')" title="Remove">×</button>' : ''}
+          <div class="review-item-actions">
+            <button type="button" class="btn-publish-toggle" id="p-pub-btn-${idx}" onclick="toggleReviewPublish(${idx})" title="Toggle published state">Published</button>
+            ${idx > 1 ? '<button type="button" class="btn-remove-review" onclick="removeProReview(' + idx + ')" title="Remove">×</button>' : ''}
+          </div>
         </div>
         <div class="field-row">
           <div class="field">
@@ -718,6 +747,31 @@
     function removeProReview(idx) {
       const el = document.getElementById('pro-review-' + idx);
       if (el) el.remove();
+    }
+
+    async function toggleReviewPublish(idx) {
+      const item = document.getElementById('pro-review-' + idx);
+      const btn  = document.getElementById('p-pub-btn-' + idx);
+      const existingId       = item.dataset.reviewId;
+      const currentPublished = item.dataset.published !== 'false';
+      const newState         = !currentPublished;
+
+      if (existingId) {
+        const { error } = await sb.from('pro_reviews')
+          .update({ published: newState })
+          .eq('id', existingId);
+        if (error) { showToast('Failed: ' + error.message, 'error'); return; }
+        showToast(newState ? 'Review published.' : 'Review hidden from public.', 'success');
+      }
+
+      item.dataset.published = String(newState);
+      if (newState) {
+        btn.textContent = existingId ? 'Published' : 'Will Publish';
+        btn.classList.remove('unpublished');
+      } else {
+        btn.textContent = existingId ? 'Unpublished' : 'Will Not Publish';
+        btn.classList.add('unpublished');
+      }
     }
 
     function addReaderExperience() {
@@ -846,11 +900,22 @@
             addProReview();
             const idx = proReviewCount;
             const itemEl = document.getElementById(`pro-review-${idx}`);
-            itemEl.dataset.reviewId = r.id;
+            itemEl.dataset.reviewId  = r.id;
+            itemEl.dataset.published = String(r.published !== false);
             document.getElementById(`p-source-${idx}`).value  = r.source  || '';
             document.getElementById(`p-award-${idx}`).value   = r.award   || '';
             document.getElementById(`p-summary-${idx}`).value = r.summary || '';
             document.getElementById(`p-url-${idx}`).value     = r.url     || '';
+            const pubBtn = document.getElementById(`p-pub-btn-${idx}`);
+            if (pubBtn) {
+              if (r.published === false) {
+                pubBtn.textContent = 'Unpublished';
+                pubBtn.classList.add('unpublished');
+              } else {
+                pubBtn.textContent = 'Published';
+                pubBtn.classList.remove('unpublished');
+              }
+            }
           });
         }
 
@@ -1049,24 +1114,33 @@
             if (existingId) {
               const { error: pErr } = await sb.from('pro_reviews')
                 .update({
-                  source:  source  || null,
-                  award:   award   || null,
-                  summary: summary || null,
-                  url:     proUrl  || null,
+                  source:    source  || null,
+                  award:     award   || null,
+                  summary:   summary || null,
+                  url:       proUrl  || null,
+                  published: true,
                 })
                 .eq('id', existingId);
               if (pErr) throw new Error('Pro review: ' + pErr.message);
+              // Reflect auto-publish in the button
+              item.dataset.published = 'true';
+              const pubBtn = document.getElementById('p-pub-btn-' + idx);
+              if (pubBtn) { pubBtn.textContent = 'Published'; pubBtn.classList.remove('unpublished'); }
             } else {
               const { data: newReview, error: pErr } = await sb.from('pro_reviews').insert({
-                book_id: bookId,
-                user_id: currentUser.id,
-                source:  source  || null,
-                award:   award   || null,
-                summary: summary || null,
-                url:     proUrl  || null,
+                book_id:   bookId,
+                user_id:   currentUser.id,
+                source:    source  || null,
+                award:     award   || null,
+                summary:   summary || null,
+                url:       proUrl  || null,
+                published: true,
               }).select('id').single();
               if (pErr) throw new Error('Pro review: ' + pErr.message);
-              item.dataset.reviewId = newReview.id;
+              item.dataset.reviewId  = newReview.id;
+              item.dataset.published = 'true';
+              const pubBtn = document.getElementById('p-pub-btn-' + idx);
+              if (pubBtn) { pubBtn.textContent = 'Published'; pubBtn.classList.remove('unpublished'); }
             }
           }
         }
