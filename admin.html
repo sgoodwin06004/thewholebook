@@ -178,7 +178,7 @@
     /* ── Book list ── */
     .book-row {
       display: grid;
-      grid-template-columns: 36px 2fr 1fr 0.8fr 1fr 110px 70px;
+      grid-template-columns: 36px 2fr 1fr 0.8fr 1fr 110px auto;
       align-items: center; padding: 11px 20px;
       border-bottom: 1px solid var(--border); font-size: 12px;
       gap: 12px; transition: background 0.15s;
@@ -203,6 +203,14 @@
       text-align: center; transition: border-color 0.2s, color 0.2s;
     }
     .btn-edit:hover { border-color: var(--accent); color: var(--accent); }
+
+    .btn-delete {
+      background: none; border: 1px solid var(--border); color: var(--muted);
+      font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.06em;
+      text-transform: uppercase; padding: 4px 10px; border-radius: 2px;
+      cursor: pointer; transition: border-color 0.2s, color 0.2s;
+    }
+    .btn-delete:hover { border-color: var(--error); color: var(--error); }
 
     .empty-state { padding: 32px 20px; text-align: center; color: var(--muted); font-size: 12px; }
     .loading-row  { padding: 20px; color: var(--muted); font-size: 12px; }
@@ -519,9 +527,22 @@
               ${added}
               ${updated ? `<div class="book-date-updated">↑ ${updated}</div>` : ''}
             </div>
-            <a class="btn-edit" href="/reviewer.html?id=${b.id}">Edit</a>
+            <div style="display:flex;gap:6px;align-items:center">
+              <a class="btn-edit" href="/reviewer.html?id=${b.id}">Edit</a>
+              <button class="btn-delete" onclick="deleteBook('${b.id}', ${JSON.stringify(esc(b.title||''))})">Delete</button>
+            </div>
           </div>`;
         }).join('');
+    }
+
+    async function deleteBook(bookId, title) {
+      if (!confirm(`Delete "${title}"? This cannot be undone.`)) return;
+      const { error } = await sb.from('books').delete().eq('id', bookId);
+      if (error) { showToast('Error: ' + error.message, 'error'); return; }
+      showToast(`"${title}" deleted.`, 'success');
+      allBooks = allBooks.filter(b => b.id !== bookId);
+      document.getElementById('book-count').textContent = `(${allBooks.length})`;
+      applyAndRender();
     }
 
     function exportCSV() {

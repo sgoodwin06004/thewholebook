@@ -694,7 +694,7 @@
     const results=BOOKS.filter(b=>(b.title&&b.title.toLowerCase().includes(q))||(b.author&&b.author.toLowerCase().includes(q))||(b.isbn&&b.isbn.toLowerCase().includes(q)));
     if(!results.length){searchResults.classList.remove('has-results');searchResults.innerHTML=`<div class="search-placeholder"><div class="search-placeholder-icon">🔍</div><p>No results for "${query}"<br/><br/>Not in our database yet</p></div>`;return;}
     searchResults.classList.add('has-results');
-    searchResults.innerHTML=results.map(book=>{const report=getReportForBook(book.id);return`<div class="book-card" onclick="openModal('${book.id}')"><div><div class="book-card-title">${book.title}</div><div class="book-card-author">by ${book.author||'Unknown'}${book.publication_year?` · ${book.publication_year}`:''}</div><div class="book-card-tags">${book.award?'<span class="tag tag-award">Award</span>':''}${report?'<span class="tag tag-banned">Flagged</span>':''}${(book.categories||[]).map(c=>`<span class="tag" style="border-color:var(--gray);color:var(--gray)">${c}</span>`).join('')}</div></div><div class="book-card-scores">${report?`<span class="score-pill score-ban">Rating: ${report.rating||'N/A'}</span>`:''}<span class="score-pill score-real">📖 In Database</span></div></div>`;}).join('');
+    searchResults.innerHTML=results.map(book=>{const report=getReportForBook(book.id);return`<div class="book-card" onclick="openModal('${book.id}')"><div><div class="book-card-title">${book.title}</div><div class="book-card-author">by ${book.author||'Unknown'}${book.publication_year?` · ${book.publication_year}`:''}</div><div class="book-card-tags">${book.award?'<span class="tag tag-award">Award</span>':''}${report?'<span class="tag tag-banned">Flagged</span>':''}${(book.categories||[]).map(c=>`<span class="tag" style="border-color:var(--gray);color:var(--gray)">${c}</span>`).join('')}</div></div><div class="book-card-scores">${report?`<span class="score-pill score-ban">Level: ${contentLevelLabel(report.rating)}</span>`:''}<span class="score-pill score-real">📖 In Database</span></div></div>`;}).join('');
   }
 
   searchInput.addEventListener('input',e=>doSearch(e.target.value));
@@ -792,19 +792,55 @@
       ?experiences.map(e=>`<div style="margin-bottom:2rem;border-left:3px solid var(--red);padding-left:1.2rem">${e.story?`<div class="analysis-text" style="font-style:italic"><p>${e.story}</p></div>`:''}${(e.reader_name||e.source)?`<p style="font-family:var(--font-mono);font-size:0.65rem;color:var(--gray);margin-top:0.5rem">— ${[e.reader_name,e.source].filter(Boolean).join(' · ')}</p>`:''}</div>`).join('')
       :noItem+'ℹ No reader experiences on file yet.</p>';
 
+    const concerns=extractPrimaryConcerns(report&&report.flagged_categories);
     const ratedHtml=report
-      ?`<div class="verdict-grid"><div class="verdict-col"><div class="verdict-label ban">Their Rating</div><div class="verdict-rating">${report.rating||'?'}</div><div class="verdict-source">${report.report_url?`<a href="${report.report_url}" target="_blank" style="color:var(--red)">View Source Report</a>`:'Source on file'}</div><div style="font-family:var(--font-mono);font-size:0.6rem;color:var(--gray);letter-spacing:0.03em;line-height:1.5;margin-top:0.8rem;max-width:220px">This rating is not an approval rating, but how severely inappropriate the content is to their worldview. <a href="https://www.ratedbooks.org/ratingscale" target="_blank" style="color:var(--red)">See rating scale</a></div></div>${report.flagged_categories?`<div style="font-family:var(--font-mono);font-size:1.4rem;color:var(--ink);flex:1;text-align:right;padding:1.5rem;letter-spacing:0.02em;line-height:1.3">These are their objections to the book.</div>`:''}</div>${report.flagged_categories?`<div class="section-label">RatedBooks Categories</div><div class="context-quote" style="font-style:normal;margin-bottom:2rem">${report.flagged_categories}</div>`:''}${report.excerpts?`<div class="section-label">How They Framed It</div><div class="context-quote">${report.excerpts}<cite>From the ban report — stripped of context</cite></div>`:''}`
-      :noItem+'ℹ No RatedBooks report on file for this title yet.</p>';
+      ?`<div class="verdict-grid"><div class="verdict-col"><div class="verdict-label ban">Content Level</div><div class="verdict-rating" style="font-size:2rem">${contentLevelLabel(report.rating)}</div>${concerns?`<div style="font-family:var(--font-mono);font-size:0.65rem;color:var(--red);letter-spacing:0.04em;line-height:1.6;margin-top:0.5rem;max-width:240px"><strong>Their primary concerns:</strong><br>${concerns}</div>`:''}<div class="verdict-source" style="margin-top:0.8rem">${report.report_url?`<a href="${report.report_url}" target="_blank" style="color:var(--red)">View Source Report</a>`:'Source on file'}</div><div style="font-family:var(--font-mono);font-size:0.6rem;color:var(--gray);letter-spacing:0.03em;line-height:1.5;margin-top:0.8rem;max-width:220px">This content level reflects how the book was assessed for mature themes — not a measure of its literary value.</div></div>${report.flagged_categories?`<div style="font-family:var(--font-mono);font-size:1.4rem;color:var(--ink);flex:1;text-align:right;padding:1.5rem;letter-spacing:0.02em;line-height:1.3">These are their objections to the book.</div>`:''}</div>${report.flagged_categories?`<div class="section-label">Flagged Content</div><div class="context-quote" style="font-style:normal;margin-bottom:2rem">${report.flagged_categories}</div>`:''}${report.excerpts?`<div class="section-label">How They Framed It</div><div class="context-quote">${report.excerpts}<cite>From the ban report — stripped of context</cite></div>`:''}`
+      :noItem+'ℹ No content report on file for this title yet.</p>';
 
     const coverHtml=book.cover_url?`<div style="padding:2rem 2.5rem 0"><img src="${book.cover_url}" alt="Cover of ${book.title}" style="max-width:80px;border:2px solid var(--ink);" /></div>`:'';
 
-    modalBody.innerHTML=`${coverHtml}<div class="modal-tabs"><button class="modal-tab active" onclick="switchModalTab(this,'modal-tab-pro')">Pro Reviews</button><button class="modal-tab" onclick="switchModalTab(this,'modal-tab-exp')">Reader Experiences</button><button class="modal-tab" onclick="switchModalTab(this,'modal-tab-rated')">RatedBooks Ratings</button></div><div class="modal-tab-panel active" id="modal-tab-pro">${proHtml}</div><div class="modal-tab-panel" id="modal-tab-exp">${expHtml}</div><div class="modal-tab-panel" id="modal-tab-rated">${ratedHtml}</div>`;
+    modalBody.innerHTML=`${coverHtml}<div class="modal-tabs"><button class="modal-tab active" onclick="switchModalTab(this,'modal-tab-pro')">Pro Reviews</button><button class="modal-tab" onclick="switchModalTab(this,'modal-tab-exp')">Reader Experiences</button><button class="modal-tab" onclick="switchModalTab(this,'modal-tab-rated')">Content Report</button></div><div class="modal-tab-panel active" id="modal-tab-pro">${proHtml}</div><div class="modal-tab-panel" id="modal-tab-exp">${expHtml}</div><div class="modal-tab-panel" id="modal-tab-rated">${ratedHtml}</div>`;
   }
 
   document.getElementById('modalClose').addEventListener('click',closeModal);
   modalOverlay.addEventListener('click',e=>{if(e.target===modalOverlay)closeModal();});
   document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
   function closeModal(){modalOverlay.classList.remove('open');document.body.style.overflow='';}
+
+  const CONTENT_LEVEL_LABELS = {
+    1: 'Mild Advisory',
+    2: 'Ages 13+',
+    3: 'Teen+',
+    4: 'Adults Only',
+    5: 'Extreme/Explicit'
+  };
+  function contentLevelLabel(n) {
+    const num = parseInt(n);
+    return CONTENT_LEVEL_LABELS[num] || (n || 'N/A');
+  }
+
+  // Buckets and the terms (from reworded flagged_categories) that trigger them
+  const CONCERN_BUCKETS = [
+    { label: 'Sexual content',    patterns: [/sexual content/,/explicit sexual/,/sexual activities/,/sexual battery/,/bdsm/,/non-consensual/,/marital sexual assault/,/prostitution/,/sex acts/,/sexual crude/] },
+    { label: 'Nudity',            patterns: [/nudity/] },
+    { label: 'LGBTQ\+ themes',    patterns: [/lgbtq/,/gender and sexuality themes/,/gender dysphoria/,/gender ideolog/,/alternate sexualit/,/queer/,/transgender/] },
+    { label: 'Violence & gore',   patterns: [/violence/,/graphic gore/,/body horror/,/murder/,/torture/,/gore/] },
+    { label: 'Abuse',             patterns: [/abuse/,/assault/,/grooming/,/molestation/,/neglect/,/coercive/,/stalking/] },
+    { label: 'Strong language',   patterns: [/strong language/,/offensive language/] },
+    { label: 'Substance use',     patterns: [/alcohol use/,/heavy drinking/,/problematic drinking/,/drug use/,/tobacco use/,/substance/,/vaping/] },
+    { label: 'Death & self-harm', patterns: [/suicide/,/self-harm/,/death/,/dying/] },
+    { label: 'Religious themes',  patterns: [/religious themes/,/religious content/] },
+    { label: 'Racial & social themes', patterns: [/racial/,/social commentary/,/cultural themes/,/political commentary/,/discrimination/,/racism/] },
+  ];
+
+  function extractPrimaryConcerns(flaggedCategories) {
+    if (!flaggedCategories) return null;
+    const text = flaggedCategories.toLowerCase();
+    const found = CONCERN_BUCKETS
+      .filter(bucket => bucket.patterns.some(re => re.test(text)))
+      .map(bucket => bucket.label);
+    return found.length ? found.join(' · ') : null;
+  }
 
   renderAla();
   loadData();

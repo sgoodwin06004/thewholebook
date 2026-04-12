@@ -188,7 +188,7 @@
       margin-left: 3px;
     }
 
-    input, textarea {
+    input, textarea, select {
       width: 100%;
       background: var(--surface2);
       border: 1px solid var(--border);
@@ -201,7 +201,10 @@
       transition: border-color 0.2s, box-shadow 0.2s;
     }
 
-    input:focus, textarea:focus {
+    select { cursor: pointer; }
+    select option { background: var(--surface2); }
+
+    input:focus, textarea:focus, select:focus {
       border-color: var(--accent);
       box-shadow: 0 0 0 3px var(--accent-glow);
     }
@@ -575,8 +578,15 @@
       <div class="section rated-section">
         <div class="section-label">Rated Books Report</div>
         <div class="field">
-          <label>Rating <span class="optional">1–5</span></label>
-          <input type="number" id="r-rating" min="1" max="5" placeholder="e.g. 3" />
+          <label>Content Level <span class="optional">optional</span></label>
+          <select id="r-rating">
+            <option value="">— Select —</option>
+            <option value="1">Mild Advisory</option>
+            <option value="2">Ages 13+</option>
+            <option value="3">Teen+</option>
+            <option value="4">Adults Only</option>
+            <option value="5">Extreme/Explicit</option>
+          </select>
         </div>
         <div class="field">
           <label>Rated Books Categories <span class="optional">optional</span></label>
