@@ -414,6 +414,36 @@
       color: var(--muted);
     }
     .btn-publish-toggle.unpublished:hover { border-color: var(--accent); color: var(--accent); }
+
+    .btn-book-publish {
+      background: none;
+      border: 1px solid var(--success);
+      color: var(--success);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 13px 24px;
+      border-radius: 2px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-book-publish:hover { background: rgba(111,207,151,0.1); }
+    .btn-book-publish:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-book-unpublish {
+      background: none;
+      border: 1px solid var(--muted);
+      color: var(--muted);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 13px 24px;
+      border-radius: 2px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-book-unpublish:hover { border-color: var(--error); color: var(--error); }
+    .btn-book-unpublish:disabled { opacity: 0.4; cursor: not-allowed; }
+    .book-publish-group { display: none; align-items: center; gap: 8px; }
     .btn-add-review {
       background: none;
       border: 1px dashed var(--border);
@@ -678,10 +708,16 @@
 
     <div class="submit-row">
       <span class="submit-hint">All records will be saved together.</span>
-      <button class="btn-submit" id="submitBtn" onclick="handleSubmit()">
-        <span class="btn-label">Save Book</span>
-        <div class="spinner"></div>
-      </button>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="book-publish-group" id="bookPublishGroup">
+          <button class="btn-book-publish" id="btnBookPublish" onclick="setBookPublished(true)">Publish</button>
+          <button class="btn-book-unpublish" id="btnBookUnpublish" onclick="setBookPublished(false)">Unpublish</button>
+        </div>
+        <button class="btn-submit" id="submitBtn" onclick="handleSubmit()">
+          <span class="btn-label">Save Book</span>
+          <div class="spinner"></div>
+        </button>
+      </div>
     </div>
   </main>
 
@@ -706,6 +742,7 @@
     let isBookOwner = false;
     let allUsers = [];
     let currentCollaborators = [];
+    let bookPublished = false;
 
     function addProReview() {
       proReviewCount++;
@@ -747,6 +784,33 @@
     function removeProReview(idx) {
       const el = document.getElementById('pro-review-' + idx);
       if (el) el.remove();
+    }
+
+    function updateBookPublishButtons() {
+      const publishBtn   = document.getElementById('btnBookPublish');
+      const unpublishBtn = document.getElementById('btnBookUnpublish');
+      if (!publishBtn) return;
+      publishBtn.disabled   = bookPublished;
+      unpublishBtn.disabled = !bookPublished;
+    }
+
+    async function setBookPublished(state) {
+      if (!editingBookId) return;
+      const publishBtn   = document.getElementById('btnBookPublish');
+      const unpublishBtn = document.getElementById('btnBookUnpublish');
+      publishBtn.disabled   = true;
+      unpublishBtn.disabled = true;
+
+      const { error } = await sb.from('books').update({ published: state }).eq('id', editingBookId);
+      if (error) {
+        showToast('Failed: ' + error.message, 'error');
+        updateBookPublishButtons();
+        return;
+      }
+
+      bookPublished = state;
+      updateBookPublishButtons();
+      showToast(state ? 'Book published.' : 'Book unpublished.', 'success');
     }
 
     async function toggleReviewPublish(idx) {
@@ -878,6 +942,13 @@
             document.getElementById('coverPreview').src = book.cover_url;
             document.getElementById('coverPreviewWrap').style.display = 'block';
             document.getElementById('coverUploadLabel').textContent = 'Change Image';
+          }
+
+          // Show publish/unpublish controls for book owner or admin
+          if (isBookOwner || isAdmin) {
+            bookPublished = book.published !== false;
+            updateBookPublishButtons();
+            document.getElementById('bookPublishGroup').style.display = 'flex';
           }
         }
 
