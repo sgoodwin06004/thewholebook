@@ -476,7 +476,8 @@
       const { data, error } = await sb
         .from('books')
         .select('id, title, author, isbn, user_id, created_at, updated_at, published')
-        .order('title');
+        .order('title')
+        .limit(5000);
       if (error) {
         document.getElementById('bookList').innerHTML = `<div class="empty-state">${error.message}</div>`;
         return;
