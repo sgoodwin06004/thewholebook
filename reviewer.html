@@ -1080,9 +1080,11 @@
         } else {
           // ── INSERT new book ──
           const newCat = document.getElementById('cat-audience').value;
-          const { data: book, error: bookErr } = await sb
+          const newId = crypto.randomUUID();
+          const { error: bookErr } = await sb
             .from('books')
             .insert({
+              id:               newId,
               title,
               author:           document.getElementById('b-author').value.trim()   || null,
               author2:          document.getElementById('b-author2').value.trim() || null,
@@ -1092,11 +1094,9 @@
               publication_year: document.getElementById('b-pub-year').value ? parseInt(document.getElementById('b-pub-year').value) : null,
               categories:       newCat ? [newCat] : null,
               user_id:          currentUser.id,
-            })
-            .select('id')
-            .single();
+            });
           if (bookErr) throw new Error('Book: ' + bookErr.message);
-          bookId = book.id;
+          bookId = newId;
         }
 
         const flagged   = document.getElementById('r-flagged').value.trim();
@@ -1329,7 +1329,14 @@
       document.getElementById('toast-msg').textContent = msg;
       toast.className = `toast ${type} show`;
       clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => toast.classList.remove('show'), 4000);
+      if (type === 'error') {
+        console.error('[TWB Error]', msg);
+        // errors stay visible until clicked
+        toast.onclick = () => toast.classList.remove('show');
+      } else {
+        toast.onclick = null;
+        toastTimer = setTimeout(() => toast.classList.remove('show'), 4000);
+      }
     }
 
     init();

@@ -7,8 +7,8 @@ require('dotenv').config();
 const https = require('https');
 const { createClient } = require('@supabase/supabase-js');
 
-const SUPABASE_URL      = 'https://cqslqfztgtuuidgdkyyz.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_TBJdijzfEaYzBDBeqAy2CA_edJMKfgz';
+const SUPABASE_URL      = process.env.SUPABASE_URL      || 'https://cqslqfztgtuuidgdkyyz.supabase.co';
+const SUPABASE_KEY      = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_ANON_KEY || 'sb_publishable_TBJdijzfEaYzBDBeqAy2CA_edJMKfgz';
 
 const FEEDS = [
   { url: 'https://www.google.com/alerts/feeds/00866925138509230325/5591207799340368795', name: 'Banned Books' },
@@ -18,12 +18,23 @@ const FEEDS = [
   { url: 'https://www.google.com/alerts/feeds/00866925138509230325/9026022860445592565', name: 'PEN America / ALA' },
 ];
 
-// Entry must match at least one book term AND one ban/censorship term to pass.
-const BOOK_TERMS = ['book', 'librar', 'reading', 'novel', 'author', 'publish', 'literary', 'classroom', 'curriculum', 'title', 'pen america', 'ala '];
+// Entry must match at least one book term AND one ban/censorship term to pass,
+// and must not match any noise pattern.
+const BOOK_TERMS = ['book ban', 'banned book', 'book remov', 'book challeng', 'librar', 'reading list', 'literary censor', 'curriculum ban', 'pen america', 'ala book'];
 const BAN_TERMS  = ['ban', 'censor', 'challeng', 'remov', 'restrict', 'prohibit', 'pulled', 'suppress'];
 
+// If title or snippet contains any of these, drop the article outright.
+const NOISE_PATTERNS = [
+  'book an ad', 'book a table', 'book a room', 'book tickets',
+  'social media ban', 'food ban', 'fried food', 'diet ban',
+  'sports ban', 'fan ban', 'player ban', 'golf ban', 'nhl ban', 'nba ban', 'nfl ban',
+  'protest ban', 'palestine action ban', 'demonstration ban',
+  'travel ban', 'immigration ban', 'drug ban', 'alcohol ban',
+  'meghan markle', 'royal family', 'prince harry', 'prince william',
+];
+
 const apply = process.argv.includes('--apply');
-const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -59,6 +70,7 @@ function extractRealUrl(googleUrl) {
 
 function isRelevant(title, snippet) {
   const combined = (title + ' ' + snippet).toLowerCase();
+  if (NOISE_PATTERNS.some(p => combined.includes(p))) return false;
   const hasBook = BOOK_TERMS.some(t => combined.includes(t));
   const hasBan  = BAN_TERMS.some(t => combined.includes(t));
   return hasBook && hasBan;
