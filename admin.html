@@ -599,6 +599,11 @@
 
     async function deleteBook(bookId, title) {
       if (!confirm(`Delete "${title}"? This cannot be undone.`)) return;
+      // Delete related records first to satisfy foreign key constraints
+      for (const table of ['rated_reports', 'pro_reviews', 'goodreads', 'reader_experiences', 'book_collaborators']) {
+        const { error } = await sb.from(table).delete().eq('book_id', bookId);
+        if (error) { showToast(`Error clearing ${table}: ` + error.message, 'error'); return; }
+      }
       const { error } = await sb.from('books').delete().eq('id', bookId);
       if (error) { showToast('Error: ' + error.message, 'error'); return; }
       showToast(`"${title}" deleted.`, 'success');
