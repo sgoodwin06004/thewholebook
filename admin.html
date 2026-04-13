@@ -591,7 +591,7 @@
             </div>
             <div style="display:flex;gap:6px;align-items:center">
               <a class="btn-edit" href="/reviewer.html?id=${b.id}">Edit</a>
-              <button class="btn-delete" onclick="deleteBook('${b.id}', ${JSON.stringify(esc(b.title||''))})">Delete</button>
+              <button class="btn-delete" data-id="${b.id}" data-title="${esc(b.title||'')}" onclick="deleteBook(this.dataset.id, this.dataset.title)">Delete</button>
             </div>
           </div>`;
         }).join('');
