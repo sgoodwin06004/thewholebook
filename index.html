@@ -115,13 +115,10 @@
     .modal-tab.active{color:var(--paper);border-bottom-color:var(--red)}
     .modal-tab-panel{display:none;padding:2.5rem}
     .modal-tab-panel.active{display:block}
-    .verdict-grid{border:2px solid var(--ink);margin-bottom:2rem;background:#fff8ec;display:flex;align-items:center}
-    .verdict-col{padding:1.5rem}
-    .verdict-label{font-family:var(--font-mono);font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;margin-bottom:0.6rem;display:flex;align-items:center;gap:0.5rem}
-    .verdict-label.ban{color:var(--red)}
-    .verdict-label::before{content:'';display:block;width:8px;height:8px;border-radius:50%;background:currentColor}
-    .verdict-rating{font-family:var(--font-display);font-size:3.5rem;line-height:1;margin-bottom:0.3rem;color:var(--red)}
-    .verdict-source{font-family:var(--font-mono);font-size:0.65rem;color:var(--gray);letter-spacing:0.05em}
+    .why-object-intro{font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-bottom:1.2rem}
+    .concern-tags{display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:2rem}
+    .concern-tag{font-family:var(--font-mono);font-size:0.7rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.45rem 0.9rem;border:2px solid var(--red);color:var(--red);background:rgba(155,0,0,0.04)}
+    .flagged-text{font-family:var(--font-serif);font-size:0.95rem;line-height:1.75;color:var(--ink);margin-bottom:2rem;border-left:4px solid var(--paper-dark);padding-left:1.2rem}
     .section-label{font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--gray);margin-bottom:0.8rem;padding-bottom:0.5rem;border-bottom:1px solid var(--paper-dark);display:flex;align-items:center;gap:0.6rem}
     .section-label::after{content:'';flex:1;height:1px;background:var(--paper-dark)}
     .analysis-text{font-family:var(--font-serif);font-size:1rem;line-height:1.75;color:var(--ink);margin-bottom:2rem}
@@ -218,6 +215,15 @@
     .alpha-btn:hover{border-color:var(--ink);color:var(--ink)}
     .alpha-btn.active{background:var(--red);border-color:var(--red);color:var(--white)}
     .grid-empty{grid-column:1/-1;padding:3rem;text-align:center;font-family:var(--font-mono);font-size:0.75rem;color:var(--gray);letter-spacing:0.1em;text-transform:uppercase}
+    .news-section{padding:5rem 4rem;border-bottom:3px solid var(--border);background:var(--white)}
+    .news-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:0;border:2px solid var(--ink);margin-top:0}
+    .news-card{padding:1.8rem;border-right:2px solid var(--ink);border-bottom:2px solid var(--ink);text-decoration:none;color:inherit;display:block;transition:background 0.15s}
+    .news-card:hover{background:var(--ink);color:var(--paper)}
+    .news-card:hover .news-card-source,.news-card:hover .news-card-snippet{color:rgba(245,240,232,0.6)}
+    .news-card-source{font-family:var(--font-mono);font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--red);margin-bottom:0.6rem;transition:color 0.15s}
+    .news-card-title{font-family:var(--font-serif);font-weight:700;font-size:1rem;line-height:1.35;margin-bottom:0.6rem}
+    .news-card-snippet{font-family:var(--font-mono);font-size:0.65rem;line-height:1.6;color:var(--gray);transition:color 0.15s}
+    .news-loading{grid-column:1/-1;padding:3rem;text-align:center;font-family:var(--font-mono);font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray)}
     footer{background:var(--ink);color:var(--paper);padding:3rem 4rem;display:grid;grid-template-columns:2fr 1fr 1fr;gap:3rem;border-top:3px solid var(--border)}
     .footer-brand{font-family:var(--font-display);font-size:2.5rem;letter-spacing:0.05em;margin-bottom:0.8rem}
     .footer-tagline{font-family:var(--font-serif);font-style:italic;font-size:0.95rem;color:rgba(245,240,232,0.6);line-height:1.6;max-width:340px}
@@ -249,8 +255,6 @@
       .banned-panel{padding:2rem 1.5rem}
       .banned-tabs{overflow-x:auto;-webkit-overflow-scrolling:touch;flex-wrap:nowrap}
       .banned-tab{white-space:nowrap;flex-shrink:0}
-      .verdict-grid{grid-template-columns:1fr}
-      .verdict-col:first-child{border-right:none;border-bottom:2px solid var(--ink)}
       .pen-row{grid-template-columns:40px 1fr auto}
       .ala-grid{grid-template-columns:1fr}
       .wwd-intro{padding:2rem}
@@ -293,6 +297,7 @@
     <a href="#what-we-do">What We Do</a>
     <a href="#most-banned">Most Banned</a>
     <a href="#recently-added">Browse</a>
+    <a href="#news">News</a>
     <a href="/contact.html">Contact</a>
   </nav>
   <button class="nav-toggle" id="navToggle" aria-label="Open menu">&#9776;</button>
@@ -305,6 +310,7 @@
   <a href="#what-we-do" class="mobile-nav-link">What We Do</a>
   <a href="#most-banned" class="mobile-nav-link">Most Banned</a>
   <a href="#recently-added" class="mobile-nav-link">Browse</a>
+  <a href="#news" class="mobile-nav-link">News</a>
   <a href="/contact.html" class="mobile-nav-link">Contact</a>
 </div>
 
@@ -463,6 +469,16 @@
   </div>
 </section>
 
+<section class="news-section" id="news">
+  <div class="section-header">
+    <h2 class="section-title">News & Updates</h2>
+    <span class="section-meta">Book ban coverage</span>
+  </div>
+  <div class="news-grid" id="newsGrid">
+    <div class="news-loading">Loading news…</div>
+  </div>
+</section>
+
 <footer id="contribute">
   <div>
     <div class="footer-brand">The Whole Book</div>
@@ -476,6 +492,7 @@
       <li><a href="#what-we-do">What We Do</a></li>
       <li><a href="#most-banned">Most Banned</a></li>
       <li><a href="#recently-added">Browse All</a></li>
+      <li><a href="#news">News</a></li>
     </ul>
   </div>
   <div class="footer-col">
@@ -760,7 +777,7 @@
     const results=BOOKS.filter(b=>(b.title&&b.title.toLowerCase().includes(q))||(b.author&&b.author.toLowerCase().includes(q))||(b.isbn&&b.isbn.toLowerCase().includes(q)));
     if(!results.length){searchResults.classList.remove('has-results');searchResults.innerHTML=`<div class="search-placeholder"><div class="search-placeholder-icon">🔍</div><p>No results for "${query}"<br/><br/>Not in our database yet</p></div>`;return;}
     searchResults.classList.add('has-results');
-    searchResults.innerHTML=results.map(book=>{const report=getReportForBook(book.id);return`<div class="book-card" onclick="openModal('${book.id}')"><div><div class="book-card-title">${book.title}</div><div class="book-card-author">by ${book.author||'Unknown'}${book.publication_year?` · ${book.publication_year}`:''}</div><div class="book-card-tags">${book.award?'<span class="tag tag-award">Award</span>':''}${report?'<span class="tag tag-banned">Flagged</span>':''}${(book.categories||[]).map(c=>`<span class="tag" style="border-color:var(--gray);color:var(--gray)">${c}</span>`).join('')}</div></div><div class="book-card-scores">${report?`<span class="score-pill score-ban">Level: ${contentLevelLabel(report.rating)}</span>`:''}<span class="score-pill score-real">📖 In Database</span></div></div>`;}).join('');
+    searchResults.innerHTML=results.map(book=>{const report=getReportForBook(book.id);return`<div class="book-card" onclick="openModal('${book.id}')"><div><div class="book-card-title">${book.title}</div><div class="book-card-author">by ${book.author||'Unknown'}${book.publication_year?` · ${book.publication_year}`:''}</div><div class="book-card-tags">${book.award?'<span class="tag tag-award">Award</span>':''}${report?'<span class="tag tag-banned">Flagged</span>':''}${(book.categories||[]).map(c=>`<span class="tag" style="border-color:var(--gray);color:var(--gray)">${c}</span>`).join('')}</div></div><div class="book-card-scores"><span class="score-pill score-real">📖 In Database</span></div></div>`;}).join('');
   }
 
   searchInput.addEventListener('input',e=>doSearch(e.target.value));
@@ -859,31 +876,26 @@
       :noItem+'ℹ No reader experiences on file yet.</p>';
 
     const concerns=extractPrimaryConcerns(report&&report.flagged_categories);
+    const concernTagsHtml=concerns
+      ?`<div class="concern-tags">${concerns.split(' · ').map(c=>`<span class="concern-tag">${c}</span>`).join('')}</div>`
+      :'';
     const ratedHtml=report
-      ?`<div class="verdict-grid"><div class="verdict-col"><div class="verdict-label ban">Content Level</div><div class="verdict-rating" style="font-size:2rem">${contentLevelLabel(report.rating)}</div>${concerns?`<div style="font-family:var(--font-mono);font-size:0.65rem;color:var(--red);letter-spacing:0.04em;line-height:1.6;margin-top:0.5rem;max-width:240px"><strong>Their primary concerns:</strong><br>${concerns}</div>`:''}<div class="verdict-source" style="margin-top:0.8rem">${report.report_url?`<a href="${report.report_url}" target="_blank" style="color:var(--red)">View Source Report</a>`:'Source on file'}</div><div style="font-family:var(--font-mono);font-size:0.6rem;color:var(--gray);letter-spacing:0.03em;line-height:1.5;margin-top:0.8rem;max-width:220px">This content level reflects how the book was assessed for mature themes — not a measure of its literary value.</div></div>${report.flagged_categories?`<div style="font-family:var(--font-mono);font-size:1.4rem;color:var(--ink);flex:1;text-align:right;padding:1.5rem;letter-spacing:0.02em;line-height:1.3">These are their objections to the book.</div>`:''}</div>${report.flagged_categories?`<div class="section-label">Flagged Content</div><div class="context-quote" style="font-style:normal;margin-bottom:2rem">${report.flagged_categories}</div>`:''}${report.excerpts?`<div class="section-label">How They Framed It</div><div class="context-quote">${report.excerpts}<cite>From the ban report — stripped of context</cite></div>`:''}`
+      ?`<p class="why-object-intro">These are the reasons they want this book removed.</p>
+        ${concernTagsHtml}
+        ${report.flagged_categories?`<div class="section-label">In Their Own Words</div><div class="flagged-text">${report.flagged_categories}</div>`:''}
+        ${report.excerpts?`<div class="section-label">How They Framed It</div><div class="context-quote">${report.excerpts}<cite>From the ban report — stripped of context</cite></div>`:''}
+        ${report.report_url?`<p style="font-family:var(--font-mono);font-size:0.65rem;margin-top:0.5rem"><a href="${report.report_url}" target="_blank" style="color:var(--red)">View Source Report ↗</a></p>`:''}`
       :noItem+'ℹ No content report on file for this title yet.</p>';
 
     const coverHtml=book.cover_url?`<div style="padding:2rem 2.5rem 0"><img src="${book.cover_url}" alt="Cover of ${book.title}" style="max-width:80px;border:2px solid var(--ink);" /></div>`:'';
 
-    modalBody.innerHTML=`${coverHtml}<div class="modal-tabs"><button class="modal-tab active" onclick="switchModalTab(this,'modal-tab-pro')">Pro Reviews</button><button class="modal-tab" onclick="switchModalTab(this,'modal-tab-exp')">Reader Experiences</button><button class="modal-tab" onclick="switchModalTab(this,'modal-tab-rated')">Content Report</button></div><div class="modal-tab-panel active" id="modal-tab-pro">${proHtml}</div><div class="modal-tab-panel" id="modal-tab-exp">${expHtml}</div><div class="modal-tab-panel" id="modal-tab-rated">${ratedHtml}</div>`;
+    modalBody.innerHTML=`${coverHtml}<div class="modal-tabs"><button class="modal-tab active" onclick="switchModalTab(this,'modal-tab-pro')">Pro Reviews</button><button class="modal-tab" onclick="switchModalTab(this,'modal-tab-exp')">Reader Experiences</button><button class="modal-tab" onclick="switchModalTab(this,'modal-tab-rated')">Why They Object</button></div><div class="modal-tab-panel active" id="modal-tab-pro">${proHtml}</div><div class="modal-tab-panel" id="modal-tab-exp">${expHtml}</div><div class="modal-tab-panel" id="modal-tab-rated">${ratedHtml}</div>`;
   }
 
   document.getElementById('modalClose').addEventListener('click',closeModal);
   modalOverlay.addEventListener('click',e=>{if(e.target===modalOverlay)closeModal();});
   document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
   function closeModal(){modalOverlay.classList.remove('open');document.body.style.overflow='';}
-
-  const CONTENT_LEVEL_LABELS = {
-    1: 'Mild Advisory',
-    2: 'Ages 13+',
-    3: 'Teen+',
-    4: 'Adults Only',
-    5: 'Extreme/Explicit'
-  };
-  function contentLevelLabel(n) {
-    const num = parseInt(n);
-    return CONTENT_LEVEL_LABELS[num] || (n || 'N/A');
-  }
 
   // Buckets and the terms (from reworded flagged_categories) that trigger them
   const CONCERN_BUCKETS = [
@@ -910,6 +922,7 @@
 
   renderAla();
   loadData();
+  loadNewsFeed();
 
   // Mobile nav
   const navToggle = document.getElementById('navToggle');
@@ -918,6 +931,33 @@
   navToggle.addEventListener('click', () => mobileNav.classList.add('open'));
   navClose.addEventListener('click', () => mobileNav.classList.remove('open'));
   mobileNav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => mobileNav.classList.remove('open')));
+
+  async function loadNewsFeed() {
+    const grid = document.getElementById('newsGrid');
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/news_feed?published=eq.true&order=published_at.desc&limit=9`, {
+        headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
+      });
+      if (!res.ok) throw new Error('Could not load news');
+      const items = await res.json();
+      if (!items.length) { grid.innerHTML = '<div class="news-loading">No news articles yet.</div>'; return; }
+      grid.innerHTML = items.map(item => {
+        const date = item.published_at ? new Date(item.published_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
+        const source = [item.alert_name, date].filter(Boolean).join(' · ');
+        return `<a class="news-card" href="${escHtml(item.url)}" target="_blank" rel="noopener">
+          <div class="news-card-source">${escHtml(source)}</div>
+          <div class="news-card-title">${escHtml(item.title)}</div>
+          ${item.snippet ? `<div class="news-card-snippet">${escHtml(item.snippet)}</div>` : ''}
+        </a>`;
+      }).join('');
+    } catch (e) {
+      grid.innerHTML = '<div class="news-loading">Could not load news.</div>';
+    }
+  }
+
+  function escHtml(str) {
+    return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
 </script>
 </body>
 </html>

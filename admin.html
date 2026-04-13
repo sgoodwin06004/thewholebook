@@ -271,6 +271,41 @@
     .invite-msg.error   { color: var(--error);   display: block; }
     .invite-msg.success { color: var(--success);  display: block; }
 
+    /* ── News feed ── */
+    .news-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: start; padding: 16px 20px;
+      border-bottom: 1px solid var(--border); gap: 16px;
+      transition: background 0.15s;
+    }
+    .news-row:last-child { border-bottom: none; }
+    .news-row:hover { background: rgba(255,255,255,0.02); }
+    .news-row.rejected-row { opacity: 0.45; }
+    .news-title { color: var(--text); font-size: 13px; margin-bottom: 4px; text-decoration: none; }
+    .news-title:hover { color: var(--accent); }
+    .news-meta  { color: var(--muted); font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 6px; }
+    .news-snippet { color: var(--muted); font-size: 11px; line-height: 1.55; }
+    .news-actions { display: flex; gap: 8px; flex-shrink: 0; }
+    .btn-approve {
+      background: none; border: 1px solid var(--border); color: var(--muted);
+      font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.06em;
+      text-transform: uppercase; padding: 4px 12px; border-radius: 3px;
+      cursor: pointer; transition: border-color 0.2s, color 0.2s, background 0.2s;
+      white-space: nowrap;
+    }
+    .btn-approve:hover { border-color: var(--success); color: var(--success); }
+    .btn-approve.active { background: var(--success); border-color: var(--success); color: #0f0f0f; }
+    .btn-reject {
+      background: none; border: 1px solid var(--border); color: var(--muted);
+      font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.06em;
+      text-transform: uppercase; padding: 4px 12px; border-radius: 3px;
+      cursor: pointer; transition: border-color 0.2s, color 0.2s;
+      white-space: nowrap;
+    }
+    .btn-reject:hover { border-color: var(--error); color: var(--error); }
+    .news-filter-bar { padding: 10px 20px; border-bottom: 1px solid var(--border); display: flex; gap: 8px; }
+
     /* ── Toast ── */
     .toast {
       position: fixed; bottom: 28px; right: 28px;
@@ -302,6 +337,7 @@
   <div class="tab-bar">
     <button class="tab active" data-tab="books">Books</button>
     <button class="tab" data-tab="users">Users</button>
+    <button class="tab" data-tab="news">News <span id="news-pending-badge" style="display:none;margin-left:4px;background:var(--accent);color:#fff;font-size:9px;padding:1px 6px;border-radius:10px;vertical-align:middle"></span></button>
   </div>
 
   <main>
@@ -359,6 +395,24 @@
         </div>
         <div class="invite-msg" id="inviteMsg"></div>
         <div id="userList"><div class="loading-row">Loading users…</div></div>
+      </div>
+    </div>
+
+    <!-- ── NEWS TAB ── -->
+    <div id="tab-news" class="tab-pane">
+      <div class="pane-header">
+        <span class="pane-title">News Feed</span>
+        <div style="display:flex;gap:8px;align-items:center">
+          <span id="news-queue-label" style="font-size:11px;color:var(--muted)"></span>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="news-filter-bar">
+          <button class="sort-btn active" id="newsFilterPending" onclick="setNewsFilter('pending', this)">Pending</button>
+          <button class="sort-btn" id="newsFilterApproved" onclick="setNewsFilter('approved', this)">Approved</button>
+          <button class="sort-btn" id="newsFilterRejected" onclick="setNewsFilter('rejected', this)">Rejected</button>
+        </div>
+        <div id="newsList"><div class="loading-row">Loading…</div></div>
       </div>
     </div>
 
@@ -744,6 +798,94 @@
     function esc(str) {
       return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
     }
+
+    // ── NEWS FEED ─────────────────────────────────────────────────────────────
+    let newsFilter = 'pending';
+
+    async function loadNews() {
+      const list = document.getElementById('newsList');
+      list.innerHTML = '<div class="loading-row">Loading…</div>';
+
+      let query = sb.from('news_feed').select('*').order('published_at', { ascending: false });
+      if (newsFilter === 'pending')  query = query.eq('published', false).eq('rejected', false);
+      if (newsFilter === 'approved') query = query.eq('published', true);
+      if (newsFilter === 'rejected') query = query.eq('rejected', true);
+
+      const { data, error } = await query;
+      if (error) { list.innerHTML = `<div class="empty-state">${esc(error.message)}</div>`; return; }
+
+      // Update pending badge
+      const { count } = await sb.from('news_feed').select('*', { count: 'exact', head: true }).eq('published', false).eq('rejected', false);
+      const badge = document.getElementById('news-pending-badge');
+      if (count > 0) { badge.textContent = count; badge.style.display = 'inline'; }
+      else { badge.style.display = 'none'; }
+
+      document.getElementById('news-queue-label').textContent = `${(data||[]).length} ${newsFilter}`;
+
+      if (!data?.length) { list.innerHTML = '<div class="empty-state">No articles in this queue.</div>'; return; }
+
+      list.innerHTML = '';
+      data.forEach(item => list.appendChild(buildNewsRow(item)));
+    }
+
+    function buildNewsRow(item) {
+      const row = document.createElement('div');
+      row.className = 'news-row' + (item.rejected ? ' rejected-row' : '');
+      row.id = 'news-row-' + item.id.replace(/[^a-z0-9]/gi, '_');
+      const date = item.published_at ? new Date(item.published_at).toLocaleDateString() : '—';
+      row.innerHTML = `
+        <div>
+          <div class="news-meta">${esc(item.alert_name)} &middot; ${esc(date)}</div>
+          <a class="news-title" href="${esc(item.url)}" target="_blank" rel="noopener">${esc(item.title)}</a>
+          ${item.snippet ? `<div class="news-snippet">${esc(item.snippet)}</div>` : ''}
+        </div>
+        <div class="news-actions">
+          ${!item.published && !item.rejected ? `
+            <button class="btn-approve" onclick="approveNews('${esc(item.id)}')">Approve</button>
+            <button class="btn-reject"  onclick="rejectNews('${esc(item.id)}')">Reject</button>
+          ` : item.published ? `
+            <button class="btn-reject" onclick="unapproveNews('${esc(item.id)}')">Unpublish</button>
+          ` : `
+            <button class="btn-approve" onclick="approveNews('${esc(item.id)}')">Restore</button>
+          `}
+        </div>`;
+      return row;
+    }
+
+    async function approveNews(id) {
+      const { error } = await sb.from('news_feed').update({ published: true, rejected: false }).eq('id', id);
+      if (error) { showToast('Error: ' + error.message, 'error'); return; }
+      showToast('Article approved.', 'success');
+      loadNews();
+    }
+
+    async function rejectNews(id) {
+      const { error } = await sb.from('news_feed').update({ rejected: true, published: false }).eq('id', id);
+      if (error) { showToast('Error: ' + error.message, 'error'); return; }
+      showToast('Article rejected.', 'success');
+      loadNews();
+    }
+
+    async function unapproveNews(id) {
+      const { error } = await sb.from('news_feed').update({ published: false, rejected: false }).eq('id', id);
+      if (error) { showToast('Error: ' + error.message, 'error'); return; }
+      showToast('Article unpublished.', 'success');
+      loadNews();
+    }
+
+    function setNewsFilter(filter, btn) {
+      newsFilter = filter;
+      document.querySelectorAll('.news-filter-bar .sort-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      loadNews();
+    }
+
+    // Load news when tab is clicked
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        if (tab.dataset.tab === 'news') loadNews();
+      });
+    });
 
     init();
   </script>
