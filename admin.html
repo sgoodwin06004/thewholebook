@@ -473,16 +473,23 @@
 
     // ── BOOKS ─────────────────────────────────────────────────────────────
     async function loadBooks() {
-      const { data, error } = await sb
-        .from('books')
-        .select('id, title, author, isbn, user_id, created_at, updated_at, published')
-        .order('title')
-        .limit(5000);
-      if (error) {
-        document.getElementById('bookList').innerHTML = `<div class="empty-state">${error.message}</div>`;
-        return;
+      const PAGE = 1000;
+      let all = [], from = 0, done = false;
+      while (!done) {
+        const { data, error } = await sb
+          .from('books')
+          .select('id, title, author, isbn, user_id, created_at, updated_at, published')
+          .order('title')
+          .range(from, from + PAGE - 1);
+        if (error) {
+          document.getElementById('bookList').innerHTML = `<div class="empty-state">${error.message}</div>`;
+          return;
+        }
+        all = all.concat(data || []);
+        done = !data || data.length < PAGE;
+        from += PAGE;
       }
-      allBooks = (data || []).map(b => ({ ...b, submitter_id: b.user_id || null }));
+      allBooks = all.map(b => ({ ...b, submitter_id: b.user_id || null }));
       document.getElementById('book-count').textContent = `(${allBooks.length})`;
       buildAdminAlphaStrip();
       applyAndRender();
