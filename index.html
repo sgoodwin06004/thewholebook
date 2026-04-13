@@ -196,20 +196,24 @@
     .section-header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:2.5rem;border-bottom:3px solid var(--ink);padding-bottom:1rem}
     .section-title{font-family:var(--font-display);font-size:clamp(2rem,4vw,3rem);letter-spacing:0.03em}
     .section-meta{font-family:var(--font-mono);font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray)}
-    .books-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:0;border:2px solid var(--ink)}
-    .book-tile{padding:1.8rem;border-right:2px solid var(--ink);border-bottom:2px solid var(--ink);cursor:pointer;transition:background 0.15s;position:relative}
+    .books-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:0;border:2px solid var(--ink)}
+    .book-tile{padding:1.1rem 1.2rem;border-right:2px solid var(--ink);border-bottom:2px solid var(--ink);cursor:pointer;transition:background 0.15s;position:relative}
     .book-tile:hover{background:var(--ink);color:var(--paper)}
     .book-tile:hover .book-tile-author{color:rgba(245,240,232,0.6)}
     .book-tile:hover .book-tile-meta{color:rgba(245,240,232,0.5)}
     .book-tile:hover .tile-tag{border-color:rgba(245,240,232,0.3);color:rgba(245,240,232,0.7)}
-    .book-tile-cover{width:60px;height:85px;object-fit:cover;border:2px solid var(--paper-dark);margin-bottom:1rem;display:block}
-    .book-tile-number{font-family:var(--font-display);font-size:4rem;color:var(--paper-dark);line-height:1;margin-bottom:0.5rem;transition:color 0.15s}
+    .book-tile-cover{width:44px;height:62px;object-fit:cover;border:2px solid var(--paper-dark);margin-bottom:0.6rem;display:block}
+    .book-tile-number{font-family:var(--font-display);font-size:2.5rem;color:var(--paper-dark);line-height:1;margin-bottom:0.3rem;transition:color 0.15s}
     .book-tile:hover .book-tile-number{color:rgba(245,240,232,0.1)}
-    .book-tile-title{font-family:var(--font-serif);font-weight:700;font-size:1.05rem;line-height:1.3;margin-bottom:0.3rem}
-    .book-tile-author{font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.08em;color:var(--gray);margin-bottom:0.8rem;transition:color 0.15s}
-    .book-tile-meta{font-family:var(--font-mono);font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);transition:color 0.15s}
-    .tile-tags{display:flex;flex-wrap:wrap;gap:0.3rem;margin-top:0.6rem}
-    .tile-tag{font-family:var(--font-mono);font-size:0.55rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.2rem 0.4rem;border:1px solid var(--paper-dark);color:var(--gray);transition:border-color 0.15s,color 0.15s}
+    .book-tile-title{font-family:var(--font-serif);font-weight:700;font-size:0.9rem;line-height:1.3;margin-bottom:0.2rem}
+    .book-tile-author{font-family:var(--font-mono);font-size:0.58rem;letter-spacing:0.08em;color:var(--gray);margin-bottom:0.5rem;transition:color 0.15s}
+    .book-tile-meta{font-family:var(--font-mono);font-size:0.55rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);transition:color 0.15s}
+    .tile-tags{display:flex;flex-wrap:wrap;gap:0.25rem;margin-top:0.4rem}
+    .tile-tag{font-family:var(--font-mono);font-size:0.5rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.15rem 0.35rem;border:1px solid var(--paper-dark);color:var(--gray);transition:border-color 0.15s,color 0.15s}
+    .books-grid-footer{display:flex;align-items:center;justify-content:space-between;padding:0.8rem 1rem;border:2px solid var(--ink);border-top:none;background:var(--white)}
+    .btn-show-all{font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;background:none;border:1.5px solid var(--ink);color:var(--ink);padding:0.45rem 1.1rem;cursor:pointer;transition:background 0.2s,color 0.2s}
+    .btn-show-all:hover{background:var(--ink);color:var(--paper)}
+    .books-showing-label{font-family:var(--font-mono);font-size:0.62rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray)}
     .grid-loading{grid-column:1/-1;display:flex;align-items:center;justify-content:center;padding:4rem;gap:1rem;flex-direction:column}
     .grid-loading p{font-family:var(--font-mono);font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gray)}
     .grid-error{grid-column:1/-1;padding:3rem;text-align:center;font-family:var(--font-mono);font-size:0.75rem;color:var(--red);letter-spacing:0.1em}
@@ -306,6 +310,7 @@
     <a href="#most-banned">Most Banned</a>
     <a href="#recently-added">Browse</a>
     <a href="#news">News</a>
+    <a href="impact.html">Share Your Story</a>
     <a href="/contact.html">Contact</a>
   </nav>
   <button class="nav-toggle" id="navToggle" aria-label="Open menu">&#9776;</button>
@@ -319,6 +324,7 @@
   <a href="#most-banned" class="mobile-nav-link">Most Banned</a>
   <a href="#recently-added" class="mobile-nav-link">Browse</a>
   <a href="#news" class="mobile-nav-link">News</a>
+  <a href="impact.html" class="mobile-nav-link">Share Your Story</a>
   <a href="/contact.html" class="mobile-nav-link">Contact</a>
 </div>
 
@@ -474,6 +480,10 @@
   </div>
   <div class="books-grid" id="recentBooks">
     <div class="grid-loading"><div class="spinner-ring"></div><p>Loading books…</p></div>
+  </div>
+  <div class="books-grid-footer" id="booksGridFooter" style="display:none">
+    <span class="books-showing-label" id="booksShowingLabel"></span>
+    <button class="btn-show-all" id="btnShowAll" onclick="toggleShowAll()">Show All</button>
   </div>
 </section>
 
@@ -668,14 +678,14 @@
   }
 
   function setBrowseSort(sort){
-    browseSort=sort;
+    browseSort=sort;booksShowAll=false;
     document.querySelectorAll('.sort-btn').forEach(b=>b.classList.remove('active'));
     event.target.classList.add('active');
     renderRecentBooks();
   }
 
   function setBrowseLetter(l){
-    browseLetter=(browseLetter===l&&l!=='All')?'':l;
+    browseLetter=(browseLetter===l&&l!=='All')?'':l;booksShowAll=false;
     buildAlphaStrip();
     renderRecentBooks();
   }
@@ -765,14 +775,34 @@
     container.innerHTML=[...BOOKS].sort((a,b)=>sortKey(a.title).localeCompare(sortKey(b.title))).slice(0,5).map(book=>{const report=getReportForBook(book.id);return`<div class="book-list-item" onclick="openModal('${book.id}')"><div class="book-list-item-info"><div class="book-list-item-title">${book.title}</div><div class="book-list-item-author">${book.author||''}</div></div>${report?'<span class="book-list-flag">Flagged</span>':''}</div>`;}).join('');
   }
 
+  const BOOKS_PAGE_SIZE=10;
+  let booksShowAll=false;
+
+  function toggleShowAll(){
+    booksShowAll=!booksShowAll;
+    renderRecentBooks();
+  }
+
   function renderRecentBooks(){
-    const container=document.getElementById('recentBooks');const meta=document.getElementById('recentMeta');
-    if(!BOOKS.length){container.innerHTML=`<div class="grid-error">No books found.</div>`;meta.textContent='0 books';return;}
+    const container=document.getElementById('recentBooks');
+    const meta=document.getElementById('recentMeta');
+    const footer=document.getElementById('booksGridFooter');
+    const showingLabel=document.getElementById('booksShowingLabel');
+    const btnShowAll=document.getElementById('btnShowAll');
+    if(!BOOKS.length){container.innerHTML=`<div class="grid-error">No books found.</div>`;meta.textContent='0 books';footer.style.display='none';return;}
     const filtered=applyBrowseFilters(BOOKS);
     const total=BOOKS.length;
     meta.textContent=filtered.length===total?`${total} book${total!==1?'s':''} in database`:`${filtered.length} of ${total} books`;
-    if(!filtered.length){container.innerHTML=`<div class="grid-empty">No books starting with "${browseLetter}"</div>`;return;}
-    container.innerHTML=filtered.map((book,i)=>{const report=getReportForBook(book.id);const reviews=getReviewsForBook(book.id);const cats=(book.categories||[]).join(' · ');return`<div class="book-tile" onclick="openModal('${book.id}')">${book.cover_url?`<img class="book-tile-cover" src="${book.cover_url}" alt="Cover of ${book.title}" onerror="this.style.display='none'" />`:`<div class="book-tile-number">${String(i+1).padStart(2,'0')}</div>`}<div class="book-tile-title">${book.title}</div><div class="book-tile-author">— ${book.author||'Unknown Author'}</div><div class="book-tile-meta">${book.publication_year?`${book.publication_year} · `:''}${cats?`${cats} · `:''}${report?'⚠ Report on file':'No report yet'}${reviews.length>0?` · ${reviews.length} review${reviews.length>1?'s':''}`:''}</div><div class="tile-tags">${report?`<span class="tile-tag" style="border-color:var(--red);color:var(--red)">Flagged</span>`:''}${book.award?`<span class="tile-tag" style="border-color:var(--gold);color:var(--gold)">Award</span>`:''}${reviews.length>0?'<span class="tile-tag">Reviewed</span>':''}${(book.categories||[]).map(c=>`<span class="tile-tag">${c}</span>`).join('')}</div></div>`;}).join('');
+    if(!filtered.length){container.innerHTML=`<div class="grid-empty">No books starting with "${browseLetter}"</div>`;footer.style.display='none';return;}
+    const visible=booksShowAll?filtered:filtered.slice(0,BOOKS_PAGE_SIZE);
+    container.innerHTML=visible.map((book,i)=>{const report=getReportForBook(book.id);const reviews=getReviewsForBook(book.id);const cats=(book.categories||[]).join(' · ');return`<div class="book-tile" onclick="openModal('${book.id}')">${book.cover_url?`<img class="book-tile-cover" src="${book.cover_url}" alt="Cover of ${book.title}" onerror="this.style.display='none'" />`:`<div class="book-tile-number">${String(i+1).padStart(2,'0')}</div>`}<div class="book-tile-title">${book.title}</div><div class="book-tile-author">— ${book.author||'Unknown Author'}</div><div class="book-tile-meta">${book.publication_year?`${book.publication_year} · `:''}${cats?`${cats} · `:''}${report?'⚠ Report on file':'No report yet'}${reviews.length>0?` · ${reviews.length} review${reviews.length>1?'s':''}`:''}</div><div class="tile-tags">${report?`<span class="tile-tag" style="border-color:var(--red);color:var(--red)">Flagged</span>`:''}${book.award?`<span class="tile-tag" style="border-color:var(--gold);color:var(--gold)">Award</span>`:''}${reviews.length>0?'<span class="tile-tag">Reviewed</span>':''}${(book.categories||[]).map(c=>`<span class="tile-tag">${c}</span>`).join('')}</div></div>`;}).join('');
+    if(filtered.length>BOOKS_PAGE_SIZE){
+      footer.style.display='flex';
+      showingLabel.textContent=booksShowAll?`Showing all ${filtered.length} books`:`Showing ${visible.length} of ${filtered.length} books`;
+      btnShowAll.textContent=booksShowAll?'Show Less':'Show All';
+    }else{
+      footer.style.display='none';
+    }
   }
 
   const searchInput=document.getElementById('searchInput');
