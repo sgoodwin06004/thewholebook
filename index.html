@@ -657,7 +657,7 @@
   ];
 
   function sortKey(title){return(title||'').replace(/^(the|a|an)\s+/i,'').toLowerCase();}
-  let BOOKS=[], RATED_REPORTS=[], PRO_REVIEWS=[];
+  let BOOKS=[], RATED_REPORTS=[], PRO_REVIEWS=[], IMPACT_STATEMENTS=[];
   let alaFilter='';
   let browseSort='title-asc', browseLetter='';
 
@@ -719,13 +719,14 @@
 
   async function loadData(){
     try{
-      const [books,reports,reviews,experiences]=await Promise.all([
+      const [books,reports,reviews,experiences,impacts]=await Promise.all([
         supabaseFetch('books?select=*&published=eq.true&order=created_at.desc'),
         supabaseFetch('rated_reports?select=*'),
         supabaseFetch('pro_reviews?select=*&published=eq.true'),
-        supabaseFetch('reader_experiences?select=*')
+        supabaseFetch('reader_experiences?select=*'),
+        supabaseFetch('impact_statements?select=*&published=eq.true')
       ]);
-      BOOKS=books;RATED_REPORTS=reports;PRO_REVIEWS=reviews;READER_EXPERIENCES=experiences||[];
+      BOOKS=books;RATED_REPORTS=reports;PRO_REVIEWS=reviews;READER_EXPERIENCES=experiences||[];IMPACT_STATEMENTS=impacts||[];
       buildAlphaStrip();renderBookListPreview();renderRecentBooks();renderAla();buildMarquee();updateStats();
     }catch(err){
       console.error('Failed to load data:',err);
@@ -755,6 +756,7 @@
   function getReportForBook(id){return RATED_REPORTS.find(r=>r.book_id===id);}
   function getReviewsForBook(id){return PRO_REVIEWS.filter(r=>String(r.book_id)===String(id));}
   function getExperiencesForBook(id){return READER_EXPERIENCES.filter(e=>String(e.book_id)===String(id));}
+  function getImpactsForBook(id){return IMPACT_STATEMENTS.filter(s=>String(s.book_id)===String(id));}
 
   function renderBookListPreview(){
     const container=document.getElementById('bookListItems');const label=document.getElementById('bookListLabel');
@@ -803,7 +805,7 @@
     const authorLine=[`by ${book.author||'Unknown Author'}`,book.publication_year,( book.categories||[]).join(' · ')].filter(Boolean).join(' · ');
     modalAuthor.textContent=authorLine;
     modalOverlay.classList.add('open');document.body.style.overflow='hidden';
-    renderModal(book,getReportForBook(book.id),getReviewsForBook(book.id),getExperiencesForBook(book.id));
+    renderModal(book,getReportForBook(book.id),getReviewsForBook(book.id),getExperiencesForBook(book.id),getImpactsForBook(book.id));
   }
 
   function switchModalTab(btn,panelId){
@@ -867,11 +869,32 @@
     });
   }
 
-  function renderModal(book,report,reviews,experiences){
+  function renderModal(book,report,reviews,experiences,impacts){
     _pdfBook=book;_pdfReviews=reviews||[];_pdfExperiences=experiences||[];
     const noItem='<p style="font-family:var(--font-mono);font-size:0.7rem;color:var(--gray);letter-spacing:0.1em;text-transform:uppercase;padding:0.5rem 0">';
 
     const fmtDate=d=>new Date(d).toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'});
+
+    // ── IMPACT STATEMENTS (primary content) ──
+    const impactList=impacts&&impacts.length>0?impacts:[];
+    const roleColors={Student:'var(--red)',Teacher:'var(--gold)','Librarian':'#4a7c6f','Parent':'#6b4a7c','Community Member':'var(--gray)',Author:'#2c6e8a',Other:'var(--gray)'};
+    const impactHtml=impactList.length>0
+      ?impactList.map(s=>{
+        const roleColor=roleColors[s.role]||'var(--gray)';
+        const meta=[s.role,s.location&&s.location!=='withheld'?s.location:s.location==='withheld'?'Location withheld':null].filter(Boolean).join(' · ');
+        return `<div style="margin-bottom:2rem;padding-bottom:2rem;border-bottom:1px solid var(--paper-dark)">
+          <div class="analysis-text" style="font-style:italic;margin-bottom:0.8rem"><p>${s.statement}</p></div>
+          <p style="font-family:var(--font-mono);font-size:0.65rem;color:var(--gray);display:flex;gap:0.6rem;align-items:center;flex-wrap:wrap">
+            <span style="color:var(--ink);font-weight:700">${s.name||'Anonymous'}</span>
+            ${s.role?`<span style="border:1px solid ${roleColor};color:${roleColor};padding:0.15rem 0.5rem;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase">${s.role}</span>`:''}
+            ${s.location&&s.location!=='withheld'?`<span>${s.location}</span>`:''}
+            ${s.location==='withheld'?`<span style="opacity:0.5">Location withheld</span>`:''}
+            ${s.submitted_at?`<span style="opacity:0.5">· ${fmtDate(s.submitted_at)}</span>`:''}
+          </p>
+        </div>`;
+      }).join('')+`<p style="font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-top:1rem"><a href="impact.html" style="color:var(--red)">Submit your own statement ↗</a></p>`
+      :`${noItem}ℹ No impact statements on file yet.</p><p style="font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-top:1rem"><a href="impact.html" style="color:var(--red)">Be the first to share your story ↗</a></p>`;
+
     const proHtml=reviews&&reviews.length>0
       ?reviews.map((r,i)=>{
         const dateStr=r.created_at?`<p style="font-family:var(--font-mono);font-size:0.6rem;color:var(--gray);opacity:0.7;margin-top:0.4rem">Posted ${fmtDate(r.created_at)}${r.updated_at&&r.updated_at!==r.created_at?` · Updated ${fmtDate(r.updated_at)}`:''}</p>`:'';
@@ -899,7 +922,20 @@
 
     const coverHtml=book.cover_url?`<div style="padding:2rem 2.5rem 0"><img src="${book.cover_url}" alt="Cover of ${book.title}" style="max-width:80px;border:2px solid var(--ink);" /></div>`:'';
 
-    modalBody.innerHTML=`${coverHtml}<div class="modal-tabs"><button class="modal-tab active" onclick="switchModalTab(this,'modal-tab-pro')">Pro Reviews</button><button class="modal-tab" onclick="switchModalTab(this,'modal-tab-exp')">Reader Experiences</button><button class="modal-tab" onclick="switchModalTab(this,'modal-tab-rated')">Why They Object</button></div><div class="modal-tab-panel active" id="modal-tab-pro">${proHtml}</div><div class="modal-tab-panel" id="modal-tab-exp">${expHtml}</div><div class="modal-tab-panel" id="modal-tab-rated">${ratedHtml}</div>`;
+    const impactBadge=impactList.length>0?` <span style="background:var(--red);color:var(--white);font-size:0.55rem;padding:0.15rem 0.45rem;vertical-align:middle;font-family:var(--font-mono);letter-spacing:0.05em">${impactList.length}</span>`:'';
+    const impactTabLabel=`Impact${impactBadge}`;
+    const defaultImpactActive=impactList.length>0;
+
+    modalBody.innerHTML=`${coverHtml}<div class="modal-tabs">
+      <button class="modal-tab${defaultImpactActive?' active':''}" onclick="switchModalTab(this,'modal-tab-impact')">${impactTabLabel}</button>
+      <button class="modal-tab${!defaultImpactActive?' active':''}" onclick="switchModalTab(this,'modal-tab-pro')">Pro Reviews</button>
+      <button class="modal-tab" onclick="switchModalTab(this,'modal-tab-exp')">Reader Experiences</button>
+      <button class="modal-tab" onclick="switchModalTab(this,'modal-tab-rated')">Why They Object</button>
+    </div>
+    <div class="modal-tab-panel${defaultImpactActive?' active':''}" id="modal-tab-impact">${impactHtml}</div>
+    <div class="modal-tab-panel${!defaultImpactActive?' active':''}" id="modal-tab-pro">${proHtml}</div>
+    <div class="modal-tab-panel" id="modal-tab-exp">${expHtml}</div>
+    <div class="modal-tab-panel" id="modal-tab-rated">${ratedHtml}</div>`;
   }
 
   document.getElementById('modalClose').addEventListener('click',closeModal);

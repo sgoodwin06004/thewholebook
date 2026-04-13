@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Share Your Story — The Whole Book</title>
+  <meta name="description" content="Tell us how a book ban affected you. Your story matters. Submit an impact statement for any banned or challenged book.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Playfair+Display:ital,wght@0,700;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root{--ink:#2c1810;--paper:#f7f0e3;--paper-dark:#e8d5b7;--red:#9b6b1a;--red-dark:#7a5214;--gold:#c9a217;--white:#fefaf4;--gray:#7a6a58;--border:#2c1810;--font-display:'Cinzel',Georgia,serif;--font-serif:'Playfair Display',Georgia,serif;--font-mono:'Space Mono',monospace}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{background:var(--paper);color:var(--ink);font-family:var(--font-serif);overflow-x:hidden}
+    body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:0.4}
+
+    /* ── HEADER ── */
+    .site-header{border-bottom:3px solid var(--border);background:var(--ink);color:var(--paper);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+    .site-logo{font-family:var(--font-display);font-size:clamp(1.4rem,3vw,2rem);letter-spacing:0.05em;color:var(--paper);text-decoration:none;padding:0.8rem 0;display:flex;align-items:center;gap:0.6rem}
+    .site-logo .logo-accent{color:var(--red)}
+    .site-logo .logo-mark{display:inline-block;width:8px;height:8px;background:var(--red);border-radius:50%;margin-right:4px}
+    .site-nav{display:flex;gap:0}
+    .site-nav a{font-family:var(--font-mono);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.15em;color:var(--paper);text-decoration:none;padding:1.1rem 1.2rem;border-left:1px solid rgba(255,255,255,0.1);transition:background 0.2s,color 0.2s}
+    .site-nav a:hover{background:var(--red);color:var(--white)}
+
+    /* ── HERO ── */
+    .page-hero{background:var(--ink);color:var(--paper);padding:4rem 4rem 3rem;border-bottom:3px solid var(--border)}
+    .hero-eyebrow{font-family:var(--font-mono);font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--red);margin-bottom:1.2rem;display:flex;align-items:center;gap:0.8rem}
+    .hero-eyebrow::before{content:'';display:block;width:40px;height:2px;background:var(--red)}
+    .hero-title{font-family:var(--font-display);font-size:clamp(2.2rem,5vw,3.5rem);letter-spacing:0.03em;line-height:1.1;margin-bottom:1.5rem}
+    .hero-title em{font-style:normal;color:var(--red)}
+    .hero-body{font-family:var(--font-serif);font-size:1.05rem;line-height:1.85;color:rgba(247,240,227,0.82);max-width:640px}
+    .hero-body p+p{margin-top:0.9rem}
+
+    /* ── WHAT IS AN IMPACT STATEMENT ── */
+    .explainer{display:grid;grid-template-columns:repeat(3,1fr);border-bottom:3px solid var(--border)}
+    .explainer-card{padding:2.5rem 2.5rem;border-right:3px solid var(--border)}
+    .explainer-card:last-child{border-right:none}
+    .explainer-num{font-family:var(--font-display);font-size:3.5rem;color:var(--paper-dark);line-height:1;margin-bottom:0.4rem}
+    .explainer-label{font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--red);margin-bottom:0.7rem}
+    .explainer-body{font-family:var(--font-serif);font-size:0.9rem;line-height:1.75;color:#555}
+
+    /* ── FORM SECTION ── */
+    .form-section{max-width:780px;margin:0 auto;padding:3.5rem 2rem 5rem}
+    .form-heading{font-family:var(--font-display);font-size:1.6rem;letter-spacing:0.03em;margin-bottom:0.5rem}
+    .form-subheading{font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gray);margin-bottom:2.5rem}
+    .form-divider{border:none;border-top:3px solid var(--border);margin:2rem 0}
+
+    .field{margin-bottom:1.4rem}
+    .field label{display:block;font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--ink);margin-bottom:0.45rem}
+    .field label .opt{color:var(--gray);font-size:0.6rem;margin-left:0.3rem;text-transform:none;letter-spacing:0}
+    .field input,.field textarea,.field select{width:100%;background:var(--white);border:2px solid var(--border);color:var(--ink);font-family:var(--font-serif);font-size:0.95rem;padding:0.7rem 0.9rem;outline:none;transition:border-color 0.15s;-webkit-appearance:none;border-radius:0}
+    .field input:focus,.field textarea:focus,.field select:focus{border-color:var(--red)}
+    .field textarea{resize:vertical;min-height:160px;line-height:1.7}
+    .field select{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%232c1810' stroke-width='2' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 0.9rem center;padding-right:2.5rem}
+
+    .field-row{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem}
+
+    .check-row{display:flex;align-items:center;gap:0.6rem;margin-top:0.5rem}
+    .check-row input[type=checkbox]{width:16px;height:16px;accent-color:var(--red);cursor:pointer;flex-shrink:0}
+    .check-row label{font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);cursor:pointer;line-height:1.4}
+
+    /* ── BOOK SEARCH ── */
+    .book-search-wrap{position:relative}
+    .book-search-wrap input{padding-right:2.5rem}
+    .book-search-clear{position:absolute;right:0.8rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1rem;color:var(--gray);padding:0.2rem;display:none}
+    .book-search-clear.visible{display:block}
+    .book-dropdown{position:absolute;top:100%;left:0;right:0;background:var(--white);border:2px solid var(--border);border-top:none;z-index:50;max-height:260px;overflow-y:auto;display:none}
+    .book-dropdown.open{display:block}
+    .book-option{padding:0.65rem 0.9rem;cursor:pointer;border-bottom:1px solid var(--paper-dark)}
+    .book-option:last-child{border-bottom:none}
+    .book-option:hover,.book-option.focused{background:var(--paper-dark)}
+    .book-option-title{font-family:var(--font-serif);font-size:0.92rem;color:var(--ink)}
+    .book-option-author{font-family:var(--font-mono);font-size:0.6rem;color:var(--gray);margin-top:0.15rem;letter-spacing:0.05em}
+    .book-option-not-listed{font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--red);padding:0.7rem 0.9rem;cursor:pointer;border-top:2px solid var(--border)}
+    .book-option-not-listed:hover{background:var(--paper-dark)}
+    .selected-book-tag{display:flex;align-items:center;gap:0.6rem;margin-top:0.5rem;padding:0.5rem 0.8rem;background:var(--paper-dark);border-left:3px solid var(--red)}
+    .selected-book-tag-text{font-family:var(--font-serif);font-size:0.88rem;color:var(--ink);flex:1}
+    .selected-book-tag-clear{background:none;border:none;cursor:pointer;font-family:var(--font-mono);font-size:0.6rem;color:var(--gray);letter-spacing:0.1em;text-transform:uppercase;padding:0.2rem 0.4rem}
+    .selected-book-tag-clear:hover{color:var(--red)}
+
+    .unlisted-fields{display:none;border-left:3px solid var(--red);padding-left:1.2rem;margin-top:1rem}
+    .unlisted-fields.open{display:block}
+    .unlisted-note{font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--red);margin-bottom:1rem}
+
+    /* ── SUBMIT ── */
+    .submit-row{display:flex;align-items:center;gap:1.2rem;margin-top:2rem;flex-wrap:wrap}
+    .btn-submit{font-family:var(--font-mono);font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;background:var(--ink);color:var(--paper);border:2px solid var(--ink);padding:0.85rem 2.2rem;cursor:pointer;transition:background 0.2s,color 0.2s;flex-shrink:0}
+    .btn-submit:hover:not(:disabled){background:var(--red);border-color:var(--red)}
+    .btn-submit:disabled{opacity:0.4;cursor:not-allowed}
+    .submit-note{font-family:var(--font-mono);font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);line-height:1.6}
+
+    /* ── SUCCESS STATE ── */
+    .success-panel{display:none;border-left:4px solid var(--red);padding:2rem 2.5rem;background:rgba(155,107,26,0.06);margin-top:1.5rem}
+    .success-panel.show{display:block}
+    .success-panel h2{font-family:var(--font-display);font-size:1.5rem;letter-spacing:0.03em;margin-bottom:0.8rem}
+    .success-panel p{font-family:var(--font-serif);font-size:0.95rem;line-height:1.75;color:var(--gray)}
+
+    /* ── ERROR ── */
+    .field-error{font-family:var(--font-mono);font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:#c0392b;margin-top:0.4rem;display:none}
+    .field-error.show{display:block}
+    .form-error{font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:#c0392b;margin-top:1rem;display:none}
+    .form-error.show{display:block}
+
+    @media(max-width:700px){
+      .page-hero{padding:2.5rem 1.5rem 2rem}
+      .explainer{grid-template-columns:1fr}
+      .explainer-card{border-right:none;border-bottom:3px solid var(--border)}
+      .explainer-card:last-child{border-bottom:none}
+      .form-section{padding:2.5rem 1.2rem 4rem}
+      .field-row{grid-template-columns:1fr}
+      .submit-row{flex-direction:column;align-items:flex-start}
+    }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <a href="index.html" class="site-logo">
+      <span class="logo-mark"></span>The <em class="logo-accent">Whole</em> Book
+    </a>
+    <nav class="site-nav">
+      <a href="index.html">Database</a>
+      <a href="impact.html">Share Your Story</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+  </header>
+
+  <section class="page-hero">
+    <div class="hero-eyebrow">Impact Statements</div>
+    <h1 class="hero-title">What Does a Book Ban<br>Actually <em>Do</em> to People?</h1>
+    <div class="hero-body">
+      <p>Behind every challenged book is a real person whose access was cut off — a student who lost a mirror, a teacher who self-censored, a librarian who was threatened, a parent who found out too late.</p>
+      <p>We collect those stories here. An impact statement is a first-person account of how a book ban or challenge affected you. It doesn't need to be long. It just needs to be true.</p>
+    </div>
+  </section>
+
+  <div class="explainer">
+    <div class="explainer-card">
+      <div class="explainer-num">01</div>
+      <div class="explainer-label">Who can submit</div>
+      <div class="explainer-body">Anyone affected by a book ban or challenge — students, parents, teachers, librarians, community members, or people who simply lost access to a book they needed.</div>
+    </div>
+    <div class="explainer-card">
+      <div class="explainer-num">02</div>
+      <div class="explainer-label">What to include</div>
+      <div class="explainer-body">Tell us what happened — what book, where, when, and how it affected you. Be as specific or as general as you're comfortable with. You can submit anonymously.</div>
+    </div>
+    <div class="explainer-card">
+      <div class="explainer-num">03</div>
+      <div class="explainer-label">What happens next</div>
+      <div class="explainer-body">Statements are reviewed before publishing. Once approved, yours will appear on the book's page in our database as primary context for why this book matters.</div>
+    </div>
+  </div>
+
+  <div class="form-section">
+    <h2 class="form-heading">Submit Your Statement</h2>
+    <p class="form-subheading">All fields marked required. Everything else is optional.</p>
+
+    <div id="mainForm">
+
+      <!-- BOOK SEARCH -->
+      <div class="field">
+        <label>Book <span class="opt">(search our database or enter manually)</span></label>
+        <div class="book-search-wrap">
+          <input type="text" id="bookSearch" placeholder="Start typing a title or author…" autocomplete="off" />
+          <button type="button" class="book-search-clear" id="bookSearchClear" title="Clear">✕</button>
+          <div class="book-dropdown" id="bookDropdown"></div>
+        </div>
+        <div class="selected-book-tag" id="selectedBookTag" style="display:none">
+          <span class="selected-book-tag-text" id="selectedBookLabel"></span>
+          <button type="button" class="selected-book-tag-clear" onclick="clearBookSelection()">Change</button>
+        </div>
+        <input type="hidden" id="bookId" />
+      </div>
+
+      <!-- UNLISTED BOOK FIELDS -->
+      <div class="unlisted-fields" id="unlistedFields">
+        <div class="unlisted-note">Book not in our database — enter details below and we'll add it.</div>
+        <div class="field">
+          <label>Book Title</label>
+          <input type="text" id="unlistedTitle" placeholder="Full title" />
+          <div class="field-error" id="errUnlistedTitle">Please enter the book title.</div>
+        </div>
+        <div class="field">
+          <label>Author <span class="opt">optional</span></label>
+          <input type="text" id="unlistedAuthor" placeholder="Author name" />
+        </div>
+      </div>
+
+      <hr class="form-divider">
+
+      <!-- SUBMITTER INFO -->
+      <div class="field-row">
+        <div class="field">
+          <label>Your Name <span class="opt">optional</span></label>
+          <input type="text" id="submitterName" placeholder="First name, or leave blank" />
+          <div class="check-row">
+            <input type="checkbox" id="chkAnon" onchange="toggleAnon(this)" />
+            <label for="chkAnon">Submit anonymously</label>
+          </div>
+        </div>
+        <div class="field">
+          <label>Your Role</label>
+          <select id="submitterRole">
+            <option value="">— select your role —</option>
+            <option value="Student">Student</option>
+            <option value="Parent">Parent / Guardian</option>
+            <option value="Teacher">Teacher / Educator</option>
+            <option value="Librarian">Librarian / Library Staff</option>
+            <option value="Community Member">Community Member</option>
+            <option value="Author">Author</option>
+            <option value="Other">Other</option>
+          </select>
+          <div class="field-error" id="errRole">Please select your role.</div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Location <span class="opt">city/state, or just state — or withhold</span></label>
+        <input type="text" id="submitterLocation" placeholder="e.g. Austin, TX or just Texas" />
+        <div class="check-row">
+          <input type="checkbox" id="chkWithhold" onchange="toggleWithhold(this)" />
+          <label for="chkWithhold">Withhold my location</label>
+        </div>
+      </div>
+
+      <hr class="form-divider">
+
+      <!-- STATEMENT -->
+      <div class="field">
+        <label>Your Impact Statement</label>
+        <textarea id="statement" placeholder="Tell us what happened. How did this book ban or challenge affect you, your family, your school, or your community? What did you lose access to — and what did that loss mean?"></textarea>
+        <div class="field-error" id="errStatement">Please write your statement before submitting.</div>
+      </div>
+
+      <div class="submit-row">
+        <button class="btn-submit" id="submitBtn" onclick="handleSubmit()">Submit Statement</button>
+        <p class="submit-note">Reviewed before publishing.<br>You will not be contacted unless you provide contact info in your statement.</p>
+      </div>
+      <div class="form-error" id="formError"></div>
+
+    </div><!-- end mainForm -->
+
+    <div class="success-panel" id="successPanel">
+      <h2>Thank You</h2>
+      <p>Your statement has been received and will be reviewed before it's published. Stories like yours are why this database exists.</p>
+      <p style="margin-top:0.8rem"><a href="index.html" style="color:var(--red);font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase">← Back to the database</a></p>
+    </div>
+
+  </div><!-- end form-section -->
+
+  <script>
+    const SUPABASE_URL  = 'https://cqslqfztgtuuidgdkyyz.supabase.co';
+    const SUPABASE_KEY  = 'sb_publishable_TBJdijzfEaYzBDBeqAy2CA_edJMKfgz';
+
+    let allBooks = [];
+    let selectedBookId = null;
+    let isUnlisted = false;
+    let dropdownFocusIdx = -1;
+
+    // ── LOAD BOOKS ──
+    async function loadBooks() {
+      try {
+        const res = await fetch(
+          `${SUPABASE_URL}/rest/v1/books?select=id,title,author&published=eq.true&order=title.asc`,
+          { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } }
+        );
+        if (res.ok) allBooks = await res.json();
+      } catch (_) {}
+    }
+
+    // ── BOOK SEARCH ──
+    const searchInput  = document.getElementById('bookSearch');
+    const dropdown     = document.getElementById('bookDropdown');
+    const clearBtn     = document.getElementById('bookSearchClear');
+    const selectedTag  = document.getElementById('selectedBookTag');
+    const selectedLabel = document.getElementById('selectedBookLabel');
+    const bookIdInput  = document.getElementById('bookId');
+    const unlistedFields = document.getElementById('unlistedFields');
+
+    searchInput.addEventListener('input', () => {
+      const q = searchInput.value.trim().toLowerCase();
+      clearBtn.classList.toggle('visible', q.length > 0);
+      if (q.length < 1) { closeDropdown(); return; }
+      const matches = allBooks.filter(b =>
+        b.title.toLowerCase().includes(q) || (b.author||'').toLowerCase().includes(q)
+      ).slice(0, 8);
+      renderDropdown(matches, q);
+    });
+
+    searchInput.addEventListener('keydown', e => {
+      const items = dropdown.querySelectorAll('.book-option, .book-option-not-listed');
+      if (e.key === 'ArrowDown') { e.preventDefault(); dropdownFocusIdx = Math.min(dropdownFocusIdx+1, items.length-1); highlightItem(items); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); dropdownFocusIdx = Math.max(dropdownFocusIdx-1, 0); highlightItem(items); }
+      else if (e.key === 'Enter' && dropdownFocusIdx >= 0) { e.preventDefault(); items[dropdownFocusIdx].click(); }
+      else if (e.key === 'Escape') closeDropdown();
+    });
+
+    function highlightItem(items) {
+      items.forEach((el, i) => el.classList.toggle('focused', i === dropdownFocusIdx));
+      if (items[dropdownFocusIdx]) items[dropdownFocusIdx].scrollIntoView({ block: 'nearest' });
+    }
+
+    clearBtn.addEventListener('click', () => {
+      searchInput.value = '';
+      clearBtn.classList.remove('visible');
+      closeDropdown();
+    });
+
+    document.addEventListener('click', e => {
+      if (!e.target.closest('.book-search-wrap')) closeDropdown();
+    });
+
+    function renderDropdown(matches, q) {
+      dropdownFocusIdx = -1;
+      let html = matches.map(b => `
+        <div class="book-option" onclick="selectBook('${escJs(b.id)}', '${escJs(b.title)}', '${escJs(b.author||'')}')">
+          <div class="book-option-title">${escHtml(b.title)}</div>
+          ${b.author ? `<div class="book-option-author">${escHtml(b.author)}</div>` : ''}
+        </div>
+      `).join('');
+      html += `<div class="book-option-not-listed" onclick="selectUnlisted()">My book isn't listed →</div>`;
+      dropdown.innerHTML = html;
+      dropdown.classList.add('open');
+    }
+
+    function closeDropdown() {
+      dropdown.classList.remove('open');
+      dropdown.innerHTML = '';
+      dropdownFocusIdx = -1;
+    }
+
+    function selectBook(id, title, author) {
+      selectedBookId = id;
+      isUnlisted = false;
+      bookIdInput.value = id;
+      searchInput.value = '';
+      clearBtn.classList.remove('visible');
+      closeDropdown();
+      selectedLabel.textContent = author ? `${title} — ${author}` : title;
+      selectedTag.style.display = 'flex';
+      searchInput.closest('.book-search-wrap').parentElement.querySelector('input[type=text]').blur();
+      unlistedFields.classList.remove('open');
+      searchInput.style.display = 'none';
+      clearBtn.style.display = 'none';
+    }
+
+    function selectUnlisted() {
+      selectedBookId = null;
+      isUnlisted = true;
+      bookIdInput.value = '';
+      searchInput.value = '';
+      clearBtn.classList.remove('visible');
+      closeDropdown();
+      selectedTag.style.display = 'none';
+      unlistedFields.classList.add('open');
+      searchInput.style.display = 'none';
+      clearBtn.style.display = 'none';
+      document.getElementById('unlistedTitle').focus();
+    }
+
+    function clearBookSelection() {
+      selectedBookId = null;
+      isUnlisted = false;
+      bookIdInput.value = '';
+      selectedTag.style.display = 'none';
+      unlistedFields.classList.remove('open');
+      searchInput.style.display = '';
+      clearBtn.style.display = '';
+      searchInput.value = '';
+      searchInput.focus();
+    }
+
+    // ── TOGGLES ──
+    function toggleAnon(chk) {
+      const nameField = document.getElementById('submitterName');
+      nameField.disabled = chk.checked;
+      nameField.value = chk.checked ? '' : nameField.value;
+      nameField.placeholder = chk.checked ? '(anonymous)' : 'First name, or leave blank';
+    }
+
+    function toggleWithhold(chk) {
+      const locField = document.getElementById('submitterLocation');
+      locField.disabled = chk.checked;
+      locField.value = chk.checked ? '' : locField.value;
+      locField.placeholder = chk.checked ? '(withheld)' : 'e.g. Austin, TX or just Texas';
+    }
+
+    // ── SUBMIT ──
+    async function handleSubmit() {
+      clearErrors();
+
+      // Validate
+      let hasError = false;
+      if (isUnlisted && !document.getElementById('unlistedTitle').value.trim()) {
+        show('errUnlistedTitle'); hasError = true;
+      }
+      if (!document.getElementById('submitterRole').value) {
+        show('errRole'); hasError = true;
+      }
+      const stmtVal = document.getElementById('statement').value.trim();
+      if (!stmtVal) {
+        show('errStatement'); hasError = true;
+      }
+      if (hasError) return;
+
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = true;
+      btn.textContent = 'Submitting…';
+
+      const anon = document.getElementById('chkAnon').checked;
+      const withhold = document.getElementById('chkWithhold').checked;
+
+      const payload = {
+        book_id:     selectedBookId || null,
+        book_title:  isUnlisted ? document.getElementById('unlistedTitle').value.trim() : null,
+        book_author: isUnlisted ? (document.getElementById('unlistedAuthor').value.trim() || null) : null,
+        name:        anon ? 'Anonymous' : (document.getElementById('submitterName').value.trim() || null),
+        role:        document.getElementById('submitterRole').value || null,
+        location:    withhold ? 'withheld' : (document.getElementById('submitterLocation').value.trim() || null),
+        statement:   stmtVal,
+        status:      'pending',
+        published:   false
+      };
+
+      try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/impact_statements`, {
+          method: 'POST',
+          headers: {
+            apikey: SUPABASE_KEY,
+            Authorization: `Bearer ${SUPABASE_KEY}`,
+            'Content-Type': 'application/json',
+            Prefer: 'return=minimal'
+          },
+          body: JSON.stringify(payload)
+        });
+        if (!res.ok) {
+          const msg = await res.text();
+          throw new Error(msg);
+        }
+        document.getElementById('mainForm').style.display = 'none';
+        document.getElementById('successPanel').classList.add('show');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } catch (e) {
+        const errEl = document.getElementById('formError');
+        errEl.textContent = 'Something went wrong: ' + e.message;
+        errEl.classList.add('show');
+        btn.disabled = false;
+        btn.textContent = 'Submit Statement';
+      }
+    }
+
+    function clearErrors() {
+      document.querySelectorAll('.field-error,.form-error').forEach(el => el.classList.remove('show'));
+    }
+    function show(id) { document.getElementById(id).classList.add('show'); }
+    function escHtml(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+    function escJs(s) { return String(s||'').replace(/'/g,"\\'").replace(/\\/g,'\\\\'); }
+
+    loadBooks();
+  </script>
+</body>
+</html>

@@ -741,6 +741,146 @@
       color: var(--muted);
       font-size: 0.85rem;
     }
+    /* ── IMPACT STATEMENTS ── */
+    .impact-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      margin: 0 2rem 1rem;
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .impact-card-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      padding: 1rem 1.2rem 0.8rem;
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+    .impact-book {
+      flex: 1;
+      min-width: 0;
+    }
+    .impact-book-title {
+      font-size: 0.95rem;
+      font-weight: bold;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .impact-book-author {
+      font-size: 0.75rem;
+      color: var(--muted);
+      font-family: var(--mono);
+      margin-top: 0.15rem;
+    }
+    .impact-unlinked-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.65rem;
+      font-family: var(--mono);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      background: rgba(243,156,18,0.12);
+      color: var(--yellow);
+      border: 1px solid var(--yellow);
+      padding: 0.2rem 0.55rem;
+      border-radius: 3px;
+      white-space: nowrap;
+    }
+    .impact-status-badge {
+      font-size: 0.65rem;
+      font-family: var(--mono);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.2rem 0.55rem;
+      border-radius: 3px;
+      white-space: nowrap;
+    }
+    .impact-status-badge.pending  { background: rgba(243,156,18,0.12); color: var(--yellow); border: 1px solid var(--yellow); }
+    .impact-status-badge.approved { background: var(--green-soft); color: var(--green); border: 1px solid var(--green); }
+    .impact-status-badge.rejected { background: var(--accent-soft); color: var(--accent); border: 1px solid var(--accent); }
+    .impact-card-meta {
+      padding: 0.6rem 1.2rem;
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      flex-wrap: wrap;
+      border-bottom: 1px solid var(--border);
+    }
+    .impact-meta-item {
+      font-size: 0.72rem;
+      color: var(--muted);
+      font-family: var(--mono);
+    }
+    .impact-meta-item strong { color: var(--text); }
+    .impact-statement-text {
+      padding: 1rem 1.2rem;
+      font-size: 0.9rem;
+      line-height: 1.7;
+      color: var(--text);
+      font-style: italic;
+      border-bottom: 1px solid var(--border);
+    }
+    .impact-card-actions {
+      padding: 0.7rem 1.2rem;
+      display: flex;
+      gap: 0.6rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .btn-impact-approve {
+      background: var(--green-soft);
+      border: 1px solid var(--green);
+      color: var(--green);
+      padding: 0.4rem 1rem;
+      border-radius: var(--radius);
+      font-size: 0.75rem;
+      font-family: var(--mono);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-impact-approve:hover:not(:disabled) { background: var(--green); color: #111; }
+    .btn-impact-approve:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-impact-reject {
+      background: var(--accent-soft);
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      padding: 0.4rem 1rem;
+      border-radius: var(--radius);
+      font-size: 0.75rem;
+      font-family: var(--mono);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-impact-reject:hover:not(:disabled) { background: var(--accent); color: #fff; }
+    .btn-impact-addbook {
+      background: rgba(243,156,18,0.12);
+      border: 1px solid var(--yellow);
+      color: var(--yellow);
+      padding: 0.4rem 1rem;
+      border-radius: var(--radius);
+      font-size: 0.75rem;
+      font-family: var(--mono);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-impact-addbook:hover { background: var(--yellow); color: #111; }
+    .impact-empty {
+      text-align: center;
+      padding: 3rem 2rem;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 0.8rem;
+    }
   </style>
 </head>
 <body>
@@ -751,6 +891,7 @@
       <a href="admin.html">Books</a>
       <a href="admin-reviews.html" class="active">Reviews</a>
       <a href="reviewer.html">Reviewer</a>
+      <a href="#impact-section" onclick="showImpactSection()">Impact Statements <span id="impactNavBadge" style="display:none;background:#c0392b;color:#fff;font-size:0.65rem;padding:0.1rem 0.4rem;vertical-align:middle;border-radius:2px;margin-left:4px"></span></a>
     </div>
   </nav>
 
@@ -793,6 +934,64 @@
     </div>
 
     <div id="dateRangeResults"></div>
+
+    <!-- ── IMPACT STATEMENTS SECTION ── -->
+    <div id="impact-section" style="display:none">
+      <div class="page-header" style="margin-top:0;border-top:3px solid var(--border)">
+        <h1 class="page-title">Impact <span>Statements</span></h1>
+      </div>
+      <div class="filters" style="gap:0.8rem">
+        <button class="filter-btn active" data-impactfilter="pending" onclick="setImpactFilter('pending',this)">Pending</button>
+        <button class="filter-btn" data-impactfilter="approved" onclick="setImpactFilter('approved',this)">Approved</button>
+        <button class="filter-btn" data-impactfilter="rejected" onclick="setImpactFilter('rejected',this)">Rejected</button>
+        <button class="filter-btn" data-impactfilter="all" onclick="setImpactFilter('all',this)">All</button>
+        <button class="btn-dr-clear" onclick="hideImpactSection()" style="margin-left:auto">← Back to Reviews</button>
+      </div>
+      <div id="impactList" style="padding:0 2rem 3rem"></div>
+    </div>
+
+    <!-- ── ADD BOOK + LINK MODAL ── -->
+    <div class="modal-overlay" id="addBookModalOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;align-items:center;justify-content:center">
+      <div class="modal" style="max-width:560px;width:95%;max-height:90vh;overflow-y:auto">
+        <div class="modal-header">
+          <div>
+            <div class="modal-book-title">Add Book to Database</div>
+            <div class="modal-book-author" id="addBookSubtitle">Pre-filled from submission</div>
+          </div>
+          <button class="modal-close" onclick="closeAddBookModal()">✕</button>
+        </div>
+        <div class="modal-body">
+          <p style="font-size:0.8rem;color:var(--muted);margin-bottom:1.2rem;font-family:var(--mono)">Fill in what you know. Once saved, the impact statement will be linked to this book and can be approved.</p>
+          <div class="form-grid">
+            <div class="form-group span2">
+              <label class="form-label">Title <span style="color:var(--accent)">*</span></label>
+              <input type="text" class="form-input" id="abTitle" />
+            </div>
+            <div class="form-group span2">
+              <label class="form-label">Author</label>
+              <input type="text" class="form-input" id="abAuthor" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Publication Year</label>
+              <input type="number" class="form-input" id="abYear" placeholder="e.g. 1960" min="1000" max="2099" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">ISBN</label>
+              <input type="text" class="form-input" id="abIsbn" placeholder="978-…" />
+            </div>
+            <div class="form-group span2">
+              <label class="form-label">Cover URL</label>
+              <input type="url" class="form-input" id="abCover" placeholder="https://…" />
+            </div>
+          </div>
+          <div class="form-actions">
+            <button class="btn-cancel" onclick="closeAddBookModal()">Cancel</button>
+            <button class="btn-save" id="btnSaveBook" onclick="saveBookAndLink()">Save Book &amp; Link</button>
+          </div>
+          <div class="form-status" id="addBookStatus"></div>
+        </div>
+      </div>
+    </div>
 
     <div class="book-list" id="bookList">
       <div class="loading-state">
@@ -885,15 +1084,18 @@
     // ── LOAD ──
     async function loadAll() {
       try {
-        const [books, reviews] = await Promise.all([
+        const [books, reviews, impact] = await Promise.all([
           sbFetch('books?select=id,title,author,cover_url,publication_year&order=title.asc'),
-          sbFetch('pro_reviews?select=*&order=created_at.asc')
+          sbFetch('pro_reviews?select=*&order=created_at.asc'),
+          sbFetch('impact_statements?select=*&order=submitted_at.desc')
         ]);
         allBooks = books;
         allBooks.sort((a,b) => sortKey(a.title).localeCompare(sortKey(b.title)));
         allReviews = reviews;
+        allImpact = impact || [];
         updateStats();
         renderList();
+        updateImpactBadge();
       } catch (e) {
         document.getElementById('bookList').innerHTML =
           `<div class="loading-state">⚠ Failed to load: ${e.message}</div>`;
@@ -1311,6 +1513,187 @@
     document.getElementById('dateFrom').addEventListener('change', applyDateRange);
     document.getElementById('dateTo').addEventListener('change', applyDateRange);
     document.getElementById('btnClearDates').addEventListener('click', clearDateRange);
+
+    // ── IMPACT STATEMENTS ──
+    let allImpact = [];
+    let impactFilter = 'pending';
+    let addBookTargetStatementId = null;
+
+    function showImpactSection() {
+      document.getElementById('impact-section').style.display = 'block';
+      document.getElementById('bookList').style.display = 'none';
+      document.querySelector('.stats-bar').style.display = 'none';
+      document.querySelector('.filters').style.display = 'none';
+      document.querySelector('.date-range-row').style.display = 'none';
+      document.getElementById('dateRangeResults').style.display = 'none';
+      document.querySelector('.page-header').style.display = 'none';
+      renderImpactList();
+    }
+
+    function hideImpactSection() {
+      document.getElementById('impact-section').style.display = 'none';
+      document.getElementById('bookList').style.display = '';
+      document.querySelector('.stats-bar').style.display = '';
+      document.querySelector('.filters').style.display = '';
+      document.querySelector('.date-range-row').style.display = '';
+      document.getElementById('dateRangeResults').style.display = '';
+      document.querySelector('.page-header').style.display = '';
+    }
+
+    function setImpactFilter(f, btn) {
+      impactFilter = f;
+      document.querySelectorAll('[data-impactfilter]').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderImpactList();
+    }
+
+    function renderImpactList() {
+      const list = document.getElementById('impactList');
+      let filtered = allImpact;
+      if (impactFilter !== 'all') filtered = allImpact.filter(s => s.status === impactFilter);
+      if (filtered.length === 0) {
+        list.innerHTML = `<div class="impact-empty">No ${impactFilter === 'all' ? '' : impactFilter + ' '}impact statements.</div>`;
+        return;
+      }
+      list.innerHTML = filtered.map(s => {
+        const book = allBooks.find(b => b.id === s.book_id);
+        const isUnlinked = !s.book_id;
+        const bookTitle = book ? book.title : (s.book_title || 'Unknown title');
+        const bookAuthor = book ? (book.author || '') : (s.book_author || '');
+        const fmtDate = d => d ? new Date(d).toLocaleDateString('en-US', { year:'numeric', month:'short', day:'numeric' }) : '—';
+        const canApprove = !isUnlinked;
+
+        return `<div class="impact-card" id="ic-${escHtml(s.id)}">
+          <div class="impact-card-header">
+            <div class="impact-book">
+              <div class="impact-book-title">${escHtml(bookTitle)}</div>
+              ${bookAuthor ? `<div class="impact-book-author">${escHtml(bookAuthor)}</div>` : ''}
+            </div>
+            ${isUnlinked ? '<span class="impact-unlinked-badge">⚠ Unlinked</span>' : ''}
+            <span class="impact-status-badge ${escHtml(s.status)}">${escHtml(s.status)}</span>
+          </div>
+          <div class="impact-card-meta">
+            <span class="impact-meta-item"><strong>${escHtml(s.name || 'Anonymous')}</strong></span>
+            ${s.role ? `<span class="impact-meta-item">Role: <strong>${escHtml(s.role)}</strong></span>` : ''}
+            ${s.location ? `<span class="impact-meta-item">Location: <strong>${escHtml(s.location)}</strong></span>` : ''}
+            <span class="impact-meta-item">Submitted: ${fmtDate(s.submitted_at)}</span>
+          </div>
+          <div class="impact-statement-text">${escHtml(s.statement)}</div>
+          <div class="impact-card-actions">
+            ${isUnlinked
+              ? `<button class="btn-impact-addbook" onclick="openAddBookModal('${escHtml(s.id)}','${escHtml(s.book_title||'')}','${escHtml(s.book_author||'')}')">Add Book &amp; Link</button>`
+              : ''}
+            <button class="btn-impact-approve" ${!canApprove ? 'disabled title="Link to a book first"' : ''} onclick="approveImpact('${escHtml(s.id)}')">
+              ${s.published ? 'Unpublish' : 'Approve'}
+            </button>
+            ${s.status !== 'rejected' ? `<button class="btn-impact-reject" onclick="rejectImpact('${escHtml(s.id)}')">Reject</button>` : ''}
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    async function approveImpact(id) {
+      const s = allImpact.find(x => x.id === id);
+      if (!s) return;
+      const newPub = !s.published;
+      const newStatus = newPub ? 'approved' : 'pending';
+      try {
+        await sbFetch(`impact_statements?id=eq.${id}`, {
+          method: 'PATCH',
+          body: JSON.stringify({ published: newPub, status: newStatus, reviewed_at: new Date().toISOString() })
+        });
+        Object.assign(s, { published: newPub, status: newStatus });
+        renderImpactList();
+        updateImpactBadge();
+      } catch (e) { alert('Failed: ' + e.message); }
+    }
+
+    async function rejectImpact(id) {
+      if (!confirm('Reject this impact statement?')) return;
+      try {
+        await sbFetch(`impact_statements?id=eq.${id}`, {
+          method: 'PATCH',
+          body: JSON.stringify({ status: 'rejected', published: false, reviewed_at: new Date().toISOString() })
+        });
+        const s = allImpact.find(x => x.id === id);
+        if (s) Object.assign(s, { status: 'rejected', published: false });
+        renderImpactList();
+        updateImpactBadge();
+      } catch (e) { alert('Failed: ' + e.message); }
+    }
+
+    function updateImpactBadge() {
+      const pending = allImpact.filter(s => s.status === 'pending').length;
+      const badge = document.getElementById('impactNavBadge');
+      badge.textContent = pending;
+      badge.style.display = pending > 0 ? 'inline' : 'none';
+    }
+
+    // ── ADD BOOK + LINK MODAL ──
+    function openAddBookModal(statementId, bookTitle, bookAuthor) {
+      addBookTargetStatementId = statementId;
+      document.getElementById('abTitle').value = bookTitle;
+      document.getElementById('abAuthor').value = bookAuthor;
+      document.getElementById('abYear').value = '';
+      document.getElementById('abIsbn').value = '';
+      document.getElementById('abCover').value = '';
+      document.getElementById('addBookStatus').textContent = '';
+      document.getElementById('addBookModalOverlay').style.display = 'flex';
+    }
+
+    function closeAddBookModal() {
+      document.getElementById('addBookModalOverlay').style.display = 'none';
+      addBookTargetStatementId = null;
+    }
+
+    async function saveBookAndLink() {
+      const title = document.getElementById('abTitle').value.trim();
+      if (!title) { document.getElementById('addBookStatus').textContent = 'Title is required.'; return; }
+
+      const btn = document.getElementById('btnSaveBook');
+      btn.disabled = true;
+      btn.textContent = 'Saving…';
+      document.getElementById('addBookStatus').textContent = '';
+
+      try {
+        // 1. Insert book
+        const newBookId = crypto.randomUUID();
+        await sbFetch('books', {
+          method: 'POST',
+          body: JSON.stringify({
+            id: newBookId,
+            title,
+            author:           document.getElementById('abAuthor').value.trim() || null,
+            publication_year: document.getElementById('abYear').value ? parseInt(document.getElementById('abYear').value) : null,
+            isbn:             document.getElementById('abIsbn').value.trim() || null,
+            cover_url:        document.getElementById('abCover').value.trim() || null,
+            published:        true
+          })
+        });
+
+        // 2. Link impact statement to new book
+        await sbFetch(`impact_statements?id=eq.${addBookTargetStatementId}`, {
+          method: 'PATCH',
+          body: JSON.stringify({ book_id: newBookId, book_title: null, book_author: null })
+        });
+
+        // 3. Update local state
+        const newBook = { id: newBookId, title, author: document.getElementById('abAuthor').value.trim() || null };
+        allBooks.push(newBook);
+        const s = allImpact.find(x => x.id === addBookTargetStatementId);
+        if (s) { s.book_id = newBookId; s.book_title = null; s.book_author = null; }
+
+        closeAddBookModal();
+        renderImpactList();
+        updateStats();
+        renderList();
+      } catch (e) {
+        document.getElementById('addBookStatus').textContent = 'Failed: ' + e.message;
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Save Book & Link';
+      }
+    }
 
     // ── INIT: load data, then auto-open modal if ?book= param is present ──
     async function init() {
