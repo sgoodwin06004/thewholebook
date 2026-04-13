@@ -631,29 +631,14 @@
       </div>
 
       <div class="section rated-section">
-        <div class="section-label">Rated Books Report</div>
+        <div class="section-label">Ban Report</div>
         <div class="field">
-          <label>Content Level <span class="optional">optional</span></label>
-          <select id="r-rating">
-            <option value="">— Select —</option>
-            <option value="1">1 · Mild Advisory</option>
-            <option value="2">2 · Ages 13+</option>
-            <option value="3">3 · Teen+</option>
-            <option value="4">4 · Adults Only</option>
-            <option value="5">5 · Extreme/Explicit</option>
-          </select>
-        </div>
-        <div class="field">
-          <label>Rated Books Categories <span class="optional">optional</span></label>
-          <input type="text" id="r-flagged" placeholder="e.g. Violence, Language, Sexual Content" />
-        </div>
-        <div class="field">
-          <label>Excerpts <span class="optional">optional</span></label>
-          <textarea id="r-excerpts" placeholder="Notable excerpts from the book…"></textarea>
+          <label>Why They Object <span class="optional">optional</span></label>
+          <textarea id="r-flagged" placeholder="Describe why this book is being challenged or banned — e.g. Sexual content, LGBTQ+ themes, racial themes, strong language…" style="min-height:140px"></textarea>
         </div>
         <div class="field">
           <label>Report URL <span class="optional">optional</span></label>
-          <input type="url" id="r-report-url" placeholder="https://ratedbooks.org/…" />
+          <input type="url" id="r-report-url" placeholder="https://…" />
         </div>
       </div>
     </div>
@@ -953,9 +938,7 @@
         }
 
         if (rated) {
-          document.getElementById('r-rating').value     = rated.rating             || '';
           document.getElementById('r-flagged').value    = rated.flagged_categories || '';
-          document.getElementById('r-excerpts').value   = rated.excerpts           || '';
           document.getElementById('r-report-url').value = rated.report_url         || '';
         }
 
@@ -1116,33 +1099,27 @@
           bookId = book.id;
         }
 
-        const rating    = document.getElementById('r-rating').value;
         const flagged   = document.getElementById('r-flagged').value.trim();
-        const excerpts  = document.getElementById('r-excerpts').value.trim();
         const reportUrl = document.getElementById('r-report-url').value.trim();
 
-        if (canEditBookFields && (rating || flagged || excerpts || reportUrl)) {
+        if (canEditBookFields && (flagged || reportUrl)) {
           if (editingBookId) {
             const { error: rErr } = await sb.from('rated_reports')
               .upsert({
                 book_id:            bookId,
                 user_id:            currentUser.id,
-                rating:             rating    ? parseInt(rating) : null,
                 flagged_categories: flagged   || null,
-                excerpts:           excerpts  || null,
                 report_url:         reportUrl || null,
               }, { onConflict: 'book_id' });
-            if (rErr) throw new Error('Rated report: ' + rErr.message);
+            if (rErr) throw new Error('Ban report: ' + rErr.message);
           } else {
             const { error: rErr } = await sb.from('rated_reports').insert({
               book_id:            bookId,
               user_id:            currentUser.id,
-              rating:             rating    ? parseInt(rating) : null,
               flagged_categories: flagged   || null,
-              excerpts:           excerpts  || null,
               report_url:         reportUrl || null,
             });
-            if (rErr) throw new Error('Rated report: ' + rErr.message);
+            if (rErr) throw new Error('Ban report: ' + rErr.message);
           }
         }
 
@@ -1260,7 +1237,7 @@
 
     function disableBookFields() {
       const ids = ['b-title','b-author','b-author2','b-isbn','b-pub-year','b-cover',
-        'r-rating','r-flagged','r-excerpts','r-report-url',
+        'r-flagged','r-report-url',
         'g-rating','g-summary','g-url','cat-audience'];
       ids.forEach(id => {
         const el = document.getElementById(id);
@@ -1334,7 +1311,7 @@
 
     function clearForm() {
       ['b-title','b-author','b-author2','b-isbn','b-pub-year','b-cover',
-       'r-rating','r-flagged','r-excerpts','r-report-url',
+       'r-flagged','r-report-url',
        'g-rating','g-summary','g-url'
       ].forEach(id => document.getElementById(id).value = '');
       document.getElementById('cat-audience').value = '';
