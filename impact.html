@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Playfair+Display:ital,wght@0,700;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    :root{--ink:#2c1810;--paper:#f7f0e3;--paper-dark:#e8d5b7;--red:#9b6b1a;--red-dark:#7a5214;--gold:#c9a217;--white:#fefaf4;--gray:#7a6a58;--border:#2c1810;--font-display:'Cinzel',Georgia,serif;--font-serif:'Playfair Display',Georgia,serif;--font-mono:'Space Mono',monospace}
+    :root{--ink:#0d4f6b;--paper:#f5f0e8;--paper-dark:#dbd5c8;--red:#1a7a9c;--red-dark:#0d5a78;--gold:#2196b0;--white:#f8f5f0;--gray:#5a6a78;--border:#0d4f6b;--font-display:'Cinzel',Georgia,serif;--font-serif:'Playfair Display',Georgia,serif;--font-mono:'Space Mono',monospace}
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     html{scroll-behavior:smooth}
     body{background:var(--paper);color:var(--ink);font-family:var(--font-serif);overflow-x:hidden}
@@ -17,9 +17,10 @@
 
     /* ── HEADER ── */
     .site-header{border-bottom:3px solid var(--border);background:var(--ink);color:var(--paper);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
-    .site-logo{font-family:var(--font-display);font-size:clamp(1.4rem,3vw,2rem);letter-spacing:0.05em;color:var(--paper);text-decoration:none;padding:0.8rem 0;display:flex;align-items:center;gap:0.6rem}
+    .site-logo{font-family:var(--font-display);font-size:clamp(1.1rem,2.5vw,1.6rem);letter-spacing:0.05em;color:var(--paper);text-decoration:none;padding:0.5rem 0;display:flex;align-items:center;gap:0.7rem}
+    .site-logo .logo-img{height:46px;width:46px;object-fit:contain;flex-shrink:0;border-radius:50%}
     .site-logo .logo-accent{color:var(--red)}
-    .site-logo .logo-mark{display:inline-block;width:8px;height:8px;background:var(--red);border-radius:50%;margin-right:4px}
+    .site-logo .logo-mark{display:none}
     .site-nav{display:flex;gap:0}
     .site-nav a{font-family:var(--font-mono);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.15em;color:var(--paper);text-decoration:none;padding:1.1rem 1.2rem;border-left:1px solid rgba(255,255,255,0.1);transition:background 0.2s,color 0.2s}
     .site-nav a:hover{background:var(--red);color:var(--white)}
@@ -30,7 +31,7 @@
     .hero-eyebrow::before{content:'';display:block;width:40px;height:2px;background:var(--red)}
     .hero-title{font-family:var(--font-display);font-size:clamp(2.2rem,5vw,3.5rem);letter-spacing:0.03em;line-height:1.1;margin-bottom:1.5rem}
     .hero-title em{font-style:normal;color:var(--red)}
-    .hero-body{font-family:var(--font-serif);font-size:1.05rem;line-height:1.85;color:rgba(247,240,227,0.82);max-width:640px}
+    .hero-body{font-family:var(--font-serif);font-size:1.05rem;line-height:1.85;color:rgba(245,242,238,0.82);max-width:640px}
     .hero-body p+p{margin-top:0.9rem}
 
     /* ── WHAT IS AN IMPACT STATEMENT ── */
@@ -53,7 +54,7 @@
     .field input,.field textarea,.field select{width:100%;background:var(--white);border:2px solid var(--border);color:var(--ink);font-family:var(--font-serif);font-size:0.95rem;padding:0.7rem 0.9rem;outline:none;transition:border-color 0.15s;-webkit-appearance:none;border-radius:0}
     .field input:focus,.field textarea:focus,.field select:focus{border-color:var(--red)}
     .field textarea{resize:vertical;min-height:160px;line-height:1.7}
-    .field select{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%232c1810' stroke-width='2' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 0.9rem center;padding-right:2.5rem}
+    .field select{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%230d4f6b' stroke-width='2' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 0.9rem center;padding-right:2.5rem}
 
     .field-row{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem}
 
@@ -92,7 +93,7 @@
     .submit-note{font-family:var(--font-mono);font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);line-height:1.6}
 
     /* ── SUCCESS STATE ── */
-    .success-panel{display:none;border-left:4px solid var(--red);padding:2rem 2.5rem;background:rgba(155,107,26,0.06);margin-top:1.5rem}
+    .success-panel{display:none;border-left:4px solid var(--red);padding:2rem 2.5rem;background:rgba(26,122,156,0.06);margin-top:1.5rem}
     .success-panel.show{display:block}
     .success-panel h2{font-family:var(--font-display);font-size:1.5rem;letter-spacing:0.03em;margin-bottom:0.8rem}
     .success-panel p{font-family:var(--font-serif);font-size:0.95rem;line-height:1.75;color:var(--gray)}
@@ -118,7 +119,7 @@
 
   <header class="site-header">
     <a href="index.html" class="site-logo">
-      <span class="logo-mark"></span>The <em class="logo-accent">Whole</em> Book
+      <img src="Logo/TWB-logo-4-16-square.png" alt="" class="logo-img">the<em class="logo-accent">wholebook</em>.org
     </a>
     <nav class="site-nav">
       <a href="index.html">Database</a>
