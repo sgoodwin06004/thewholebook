@@ -9,29 +9,29 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Playfair+Display:ital,wght@0,700;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    :root{--ink:#3D1010;--paper:#F5EDE0;--paper-dark:#E0CDB8;--red:#7B2424;--red-dark:#5C1818;--gold:#A0652A;--white:#FAF4EC;--gray:#7A6055;--border:#3D1010;--font-display:'Cinzel',Georgia,serif;--font-serif:'Playfair Display',Georgia,serif;--font-mono:'Space Mono',monospace}
+    :root{--ink:#3D0E0E;--paper:#FAF6EE;--paper-dark:#EDE5D5;--red:#7B1A1A;--red-dark:#5C1010;--gold:#A0652A;--white:#FFFDF8;--gray:#8B7055;--border:#3D0E0E;--font-display:'Cinzel',Georgia,serif;--font-serif:'Playfair Display',Georgia,serif;--font-mono:'Space Mono',monospace}
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     html{scroll-behavior:smooth}
     body{background:var(--paper);color:var(--ink);font-family:var(--font-serif);overflow-x:hidden}
     body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:0.4}
 
     /* ── HEADER ── */
-    .site-header{border-bottom:3px solid var(--border);background:var(--ink);color:var(--paper);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
-    .site-logo{font-family:var(--font-display);font-size:clamp(1.1rem,2.5vw,1.6rem);letter-spacing:0.05em;color:var(--paper);text-decoration:none;padding:0.5rem 0;display:flex;align-items:center;gap:0.7rem}
-    .site-logo .logo-img{height:62px;width:62px;object-fit:contain;flex-shrink:0;border-radius:50%}
+    .site-header{border-bottom:3px solid var(--border);background:var(--paper);color:var(--ink);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+    .site-logo{font-family:var(--font-display);font-size:clamp(1.1rem,2.5vw,1.6rem);letter-spacing:0.05em;color:var(--ink);text-decoration:none;padding:0.5rem 0;display:flex;align-items:center;gap:0.7rem}
+    .site-logo .logo-img{height:62px;width:62px;object-fit:contain;flex-shrink:0;border-radius:10px;border:2px solid var(--red)}
     .site-logo .logo-accent{color:var(--red)}
     .site-logo .logo-mark{display:none}
     .site-nav{display:flex;gap:0}
-    .site-nav a{font-family:var(--font-mono);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.15em;color:var(--paper);text-decoration:none;padding:1.1rem 1.2rem;border-left:1px solid rgba(255,255,255,0.1);transition:background 0.2s,color 0.2s}
+    .site-nav a{font-family:var(--font-mono);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.15em;color:var(--ink);text-decoration:none;padding:1.1rem 1.2rem;border-left:1px solid rgba(61,14,14,0.12);transition:background 0.2s,color 0.2s}
     .site-nav a:hover{background:var(--red);color:var(--white)}
 
     /* ── HERO ── */
-    .page-hero{background:var(--ink);color:var(--paper);padding:4rem 4rem 3rem;border-bottom:3px solid var(--border)}
+    .page-hero{background:var(--paper);color:var(--ink);padding:4rem 4rem 3rem;border-bottom:3px solid var(--border)}
     .hero-eyebrow{font-family:var(--font-mono);font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--red);margin-bottom:1.2rem;display:flex;align-items:center;gap:0.8rem}
     .hero-eyebrow::before{content:'';display:block;width:40px;height:2px;background:var(--red)}
     .hero-title{font-family:var(--font-display);font-size:clamp(2.2rem,5vw,3.5rem);letter-spacing:0.03em;line-height:1.1;margin-bottom:1.5rem}
     .hero-title em{font-style:normal;color:var(--red)}
-    .hero-body{font-family:var(--font-serif);font-size:1.05rem;line-height:1.85;color:rgba(245,242,238,0.82);max-width:640px}
+    .hero-body{font-family:var(--font-serif);font-size:1.05rem;line-height:1.85;color:var(--gray);max-width:640px}
     .hero-body p+p{margin-top:0.9rem}
 
     /* ── WHAT IS AN IMPACT STATEMENT ── */
@@ -119,7 +119,7 @@
 
   <header class="site-header">
     <a href="index.html" class="site-logo">
-      <img src="Logo/TWB-logo-4-16-square.png" alt="" class="logo-img">the<em class="logo-accent">wholebook</em>.org
+      <img src="Logo/twb-brown.jpg" alt="The Whole Book logo" class="logo-img">the<em class="logo-accent">wholebook</em>.org
     </a>
     <nav class="site-nav">
       <a href="index.html">Database</a>
