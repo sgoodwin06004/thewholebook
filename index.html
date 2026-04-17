@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Playfair+Display:ital,wght@0,700;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    :root{--ink:#0d4f6b;--paper:#f5f0e8;--paper-dark:#dbd5c8;--red:#1a7a9c;--red-dark:#0d5a78;--gold:#2196b0;--white:#f8f5f0;--gray:#5a6a78;--border:#0d4f6b;--font-display:'Cinzel',Georgia,serif;--font-serif:'Playfair Display',Georgia,serif;--font-mono:'Space Mono',monospace}
+    :root{--ink:#3D1010;--paper:#F5EDE0;--paper-dark:#E0CDB8;--red:#7B2424;--red-dark:#5C1818;--gold:#A0652A;--white:#FAF4EC;--gray:#7A6055;--border:#3D1010;--font-display:'Cinzel',Georgia,serif;--font-serif:'Playfair Display',Georgia,serif;--font-mono:'Space Mono',monospace}
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     html{scroll-behavior:smooth}
     body{background:var(--paper);color:var(--ink);font-family:var(--font-serif);overflow-x:hidden;cursor:default}
@@ -46,7 +46,7 @@
     @media(max-width:900px){.wwd-intro{padding:2rem}.wwd-steps{grid-template-columns:1fr}.wwd-step{border-right:none;border-bottom:3px solid var(--border)}.wwd-step:last-child{border-bottom:none}.wwd-header{padding:2rem}.wwd-callout{grid-template-columns:1fr;gap:1.5rem}.wwd-callout-cta{align-self:flex-start}}
     .hero{min-height:90vh;display:grid;grid-template-columns:2fr 1fr;border-bottom:3px solid var(--border);position:relative;overflow:hidden}
     .hero-left{background:var(--ink);color:var(--paper);padding:clamp(3rem,6vw,6rem) clamp(2rem,5vw,5rem);display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden}
-    .hero-left::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(-45deg,transparent,transparent 40px,rgba(26,122,156,0.06) 40px,rgba(26,122,156,0.06) 41px);pointer-events:none}
+    .hero-left::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(-45deg,transparent,transparent 40px,rgba(123,36,36,0.06) 40px,rgba(123,36,36,0.06) 41px);pointer-events:none}
     .hero-eyebrow{font-family:var(--font-mono);font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--red);margin-bottom:1.5rem;display:flex;align-items:center;gap:0.8rem}
     .hero-eyebrow::before{content:'';display:block;width:40px;height:2px;background:var(--red)}
     .hero-title{font-family:var(--font-display);font-size:clamp(4rem,8vw,9rem);line-height:0.9;letter-spacing:0.02em;margin-bottom:1.5rem;position:relative;z-index:1}
@@ -135,8 +135,8 @@
     .pro-accordion summary:hover{background:var(--paper-dark)}
     .pro-accordion .acc-body{padding:1rem 1.2rem 0.5rem;border-top:1px solid var(--paper-dark)}
     .awards-list{display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:2rem}
-    .award-badge{font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.35rem 0.7rem;border:1.5px solid var(--gold);color:var(--ink);background:rgba(33,150,176,0.08)}
-    .context-quote{border-left:4px solid var(--red);padding:1rem 1.5rem;background:rgba(26,122,156,0.05);margin-bottom:2rem;font-family:var(--font-serif);font-style:italic;font-size:0.95rem;line-height:1.7;color:var(--ink);white-space:pre-wrap}
+    .award-badge{font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.35rem 0.7rem;border:1.5px solid var(--gold);color:var(--ink);background:rgba(160,101,42,0.08)}
+    .context-quote{border-left:4px solid var(--red);padding:1rem 1.5rem;background:rgba(123,36,36,0.05);margin-bottom:2rem;font-family:var(--font-serif);font-style:italic;font-size:0.95rem;line-height:1.7;color:var(--ink);white-space:pre-wrap}
     .context-quote cite{display:block;font-family:var(--font-mono);font-style:normal;font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-top:0.6rem}
     .marquee-bar{background:var(--red);color:var(--white);overflow:hidden;border-bottom:2px solid var(--red-dark);padding:0.6rem 0}
     .marquee-track{display:flex;gap:0;white-space:nowrap;animation:marquee 35s linear infinite}
@@ -167,7 +167,7 @@
     .pen-list{display:flex;flex-direction:column;border:1px solid rgba(255,255,255,0.1)}
     .pen-row{display:grid;grid-template-columns:52px 1fr auto;align-items:center;gap:1.2rem;padding:1.1rem 1.4rem;border-bottom:1px solid rgba(255,255,255,0.07);transition:background 0.15s}
     .pen-row:last-child{border-bottom:none}
-    .pen-row:hover{background:rgba(26,122,156,0.1)}
+    .pen-row:hover{background:rgba(123,36,36,0.1)}
     .pen-rank{font-family:var(--font-display);font-size:2.2rem;color:rgba(245,240,232,0.1);line-height:1;text-align:center;transition:color 0.15s}
     .pen-row:hover .pen-rank{color:var(--red)}
     .pen-title{font-family:var(--font-serif);font-weight:700;font-size:0.95rem;line-height:1.3;color:var(--paper);margin-bottom:0.15rem}
@@ -187,7 +187,7 @@
     .ala-count{font-family:var(--font-mono);font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:rgba(245,240,232,0.35);margin-left:auto}
     .ala-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.08)}
     .ala-item{background:var(--ink);padding:0.9rem 1.1rem;display:flex;align-items:flex-start;gap:0.7rem;transition:background 0.15s;position:relative}
-    .ala-item:hover{background:rgba(26,122,156,0.1)}
+    .ala-item:hover{background:rgba(123,36,36,0.1)}
     .ala-num{font-family:var(--font-display);font-size:1.3rem;color:rgba(245,240,232,0.1);line-height:1;flex-shrink:0;width:26px;text-align:right;transition:color 0.15s}
     .ala-item:hover .ala-num{color:var(--red)}
     .ala-title-text{font-family:var(--font-serif);font-weight:700;font-size:0.83rem;line-height:1.3;color:var(--paper);margin-bottom:0.15rem}
