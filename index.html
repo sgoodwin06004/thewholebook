@@ -298,6 +298,7 @@
       .banned-panel{padding:1.5rem 1rem}
     }
   </style>
+  <script defer src="https://cloud.umami.is/script.js" data-website-id="fb174b57-8599-455d-99a4-3d366b6eb23c"></script>
 </head>
 <body>
 
@@ -553,6 +554,23 @@
     return res.json();
   }
 
+  async function supabaseFetchAll(path) {
+    const PAGE = 1000;
+    let all = [], offset = 0;
+    while (true) {
+      const sep = path.includes('?') ? '&' : '?';
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}${sep}limit=${PAGE}&offset=${offset}`, {
+        headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':`Bearer ${SUPABASE_ANON_KEY}`,'Content-Type':'application/json'}
+      });
+      if (!res.ok) throw new Error(`Supabase error: ${res.status}`);
+      const page = await res.json();
+      all = all.concat(page);
+      if (page.length < PAGE) break;
+      offset += PAGE;
+    }
+    return all;
+  }
+
   function switchTab(name) {
     document.querySelectorAll('.banned-tab').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.banned-panel').forEach(p => p.classList.remove('active'));
@@ -727,7 +745,7 @@
   async function loadData(){
     try{
       const [books,reports,reviews,experiences,impacts]=await Promise.all([
-        supabaseFetch('books?select=*&published=eq.true&order=created_at.desc'),
+        supabaseFetchAll('books?select=*&published=eq.true&order=created_at.desc'),
         supabaseFetch('rated_reports?select=*'),
         supabaseFetch('pro_reviews?select=*&published=eq.true'),
         supabaseFetch('reader_experiences?select=*'),
