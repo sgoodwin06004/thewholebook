@@ -229,15 +229,6 @@
     .alpha-btn:hover{border-color:var(--ink);color:var(--ink)}
     .alpha-btn.active{background:var(--red);border-color:var(--red);color:var(--white)}
     .grid-empty{grid-column:1/-1;padding:3rem;text-align:center;font-family:var(--font-mono);font-size:0.75rem;color:var(--gray);letter-spacing:0.1em;text-transform:uppercase}
-    .news-section{padding:5rem 4rem;border-bottom:3px solid var(--border);background:var(--white)}
-    .news-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:0;border:2px solid var(--ink);margin-top:0}
-    .news-card{padding:1.8rem;border-right:2px solid var(--ink);border-bottom:2px solid var(--ink);text-decoration:none;color:inherit;display:block;transition:background 0.15s}
-    .news-card:hover{background:var(--ink);color:var(--paper)}
-    .news-card:hover .news-card-source,.news-card:hover .news-card-snippet{color:rgba(245,240,232,0.6)}
-    .news-card-source{font-family:var(--font-mono);font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--red);margin-bottom:0.6rem;transition:color 0.15s}
-    .news-card-title{font-family:var(--font-serif);font-weight:700;font-size:1rem;line-height:1.35;margin-bottom:0.6rem}
-    .news-card-snippet{font-family:var(--font-mono);font-size:0.65rem;line-height:1.6;color:var(--gray);transition:color 0.15s}
-    .news-loading{grid-column:1/-1;padding:3rem;text-align:center;font-family:var(--font-mono);font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray)}
     footer{background:var(--ink);color:var(--paper);padding:3rem 4rem;display:grid;grid-template-columns:2fr 1fr 1fr;gap:3rem;border-top:3px solid var(--border)}
     .footer-brand{font-family:var(--font-display);font-size:2.5rem;letter-spacing:0.05em;margin-bottom:0.8rem}
     .footer-tagline{font-family:var(--font-serif);font-style:italic;font-size:0.95rem;color:rgba(245,240,232,0.6);line-height:1.6;max-width:340px}
@@ -310,7 +301,6 @@
     <a href="#what-we-do">What We Do</a>
     <a href="#most-banned">Most Banned</a>
     <a href="#recently-added">Browse</a>
-    <a href="#news">News</a>
     <a href="impact.html">Share Your Story</a>
     <a href="/contact.html">Contact</a>
   </nav>
@@ -324,7 +314,6 @@
   <a href="#what-we-do" class="mobile-nav-link">What We Do</a>
   <a href="#most-banned" class="mobile-nav-link">Most Banned</a>
   <a href="#recently-added" class="mobile-nav-link">Browse</a>
-  <a href="#news" class="mobile-nav-link">News</a>
   <a href="impact.html" class="mobile-nav-link">Share Your Story</a>
   <a href="/contact.html" class="mobile-nav-link">Contact</a>
 </div>
@@ -485,16 +474,6 @@
   </div>
 </section>
 
-<section class="news-section" id="news">
-  <div class="section-header">
-    <h2 class="section-title">News & Updates</h2>
-    <span class="section-meta">Book ban coverage</span>
-  </div>
-  <div class="news-grid" id="newsGrid">
-    <div class="news-loading">Loading news…</div>
-  </div>
-</section>
-
 <footer id="contribute">
   <div>
     <div class="footer-brand">The Whole Book</div>
@@ -508,7 +487,6 @@
       <li><a href="#what-we-do">What We Do</a></li>
       <li><a href="#most-banned">Most Banned</a></li>
       <li><a href="#recently-added">Browse All</a></li>
-      <li><a href="#news">News</a></li>
     </ul>
   </div>
   <div class="footer-col">
@@ -1013,7 +991,6 @@
 
   renderAla();
   loadData();
-  loadNewsFeed();
 
   // Mobile nav
   const navToggle = document.getElementById('navToggle');
@@ -1022,29 +999,6 @@
   navToggle.addEventListener('click', () => mobileNav.classList.add('open'));
   navClose.addEventListener('click', () => mobileNav.classList.remove('open'));
   mobileNav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => mobileNav.classList.remove('open')));
-
-  async function loadNewsFeed() {
-    const grid = document.getElementById('newsGrid');
-    try {
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/news_feed?published=eq.true&order=published_at.desc&limit=9`, {
-        headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
-      });
-      if (!res.ok) throw new Error('Could not load news');
-      const items = await res.json();
-      if (!items.length) { grid.innerHTML = '<div class="news-loading">No news articles yet.</div>'; return; }
-      grid.innerHTML = items.map(item => {
-        const date = item.published_at ? new Date(item.published_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
-        const source = [item.alert_name, date].filter(Boolean).join(' · ');
-        return `<a class="news-card" href="${escHtml(item.url)}" target="_blank" rel="noopener">
-          <div class="news-card-source">${escHtml(source)}</div>
-          <div class="news-card-title">${escHtml(item.title)}</div>
-          ${item.snippet ? `<div class="news-card-snippet">${escHtml(item.snippet)}</div>` : ''}
-        </a>`;
-      }).join('');
-    } catch (e) {
-      grid.innerHTML = '<div class="news-loading">Could not load news.</div>';
-    }
-  }
 
   function escHtml(str) {
     return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
