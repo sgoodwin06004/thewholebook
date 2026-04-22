@@ -560,6 +560,21 @@
       cursor: pointer;
     }
 
+    .btn-nav {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 8px 20px;
+      border-radius: 2px;
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .btn-nav:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+    .btn-nav:disabled { opacity: 0.3; cursor: not-allowed; }
+
     @media (max-width: 768px) {
       .form-grid, .field-row { grid-template-columns: 1fr; }
       main { padding: 32px 16px 60px; }
@@ -693,6 +708,12 @@
       </div>
     </div>
 
+    <div id="book-nav" style="display:none;align-items:center;justify-content:space-between;margin-top:32px;padding-top:24px;border-top:1px solid var(--border)">
+      <button class="btn-nav" id="btnNavPrev" onclick="navigateBook(-1)">← Prev</button>
+      <span id="book-nav-label" style="font-size:11px;color:var(--muted);letter-spacing:0.06em"></span>
+      <button class="btn-nav" id="btnNavNext" onclick="navigateBook(1)">Next →</button>
+    </div>
+
     <div class="submit-row">
       <span class="submit-hint">All records will be saved together.</span>
       <div style="display:flex;align-items:center;gap:16px">
@@ -737,6 +758,8 @@
     let currentCollaborators = [];
     let bookPublished = false;
     let bookSummarized = false;
+    let allBooksList = [];
+    let currentBookIndex = -1;
 
     function addProReview() {
       proReviewCount++;
@@ -1064,7 +1087,7 @@
         editingBookId = bookId;
         document.getElementById('page-title').innerHTML = 'Edit a <span>Book</span>';
         document.querySelector('.btn-label').textContent = 'Update Book';
-        await prefillForm(bookId);
+        await Promise.all([prefillForm(bookId), loadBooksForNav(bookId)]);
       }
     }
 
@@ -1335,6 +1358,39 @@
       currentCollaborators = currentCollaborators.filter(c => c.id !== id);
       renderCollaborators();
       showToast('Co-reviewer removed.', 'success');
+    }
+
+    async function loadBooksForNav(currentId) {
+      const PAGE = 1000;
+      let all = [], from = 0, done = false;
+      while (!done) {
+        const { data } = await sb.from('books').select('id, title').order('title').range(from, from + PAGE - 1);
+        all = all.concat(data || []);
+        done = !data || data.length < PAGE;
+        from += PAGE;
+      }
+      allBooksList = all;
+      currentBookIndex = allBooksList.findIndex(b => b.id === currentId);
+      renderBookNav();
+    }
+
+    function renderBookNav() {
+      const nav = document.getElementById('book-nav');
+      if (!allBooksList.length || currentBookIndex === -1) return;
+      nav.style.display = 'flex';
+      document.getElementById('btnNavPrev').disabled = currentBookIndex === 0;
+      document.getElementById('btnNavNext').disabled = currentBookIndex === allBooksList.length - 1;
+      document.getElementById('book-nav-label').textContent =
+        `${currentBookIndex + 1} / ${allBooksList.length}`;
+    }
+
+    function navigateBook(dir) {
+      const next = allBooksList[currentBookIndex + dir];
+      if (!next) return;
+      const params = new URLSearchParams(window.location.search);
+      const fromParam = params.get('from');
+      const url = `/reviewer.html?id=${next.id}${fromParam ? '&from=' + fromParam : ''}`;
+      window.location.href = url;
     }
 
     function clearForm() {
