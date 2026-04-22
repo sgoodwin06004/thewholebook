@@ -178,7 +178,7 @@
     /* ── Book list ── */
     .book-row {
       display: grid;
-      grid-template-columns: 36px 2fr 1fr 0.8fr 1fr 110px auto;
+      grid-template-columns: 36px 2fr 1fr 0.8fr 1fr 110px 90px auto;
       align-items: center; padding: 11px 20px;
       border-bottom: 1px solid var(--border); font-size: 12px;
       gap: 12px; transition: background 0.15s;
@@ -332,6 +332,9 @@
             <button class="sort-btn" onclick="setAdminSort('author-desc',this)">Author Z→A</button>
             <button class="sort-btn" onclick="setAdminSort('date-added-desc',this)">Recently Added</button>
             <button class="sort-btn" onclick="setAdminSort('date-updated-desc',this)">Recently Updated</button>
+            <button class="sort-btn" onclick="setAdminSort('summarized-first',this)">Summarized First</button>
+            <button class="sort-btn" onclick="setAdminSort('unsummarized-first',this)">Unsummarized First</button>
+            <button class="sort-btn" id="btnPublishedOnly" onclick="togglePublishedOnly()">Published Only</button>
           </div>
           <div class="alpha-row" id="adminAlphaStrip"></div>
           <div class="date-row">
@@ -384,6 +387,7 @@
     let adminSort = 'title-asc';
     let adminLetter = '';
     let adminSearch = '';
+    let adminPublishedOnly = false;
 
     // ── AUTH ──────────────────────────────────────────────────────────────
     async function init() {
@@ -425,7 +429,7 @@
       while (!done) {
         const { data, error } = await sb
           .from('books')
-          .select('id, title, author, isbn, user_id, created_at, updated_at, published')
+          .select('id, title, author, isbn, user_id, created_at, updated_at, published, summarized')
           .order('title')
           .range(from, from + PAGE - 1);
         if (error) {
@@ -474,8 +478,29 @@
       applyAndRender();
     }
 
+    function togglePublishedOnly() {
+      adminPublishedOnly = !adminPublishedOnly;
+      const btn = document.getElementById('btnPublishedOnly');
+      btn.classList.toggle('active', adminPublishedOnly);
+      applyAndRender();
+    }
+
+    async function toggleSummarized(bookId, checked) {
+      const { error } = await sb.from('books').update({ summarized: checked }).eq('id', bookId);
+      if (error) {
+        showToast('Error: ' + error.message, 'error');
+        return;
+      }
+      const book = allBooks.find(b => b.id === bookId);
+      if (book) book.summarized = checked;
+      showToast(checked ? 'Marked as summarized.' : 'Marked as not summarized.', 'success');
+    }
+
     function applyAndRender() {
       let list = [...allBooks];
+      if (adminPublishedOnly) {
+        list = list.filter(b => b.published === true);
+      }
       if (adminSearch) {
         const lq = adminSearch.toLowerCase();
         list = list.filter(b =>
@@ -508,6 +533,8 @@
         if (adminSort === 'author-desc')       return (b.author||'').toLowerCase().localeCompare((a.author||'').toLowerCase());
         if (adminSort === 'date-added-desc')   return (b.created_at||'').localeCompare(a.created_at||'');
         if (adminSort === 'date-updated-desc') return ((b.updated_at||b.created_at)||'').localeCompare((a.updated_at||a.created_at)||'');
+        if (adminSort === 'summarized-first')   return (a.summarized ? 0 : 1) - (b.summarized ? 0 : 1);
+        if (adminSort === 'unsummarized-first') return (b.summarized ? 0 : 1) - (a.summarized ? 0 : 1);
         return 0;
       });
       renderBooks(list);
@@ -519,7 +546,7 @@
       const fmtDate = d => new Date(d).toLocaleDateString('en-US', { year:'numeric', month:'short', day:'numeric' });
       el.innerHTML =
         `<div class="book-row header">
-          <div></div><div>Title</div><div>Author</div><div>ISBN</div><div>Submitted By</div><div>Date</div><div></div>
+          <div></div><div>Title</div><div>Author</div><div>ISBN</div><div>Submitted By</div><div>Date</div><div>Summarized</div><div></div>
         </div>` +
         books.map(b => {
           const email = b.submitter_id ? (userMap[b.submitter_id] || '—') : '—';
@@ -535,6 +562,9 @@
             <div class="book-date">
               ${added}
               ${updated ? `<div class="book-date-updated">↑ ${updated}</div>` : ''}
+            </div>
+            <div style="display:flex;align-items:center;gap:6px">
+              <input type="checkbox" class="summarized-check" ${b.summarized ? 'checked' : ''} title="Mark as summarized" onchange="toggleSummarized('${b.id}', this.checked)" style="width:14px;height:14px;accent-color:var(--success);cursor:pointer" />
             </div>
             <div style="display:flex;gap:6px;align-items:center">
               <a class="btn-edit" href="/reviewer.html?id=${b.id}">Edit</a>
