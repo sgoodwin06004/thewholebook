@@ -834,11 +834,11 @@
       if (!editingBookId) return;
       const chk = document.getElementById('chkBookSummarized');
       if (chk) chk.disabled = true;
-      const { error } = await sb.from('books').update({ summarized: checked }).eq('id', editingBookId);
+      const { data, error } = await sb.from('books').update({ summarized: checked }).eq('id', editingBookId).select('id');
       if (chk) chk.disabled = false;
-      if (error) {
-        showToast('Failed: ' + error.message, 'error');
+      if (error || !data?.length) {
         if (chk) chk.checked = bookSummarized;
+        showToast(error ? 'Failed: ' + error.message : 'Update blocked — check DB permissions or run migration.', 'error');
         return;
       }
       bookSummarized = checked;

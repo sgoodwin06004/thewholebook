@@ -178,7 +178,7 @@
     /* ── Book list ── */
     .book-row {
       display: grid;
-      grid-template-columns: 36px 2fr 1fr 0.8fr 1fr 110px 90px auto;
+      grid-template-columns: 36px 2fr 1fr 0.8fr 1fr 110px 100px auto;
       align-items: center; padding: 11px 20px;
       border-bottom: 1px solid var(--border); font-size: 12px;
       gap: 12px; transition: background 0.15s;
@@ -486,9 +486,11 @@
     }
 
     async function toggleSummarized(bookId, checked) {
-      const { error } = await sb.from('books').update({ summarized: checked }).eq('id', bookId);
-      if (error) {
-        showToast('Error: ' + error.message, 'error');
+      const chk = document.getElementById('bsum-' + bookId);
+      const { data, error } = await sb.from('books').update({ summarized: checked }).eq('id', bookId).select('id');
+      if (error || !data?.length) {
+        if (chk) chk.checked = !checked;
+        showToast(error ? 'Error: ' + error.message : 'Update blocked — check DB permissions or run migration.', 'error');
         return;
       }
       const book = allBooks.find(b => b.id === bookId);
@@ -564,7 +566,7 @@
               ${updated ? `<div class="book-date-updated">↑ ${updated}</div>` : ''}
             </div>
             <div style="display:flex;align-items:center;gap:6px">
-              <input type="checkbox" class="summarized-check" ${b.summarized ? 'checked' : ''} title="Mark as summarized" onchange="toggleSummarized('${b.id}', this.checked)" style="width:14px;height:14px;accent-color:var(--success);cursor:pointer" />
+              <input type="checkbox" class="summarized-check" id="bsum-${b.id}" ${b.summarized ? 'checked' : ''} title="Mark as summarized" onchange="toggleSummarized('${b.id}', this.checked)" style="width:14px;height:14px;accent-color:var(--success);cursor:pointer" />
             </div>
             <div style="display:flex;gap:6px;align-items:center">
               <a class="btn-edit" href="/reviewer.html?id=${b.id}">Edit</a>
