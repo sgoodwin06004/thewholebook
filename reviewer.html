@@ -695,7 +695,13 @@
 
     <div class="submit-row">
       <span class="submit-hint">All records will be saved together.</span>
-      <div style="display:flex;align-items:center;gap:10px">
+      <div style="display:flex;align-items:center;gap:16px">
+        <div id="summarizedGroup" style="display:none;align-items:center;gap:8px">
+          <label class="checkbox-label" for="chkBookSummarized" style="margin-bottom:0;cursor:pointer">
+            <input type="checkbox" id="chkBookSummarized" onchange="setBookSummarized(this.checked)" style="width:auto;accent-color:var(--success);cursor:pointer" />
+            Summarized
+          </label>
+        </div>
         <div class="book-publish-group" id="bookPublishGroup">
           <button class="btn-book-publish" id="btnBookPublish" onclick="setBookPublished(true)">Publish</button>
           <button class="btn-book-unpublish" id="btnBookUnpublish" onclick="setBookPublished(false)">Unpublish</button>
@@ -730,6 +736,7 @@
     let allUsers = [];
     let currentCollaborators = [];
     let bookPublished = false;
+    let bookSummarized = false;
 
     function addProReview() {
       proReviewCount++;
@@ -798,6 +805,21 @@
       bookPublished = state;
       updateBookPublishButtons();
       showToast(state ? 'Book published.' : 'Book unpublished.', 'success');
+    }
+
+    async function setBookSummarized(checked) {
+      if (!editingBookId) return;
+      const chk = document.getElementById('chkBookSummarized');
+      if (chk) chk.disabled = true;
+      const { error } = await sb.from('books').update({ summarized: checked }).eq('id', editingBookId);
+      if (chk) chk.disabled = false;
+      if (error) {
+        showToast('Failed: ' + error.message, 'error');
+        if (chk) chk.checked = bookSummarized;
+        return;
+      }
+      bookSummarized = checked;
+      showToast(checked ? 'Marked as summarized.' : 'Marked as not summarized.', 'success');
     }
 
     async function toggleReviewPublish(idx) {
@@ -936,6 +958,10 @@
             bookPublished = book.published !== false;
             updateBookPublishButtons();
             document.getElementById('bookPublishGroup').style.display = 'flex';
+            bookSummarized = book.summarized === true;
+            const chk = document.getElementById('chkBookSummarized');
+            if (chk) chk.checked = bookSummarized;
+            document.getElementById('summarizedGroup').style.display = 'flex';
           }
         }
 

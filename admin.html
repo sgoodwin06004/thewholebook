@@ -546,7 +546,7 @@
       const fmtDate = d => new Date(d).toLocaleDateString('en-US', { year:'numeric', month:'short', day:'numeric' });
       el.innerHTML =
         `<div class="book-row header">
-          <div></div><div>Title</div><div>Author</div><div>ISBN</div><div>Submitted By</div><div>Date</div><div>Summarized</div><div></div>
+          <div></div><div>Title</div><div>Author</div><div>ISBN</div><div>Submitted By</div><div>Date</div><div>Summarize</div><div></div>
         </div>` +
         books.map(b => {
           const email = b.submitter_id ? (userMap[b.submitter_id] || '—') : '—';
